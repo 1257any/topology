@@ -1,0 +1,53 @@
+@import 'variables';
+@import 'node_modules/le5le-ui/index';
+
+.headline {
+  font-size: 0.24rem;
+  color: $color-title;
+}
+
+.sub-headline,
+.sub-headline i {
+  font-size: 0.18rem;
+  color: $color-title;
+}
+
+.title {
+  color: $color-title;
+  font-weight: 600;
+}
+
+.title.success {
+  color: $color-success;
+}
+
+.popup-title {
+  font-size: 0.14rem;
+  font-weight: 700;
+}
+
+.notice .icon-close {
+  font-size: 0.1rem;
+  top: 0.08rem;
+}
+
+.notice .body > .icon::before {
+  top: 0.02rem;
+}
+
+/*定义滚动条轨道 内阴影+圆角*/
+::-webkit-scrollbar {
+  width: 0.1rem;
+  height: 0.1rem;
+  background: #fff;
+}
+
+/*滚动条里面小方块*/
+::-webkit-scrollbar-thumb {
+  border-radius: 0.05rem;
+  background: #ccc;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #aaa;
+}

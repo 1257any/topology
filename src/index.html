@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base href="/"/>
+    <title i18n>乐吾乐 - topology</title>
+    <meta charset="UTF-8"/>
+    <meta name="format-detection" content="telephone=no"/>
+    <meta name="msapplication-tap-highlight" content="no"/>
+    <meta
+      name="viewport"
+      content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width"
+/>
+    <link href="/assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon"/>
+    <link href="//at.alicdn.com/t/font_1113798_u4j25lq1g4.css" rel="stylesheet"/>
+    <style>
+      @-webkit-keyframes line-scale-party {
+        0% {
+          transform: scale(1);
+        }
+
+        50% {
+          transform: scale(0.5);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      @keyframes line-scale-party {
+        0% {
+          transform: scale(1);
+        }
+
+        50% {
+          transform: scale(0.5);
+        }
+
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      .line-scale-party > div:nth-child(1) {
+        animation-delay: 0.8s;
+        animation-duration: 0.35s;
+      }
+
+      .line-scale-party > div:nth-child(2) {
+        animation-delay: 0.68s;
+        animation-duration: 1.25s;
+      }
+
+      .line-scale-party > div:nth-child(3) {
+        animation-delay: 0.44s;
+        animation-duration: 0.39s;
+      }
+
+      .line-scale-party > div:nth-child(4) {
+        animation-delay: 0.17s;
+        animation-duration: 0.8s;
+      }
+
+      .line-scale-party > div {
+        background-color: #0288d1;
+        width: 3px;
+        height: 25px;
+        border-radius: 2px;
+        margin: 0;
+        animation-fill-mode: both;
+        display: inline-block;
+        animation-name: line-scale-party;
+        animation-iteration-count: infinite;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script type="text/javascript">
+      if (!localStorage)
+        location.href = '/browser.html';
+    </script>
+    <app-root>
+      <div style="position: fixed; top: 50%;left: 50%;">
+        <div class="line-scale-party">
+          <div></div>
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <img src="assets/img/mountains.jpg" style="display:none"/>
+      </div>
+    </app-root>
+  </body>
+</html>

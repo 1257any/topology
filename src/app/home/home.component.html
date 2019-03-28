@@ -1,0 +1,36 @@
+<div class="page">
+  <div class="menus">
+    <div class="item">
+      <img src="/assets/img/favicon.ico">
+    </div>
+    <div class="item">
+      <a>文件</a>
+    </div>
+    <div class="item">
+      <a>编辑</a>
+    </div>
+    <div class="item">
+      <a>查看</a>
+    </div>
+    <div class="item">
+      <a>工具</a>
+    </div>
+    <div class="item">
+      <a>帮助</a>
+    </div>
+  </div>
+  <div class="body">
+    <div class="tools">
+      <div *ngFor="let item of tools">
+        <div class="title">{{item.group}}</div>
+        <div class="buttons">
+          <a *ngFor="let button of item.children" [title]="button.name">
+            <i class="iconfont {{button.icon}}"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="full" #workspace></div>
+    <div class="props"></div>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+{
+  "/ws": {
+    "target": "ws://127.0.0.1:8200",
+    "ws": true,
+    "changeOrigin": true,
+    "secure": false
+  },
+  "/api": {
+    "target": "http://127.0.0.1:8200",
+    "changeOrigin": true,
+    "secure": false
+  }
+}
