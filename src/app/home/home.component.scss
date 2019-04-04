@@ -44,6 +44,7 @@ $head-height: 0.4rem;
       .buttons {
         padding: 0.05rem 0;
         a {
+          display: inline-block;
           color: $color;
           line-height: 1.2;
           margin: 0 0.05rem;

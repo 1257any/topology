@@ -24,7 +24,7 @@
       <div *ngFor="let item of tools">
         <div class="title">{{item.group}}</div>
         <div class="buttons">
-          <a *ngFor="let button of item.children" [title]="button.name">
+          <a *ngFor="let button of item.children" [title]="button.name" draggable="true" (dragstart)="onDrag($event, button)">
             <i class="iconfont {{button.icon}}"></i>
           </a>
         </div>
