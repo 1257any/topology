@@ -5,4 +5,8 @@ export class Rect {
     this.ex = this.x + this.width;
     this.ey = this.y + this.height;
   }
+
+  hit(e: MouseEvent) {
+    return e.offsetX > this.x && e.offsetX < this.ex && e.offsetY > this.y && e.offsetY < this.ey;
+  }
 }

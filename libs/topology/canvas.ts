@@ -1,18 +1,20 @@
 import { Node } from './models/node';
 import { drawFns } from './middles/index';
 import { Store } from './store/store';
+import { Options } from './options';
 
 export class Canvas {
   canvas = document.createElement('canvas');
   nodes: Node[] = [];
-  options: any;
+  options: Options;
   constructor(options) {
     this.options = options || {};
-    if (!this.options.strokeStyle) {
-      this.options.strokeStyle = '#333';
+    this.options.style = options.style || {};
+    if (!this.options.style.strokeStyle) {
+      this.options.style.strokeStyle = '#333';
     }
-    if (!this.options.lineWidth) {
-      this.options.lineWidth = 1;
+    if (!this.options.style.lineWidth) {
+      this.options.style.lineWidth = 1;
     }
   }
 
@@ -47,10 +49,11 @@ export class Canvas {
     this.canvas.height = this.canvas.height;
 
     const ctx = this.canvas.getContext('2d');
+    ctx.strokeStyle = this.options.style.strokeStyle;
+    ctx.lineWidth = this.options.style.lineWidth;
     for (const item of this.nodes) {
       // Draw sharp.
       drawFns[item.drawFnName](ctx, item);
-      console.log('render');
       // Draw image.
       if (!item.image) {
         continue;

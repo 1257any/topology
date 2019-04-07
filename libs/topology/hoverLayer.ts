@@ -1,14 +1,14 @@
 import { Node, occupyRect } from './models/node';
 import { Canvas } from './canvas';
 
-export class ActiveLayer extends Canvas {
+export class HoverLayer extends Canvas {
   canvas = document.createElement('canvas');
   nodes: Node[] = [];
   constructor(parent: HTMLElement, options: any) {
     super(options);
-    this.options.activeStyle = options.activeStyle || {};
-    if (!this.options.activeStyle || !this.options.activeStyle.fillStyle) {
-      this.options.activeStyle.strokeStyle = '#c73203';
+    this.options.hoverStyle = options.hoverStyle || {};
+    if (!this.options.hoverStyle || !this.options.hoverStyle.fillStyle) {
+      this.options.hoverStyle.fillStyle = 'rgba(200,50,0,0.07)';
     }
     this.canvas.style.position = 'absolute';
     this.canvas.style.left = '0';
@@ -17,7 +17,8 @@ export class ActiveLayer extends Canvas {
   }
 
   render() {
-    super.render(false);
+    // 清空背景
+    this.canvas.height = this.canvas.height;
 
     const rect = occupyRect(this.nodes);
     if (!rect) {
@@ -25,9 +26,8 @@ export class ActiveLayer extends Canvas {
     }
 
     const ctx = this.canvas.getContext('2d');
-    ctx.strokeStyle = this.options.activeStyle.strokeStyle;
+    ctx.fillStyle = this.options.hoverStyle.fillStyle;
     ctx.beginPath();
-    ctx.strokeRect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6);
-    ctx.stroke();
+    ctx.fillRect(rect.x - 2, rect.y - 2, rect.width + 4, rect.height + 4);
   }
 }

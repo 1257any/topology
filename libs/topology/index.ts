@@ -4,16 +4,21 @@ import { drawFns } from './middles/index';
 import { Canvas } from './canvas';
 import { Store } from './store/store';
 import { Observer } from './store/observer';
+import { HoverLayer } from './hoverLayer';
 import { ActiveLayer } from './activeLayer';
 
 export class Topology {
   parentElem: HTMLElement;
   canvas = document.createElement('canvas');
   offscreen: Canvas;
+  hoverLayer: ActiveLayer;
   activeLayer: ActiveLayer;
   nodes: Node[] = [];
-  options: Options = {};
+  options: Options;
   subcribe: Observer;
+
+  hoverNode: Node;
+  lastHover: Node;
   constructor(parent: string | HTMLElement, options?: Options) {
     this.options = options || {};
 
@@ -23,14 +28,15 @@ export class Topology {
       this.parentElem = parent;
     }
 
-    this.offscreen = new Canvas(this.options.style);
-    this.activeLayer = new ActiveLayer(this.options.activeStyle);
+    this.offscreen = new Canvas(this.options);
 
     this.parentElem.appendChild(this.canvas);
+    this.hoverLayer = new HoverLayer(this.parentElem, this.options);
+    this.activeLayer = new ActiveLayer(this.parentElem, this.options);
     this.resize();
 
-    this.canvas.ondragover = event => event.preventDefault();
-    this.canvas.ondrop = event => {
+    this.activeLayer.canvas.ondragover = event => event.preventDefault();
+    this.activeLayer.canvas.ondrop = event => {
       this.ondrop(event);
     };
 
@@ -38,7 +44,8 @@ export class Topology {
       this.render();
     });
 
-    this.canvas.onmousemove = this.onMouseMove;
+    this.activeLayer.canvas.onmousemove = this.onMouseMove;
+    this.activeLayer.canvas.onclick = this.onclick;
   }
 
   resize() {
@@ -54,6 +61,7 @@ export class Topology {
     }
 
     this.offscreen.resize(this.canvas.width, this.canvas.height);
+    this.hoverLayer.resize(this.canvas.width, this.canvas.height);
     this.activeLayer.resize(this.canvas.width, this.canvas.height);
   }
 
@@ -75,8 +83,8 @@ export class Topology {
     this.activeLayer.clearNodes();
     if (this.activeLayer.addNode(node)) {
       this.nodes.push(node);
-      this.offscreen.setNodes(this.nodes);
-      this.offscreen.render(false);
+      this.offscreen.nodes.push.apply(this.offscreen.nodes, this.nodes);
+      this.offscreen.render();
       this.activeLayer.render();
     }
 
@@ -94,12 +102,53 @@ export class Topology {
     this.canvas.height = this.canvas.height;
     const ctx = this.canvas.getContext('2d');
     ctx.drawImage(this.offscreen.canvas, 0, 0);
-    ctx.drawImage(this.activeLayer.canvas, 0, 0);
   }
 
   onMouseMove = (e: MouseEvent) => {
-    console.log(123, e);
+    if (!this.hoverNode || !this.hoverNode.hit(e)) {
+      this.lastHover = this.hoverNode;
+      this.hoverNode = this.getHoverNode(e, this.nodes);
+      const nodes: Node[] = [];
+      if (this.hoverNode) {
+        nodes.push(this.hoverNode);
+      }
+      this.hoverLayer.setNodes(nodes);
+      this.hoverLayer.render();
+    }
   };
+
+  onclick = () => {
+    if (this.lastHover && this.hoverNode !== this.lastHover) {
+      this.offscreen.addNode(this.lastHover);
+      this.offscreen.render();
+    }
+
+    if (!this.hoverNode) {
+      return;
+    }
+
+    this.activeLayer.setNodes([this.hoverNode]);
+    this.activeLayer.render();
+  };
+
+  getHoverNode(e: MouseEvent, nodes: Node[]) {
+    let node: Node;
+    for (let i = nodes.length - 1; i >= 0; --i) {
+      if (nodes[i].hit(e)) {
+        node = nodes[i];
+        if (!nodes[i].children || !nodes[i].children.length) {
+          break;
+        }
+
+        const child = this.getHoverNode(e, nodes[i].children);
+        if (child) {
+          node = child;
+        }
+      }
+    }
+
+    return node;
+  }
 
   destory() {
     this.subcribe.unsubcribe();
