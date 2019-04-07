@@ -1,21 +1,19 @@
 import { Options } from './options';
-import { Node, calcIconRect, calcTextRect } from './models/node';
+import { Node } from './models/node';
 import { drawFns } from './middles/index';
-import { s8 } from './uuid/uuid';
+import { Canvas } from './canvas';
+import { Store } from './store/store';
+import { Observer } from './store/observer';
+import { ActiveLayer } from './activeLayer';
 
 export class Topology {
   parentElem: HTMLElement;
   canvas = document.createElement('canvas');
-  offscreens = {
-    bk: document.createElement('canvas'),
-    active: document.createElement('canvas'),
-    bkImgs: document.createElement('canvas'),
-    activeImgs: document.createElement('canvas')
-  };
-  options: Options = {};
+  offscreen: Canvas;
+  activeLayer: ActiveLayer;
   nodes: Node[] = [];
-  bkNodes: Node[] = [];
-  activeNodes: Node[] = [];
+  options: Options = {};
+  subcribe: Observer;
   constructor(parent: string | HTMLElement, options?: Options) {
     this.options = options || {};
 
@@ -25,20 +23,25 @@ export class Topology {
       this.parentElem = parent;
     }
 
-    this.initCanvas();
-  }
+    this.offscreen = new Canvas(this.options.style);
+    this.activeLayer = new ActiveLayer(this.options.activeStyle);
 
-  initCanvas() {
     this.parentElem.appendChild(this.canvas);
-    this.setSize();
+    this.resize();
 
     this.canvas.ondragover = event => event.preventDefault();
     this.canvas.ondrop = event => {
       this.ondrop(event);
     };
+
+    this.subcribe = Store.subcribe('render', () => {
+      this.render();
+    });
+
+    this.canvas.onmousemove = this.onMouseMove;
   }
 
-  setSize() {
+  resize() {
     if (this.options.width && this.options.width !== 'auto') {
       this.canvas.width = +this.options.width;
     } else {
@@ -50,11 +53,8 @@ export class Topology {
       this.canvas.height = this.parentElem.clientHeight;
     }
 
-    // tslint:disable-next-line:forin
-    for (const key in this.offscreens) {
-      this.offscreens[key].width = this.canvas.width;
-      this.offscreens[key].height = this.canvas.height;
-    }
+    this.offscreen.resize(this.canvas.width, this.canvas.height);
+    this.activeLayer.resize(this.canvas.width, this.canvas.height);
   }
 
   ondrop(event: DragEvent) {
@@ -64,8 +64,7 @@ export class Topology {
     node.x = event.offsetX - ((node.width / 2 + 0.5) << 0);
     // tslint:disable-next-line:no-bitwise
     node.y = event.offsetY - ((node.height / 2 + 0.5) << 0);
-
-    this.addNode(node);
+    this.addNode(new Node(node));
   }
 
   addNode(node: Node): boolean {
@@ -73,95 +72,36 @@ export class Topology {
       return false;
     }
 
-    this.deactivate();
-
-    node.id = s8();
-    node.anchor = node.anchor || [];
-    node.style = node.style || {};
-    node.styleHover = node.styleHover || {};
-
-    if (!node.iconRect) {
-      calcIconRect(node);
+    this.activeLayer.clearNodes();
+    if (this.activeLayer.addNode(node)) {
+      this.nodes.push(node);
+      this.offscreen.setNodes(this.nodes);
+      this.offscreen.render(false);
+      this.activeLayer.render();
     }
-
-    if (!node.textRect) {
-      calcTextRect(node);
-    }
-
-    this.activeNodes.push(node);
-    this.nodes.push(node);
-    this.renderNodes(this.offscreens.active, this.activeNodes);
-    this.renderImages(this.offscreens.activeImgs, this.activeNodes);
 
     return true;
-  }
-
-  deactivate() {
-    if (!this.activeNodes.length) {
-      return;
-    }
-
-    this.bkNodes.push.apply(this.bkNodes, this.activeNodes);
-    this.activeNodes = [];
   }
 
   render(nodes?: Node[]) {
     if (nodes) {
       this.nodes = nodes;
+      this.offscreen.nodes = nodes;
+      this.activeLayer.nodes = [];
     }
 
     // 清空画布
     this.canvas.height = this.canvas.height;
-    this.renderNodes(this.offscreens.active, this.activeNodes);
-    this.renderNodes(this.offscreens.bk, this.bkNodes);
-    this.renderImages(this.offscreens.active, this.activeNodes);
-    this.renderImages(this.offscreens.bkImgs, this.bkNodes);
+    const ctx = this.canvas.getContext('2d');
+    ctx.drawImage(this.offscreen.canvas, 0, 0);
+    ctx.drawImage(this.activeLayer.canvas, 0, 0);
   }
 
-  private renderNodes(offscreen: HTMLCanvasElement, nodes: Node[]) {
-    // 清空背景
-    offscreen.height = this.canvas.height;
+  onMouseMove = (e: MouseEvent) => {
+    console.log(123, e);
+  };
 
-    const ctx = offscreen.getContext('2d');
-    for (const item of nodes) {
-      drawFns[item.drawFnName](ctx, item);
-    }
-    ctx.stroke();
-
-    this.canvas.getContext('2d').drawImage(offscreen, 0, 0);
-  }
-
-  private renderImages(offscreen: HTMLCanvasElement, nodes: Node[]) {
-    // 清空画布
-    offscreen.height = this.canvas.height;
-
-    const ctx = offscreen.getContext('2d');
-    let cnt = 0;
-    let hasImg = false;
-    for (const item of nodes) {
-      if (!item.image) {
-        ++cnt;
-        continue;
-      } else if (item.img) {
-        ++cnt;
-        hasImg = true;
-        continue;
-      }
-
-      item.img = new Image();
-      item.img.crossOrigin = 'anonymous';
-      item.img.src = item.image;
-      item.img.onload = () => {
-        ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
-        hasImg = true;
-        if (++cnt >= nodes.length) {
-          this.canvas.getContext('2d').drawImage(offscreen, 0, 0);
-        }
-      };
-    }
-
-    if (hasImg && cnt >= nodes.length) {
-      this.canvas.getContext('2d').drawImage(offscreen, 0, 0);
-    }
+  destory() {
+    this.subcribe.unsubcribe();
   }
 }

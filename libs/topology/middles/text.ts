@@ -39,7 +39,6 @@ function getLines(ctx: CanvasRenderingContext2D, words: string[], maxWidth: numb
     }
   }
   lines.push(currentLine);
-  console.log(lines);
   return lines;
 }
 

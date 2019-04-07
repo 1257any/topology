@@ -11,4 +11,5 @@ export function diamond(ctx: CanvasRenderingContext2D, node: Node) {
   // tslint:disable-next-line:no-bitwise
   ctx.lineTo(node.x, (node.y + (node.height / 2 + 0.5)) << 0);
   ctx.closePath();
+  ctx.stroke();
 }

@@ -17,4 +17,5 @@ export function arrow(ctx: CanvasRenderingContext2D, node: Node) {
   // tslint:disable-next-line:no-bitwise
   ctx.lineTo(node.x, (node.y + ((node.height * 2) / 3 + 0.5)) << 0);
   ctx.closePath();
+  ctx.stroke();
 }

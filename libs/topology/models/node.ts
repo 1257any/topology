@@ -1,56 +1,113 @@
 import { Rect } from './rect';
+import { s8 } from '../uuid/uuid';
 
-export interface Node extends Rect {
-  id?: string;
-  icon?: string;
-  image?: string;
-  img?: HTMLImageElement;
-  text?: string;
-  iconRect?: Rect;
-  textRect?: Rect;
-  children?: Node[];
-  anchor?: Rect[];
-  style?: any;
-  styleHover?: any;
-  data?: any;
+export class Node extends Rect {
+  id: string;
+  icon: string;
+  image: string;
+  img: HTMLImageElement;
+  text: string;
+  iconRect: Rect;
+  textRect: Rect;
+  children: Node[];
+  style: any;
+  styleHover: any;
+  data: any;
   drawFnName: string;
-}
 
-export function calcIconRect(node: Node) {
-  if (node.icon || node.image) {
-    if (node.drawFnName === 'image') {
-      node.iconRect = {
-        x: node.x,
-        y: node.y,
-        width: node.width,
-        height: node.height
-      };
-    } else {
-      node.iconRect = {
+  constructor(json: any) {
+    super(json.x, json.y, json.width, json.height);
+    this.icon = json.icon;
+    this.image = json.image;
+    this.text = json.text;
+    this.style = json.style;
+    this.styleHover = json.styleHover;
+    this.data = json.data;
+    this.drawFnName = json.drawFnName;
+    if (json.children) {
+      this.children = [];
+      for (const item of json.children) {
+        this.children.push(new Node(item));
+      }
+    }
+
+    this.init();
+  }
+
+  init() {
+    this.id = s8();
+    this.style = this.style || {};
+    this.styleHover = this.styleHover || {};
+
+    if (!this.iconRect) {
+      this.calcIconRect();
+    }
+
+    if (!this.textRect) {
+      this.calcTextRect();
+    }
+  }
+
+  calcIconRect() {
+    if (this.icon || this.image) {
+      if (this.drawFnName === 'image') {
+        this.iconRect = new Rect(this.x, this.y, this.width, this.height);
+      } else {
         // tslint:disable-next-line:no-bitwise
-        x: (node.x + (node.width - 50) / 2) << 0,
-        y: node.y + 10,
-        width: 50,
-        height: 50
-      };
+        this.iconRect = new Rect((this.x + (this.width - 50) / 2) << 0, this.y + 10, 50, 50);
+      }
+    }
+  }
+
+  calcTextRect() {
+    if (this.iconRect) {
+      this.textRect = new Rect(this.x + 10, this.y + 60, this.width - 20, this.height - 70);
+    } else {
+      this.textRect = new Rect(this.x + 10, this.y + 60, this.width - 20, this.height - 70);
     }
   }
 }
 
-export function calcTextRect(node: Node) {
-  if (node.iconRect) {
-    node.textRect = {
-      x: node.x + 10,
-      y: node.y + 60,
-      width: node.width - 20,
-      height: node.height - 70
-    };
-  } else {
-    node.textRect = {
-      x: node.x + 10,
-      y: node.y + 60,
-      width: node.width - 20,
-      height: node.height - 70
-    };
+export function occupyRect(nodes: Node[]) {
+  if (!nodes || !nodes.length) {
+    return;
   }
+
+  let x1 = 99999;
+  let y1 = 99999;
+  let x2 = -99999;
+  let y2 = -99999;
+
+  for (const item of nodes) {
+    if (x1 > item.x) {
+      x1 = item.x;
+    }
+    if (y1 > item.y) {
+      y1 = item.y;
+    }
+    if (x2 < item.ex) {
+      x2 = item.ex;
+    }
+    if (y2 < item.ey) {
+      y2 = item.ey;
+    }
+
+    const childrenRect = occupyRect(item.children);
+    if (childrenRect) {
+      if (x1 > childrenRect.x) {
+        x1 = childrenRect.x;
+      }
+      if (y1 > childrenRect.y) {
+        y1 = childrenRect.y;
+      }
+      if (x2 < childrenRect.ex) {
+        x2 = childrenRect.ex;
+      }
+      if (y2 < childrenRect.ey) {
+        y2 = childrenRect.ey;
+      }
+    }
+  }
+
+  return new Rect(x1, y1, x2 - x1, y2 - y1);
 }

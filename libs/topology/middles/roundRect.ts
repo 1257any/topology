@@ -9,4 +9,5 @@ export function roundRect(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.arcTo(node.x, node.y + node.height, node.x, node.y, r);
   ctx.arcTo(node.x, node.y, node.x + node.width, node.y, r);
   ctx.closePath();
+  ctx.stroke();
 }

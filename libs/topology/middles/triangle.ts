@@ -7,4 +7,5 @@ export function triangle(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.lineTo(node.x + node.width, node.y + node.height);
   ctx.lineTo(node.x, node.y + node.height);
   ctx.closePath();
+  ctx.stroke();
 }
