@@ -1,4 +1,4 @@
-import { Node } from '../models/node';
+import { Node } from '../../models/node';
 
 export function diamond(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.beginPath();

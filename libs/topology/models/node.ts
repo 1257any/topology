@@ -9,6 +9,7 @@ export class Node extends Rect {
   text: string;
   iconRect: Rect;
   textRect: Rect;
+  anchors: Rect[] = [];
   children: Node[];
   style: any;
   styleHover: any;

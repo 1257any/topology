@@ -1,27 +1,34 @@
 import { Node } from '../models/node';
-import { roundRect } from './roundRect';
-import { rect } from './rect';
-import { circle } from './circle';
-import { triangle } from './triangle';
-import { diamond } from './diamond';
-import { arrow } from './arrow';
-import { text } from './text';
-import { line } from './line';
+import { roundRect } from './draws/roundRect';
+import { rect } from './draws/rect';
+import { circle } from './draws/circle';
+import { triangle } from './draws/triangle';
+import { diamond } from './draws/diamond';
+import { arrow } from './draws/arrow';
+import { text } from './draws/text';
+import { line } from './draws/line';
 
 export const drawFns: any = {};
+export const anchorsFns: any = {};
 
-export function registerDraw(name: string, fn: (ctx: CanvasRenderingContext2D, data: Node) => void, force?: boolean) {
+export function registerShape(
+  name: string,
+  drawFn: (ctx: CanvasRenderingContext2D, data: Node) => void,
+  anchorsFn?: (data: Node) => void,
+  force?: boolean
+) {
   // Exist
   if (drawFns[name] && !force) {
     return false;
   }
 
-  drawFns[name] = fn;
+  drawFns[name] = drawFn;
+  anchorsFns[name] = anchorsFn;
   return true;
 }
 
 function init() {
-  console.log('initDraws');
+  console.log('Middles init.');
   drawFns.roundRect = roundRect;
   drawFns.rect = rect;
   drawFns.circle = circle;

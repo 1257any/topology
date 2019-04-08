@@ -31,12 +31,12 @@ export class Topology {
     this.offscreen = new Canvas(this.options);
 
     this.parentElem.appendChild(this.canvas);
-    this.hoverLayer = new HoverLayer(this.parentElem, this.options);
     this.activeLayer = new ActiveLayer(this.parentElem, this.options);
+    this.hoverLayer = new HoverLayer(this.parentElem, this.options);
     this.resize();
 
-    this.activeLayer.canvas.ondragover = event => event.preventDefault();
-    this.activeLayer.canvas.ondrop = event => {
+    this.hoverLayer.canvas.ondragover = event => event.preventDefault();
+    this.hoverLayer.canvas.ondrop = event => {
       this.ondrop(event);
     };
 
@@ -44,8 +44,8 @@ export class Topology {
       this.render();
     });
 
-    this.activeLayer.canvas.onmousemove = this.onMouseMove;
-    this.activeLayer.canvas.onclick = this.onclick;
+    this.hoverLayer.canvas.onmousemove = this.onMouseMove;
+    this.hoverLayer.canvas.onclick = this.onclick;
   }
 
   resize() {
@@ -80,12 +80,14 @@ export class Topology {
       return false;
     }
 
+    this.offscreen.nodes.push.apply(this.offscreen.nodes, this.activeLayer.nodes);
+    this.offscreen.render();
+
     this.activeLayer.clearNodes();
     if (this.activeLayer.addNode(node)) {
       this.nodes.push(node);
-      this.offscreen.nodes.push.apply(this.offscreen.nodes, this.nodes);
-      this.offscreen.render();
       this.activeLayer.render();
+      this.lastHover = node;
     }
 
     return true;
@@ -106,7 +108,6 @@ export class Topology {
 
   onMouseMove = (e: MouseEvent) => {
     if (!this.hoverNode || !this.hoverNode.hit(e)) {
-      this.lastHover = this.hoverNode;
       this.hoverNode = this.getHoverNode(e, this.nodes);
       const nodes: Node[] = [];
       if (this.hoverNode) {
@@ -118,7 +119,8 @@ export class Topology {
   };
 
   onclick = () => {
-    if (this.lastHover && this.hoverNode !== this.lastHover) {
+    if (this.lastHover && this.hoverNode && this.hoverNode !== this.lastHover) {
+      this.offscreen.removeNode(this.hoverNode);
       this.offscreen.addNode(this.lastHover);
       this.offscreen.render();
     }
@@ -129,6 +131,7 @@ export class Topology {
 
     this.activeLayer.setNodes([this.hoverNode]);
     this.activeLayer.render();
+    this.lastHover = this.hoverNode;
   };
 
   getHoverNode(e: MouseEvent, nodes: Node[]) {

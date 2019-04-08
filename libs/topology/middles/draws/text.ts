@@ -1,4 +1,4 @@
-import { Node } from '../models/node';
+import { Node } from '../../models/node';
 
 // getWords: 拆分一段文本为单词数组。一个汉字算1个单词。
 function getWords(txt) {

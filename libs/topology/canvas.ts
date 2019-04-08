@@ -11,7 +11,7 @@ export class Canvas {
     this.options = options || {};
     this.options.style = options.style || {};
     if (!this.options.style.strokeStyle) {
-      this.options.style.strokeStyle = '#333';
+      this.options.style.strokeStyle = '#555';
     }
     if (!this.options.style.lineWidth) {
       this.options.style.lineWidth = 1;
@@ -36,6 +36,15 @@ export class Canvas {
     return true;
   }
 
+  removeNode(node: Node) {
+    for (let i = 0; i < this.nodes.length; ++i) {
+      if (this.nodes[i].id === node.id) {
+        this.nodes.splice(i, 1);
+        break;
+      }
+    }
+  }
+
   clearNodes() {
     this.nodes = [];
   }
@@ -52,7 +61,7 @@ export class Canvas {
     ctx.strokeStyle = this.options.style.strokeStyle;
     ctx.lineWidth = this.options.style.lineWidth;
     for (const item of this.nodes) {
-      // Draw sharp.
+      // Draw shape.
       drawFns[item.drawFnName](ctx, item);
       // Draw image.
       if (!item.image) {
