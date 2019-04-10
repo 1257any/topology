@@ -1,6 +1,6 @@
-import { Node } from '../../models/node';
+import { Rect } from '../../models/rect';
 
-export function triangle(ctx: CanvasRenderingContext2D, node: Node) {
+export function triangle(ctx: CanvasRenderingContext2D, node: Rect) {
   ctx.beginPath();
   // tslint:disable-next-line:no-bitwise
   ctx.moveTo((node.x + (node.width / 2 + 0.5)) << 0, node.y);

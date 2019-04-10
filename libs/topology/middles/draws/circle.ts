@@ -1,6 +1,6 @@
-import { Node } from '../../models/node';
+import { Rect } from '../../models/rect';
 
-export function circle(ctx: CanvasRenderingContext2D, node: Node) {
+export function circle(ctx: CanvasRenderingContext2D, node: Rect) {
   ctx.beginPath();
   ctx.arc(
     // tslint:disable-next-line:no-bitwise

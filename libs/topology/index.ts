@@ -1,11 +1,13 @@
 import { Options } from './options';
 import { Node } from './models/node';
-import { drawFns } from './middles/index';
+import { drawFns, anchorsFns } from './middles/index';
 import { Canvas } from './canvas';
 import { Store } from './store/store';
 import { Observer } from './store/observer';
 import { HoverLayer } from './hoverLayer';
 import { ActiveLayer } from './activeLayer';
+import { defaultAnchors } from './middles/anchors/default';
+import { Rect } from './models/rect';
 
 export class Topology {
   parentElem: HTMLElement;
@@ -18,9 +20,27 @@ export class Topology {
   subcribe: Observer;
 
   hoverNode: Node;
-  lastHover: Node;
+  mouseDown = false;
+  selectedRect = new Rect(0, 0, 0, 0);
   constructor(parent: string | HTMLElement, options?: Options) {
     this.options = options || {};
+
+    if (!this.options.style) {
+      this.options.style = {};
+    }
+
+    if (!this.options.style.fontFamily) {
+      this.options.style.fontFamily = '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial';
+    }
+
+    if (!this.options.style.fontSize) {
+      // px
+      this.options.style.fontSize = 12;
+    }
+    if (!this.options.style.lineHeight) {
+      // number
+      this.options.style.lineHeight = 1.5;
+    }
 
     if (typeof parent === 'string') {
       this.parentElem = document.getElementById(parent);
@@ -33,6 +53,7 @@ export class Topology {
     this.parentElem.appendChild(this.canvas);
     this.activeLayer = new ActiveLayer(this.parentElem, this.options);
     this.hoverLayer = new HoverLayer(this.parentElem, this.options);
+
     this.resize();
 
     this.hoverLayer.canvas.ondragover = event => event.preventDefault();
@@ -45,7 +66,8 @@ export class Topology {
     });
 
     this.hoverLayer.canvas.onmousemove = this.onMouseMove;
-    this.hoverLayer.canvas.onclick = this.onclick;
+    this.hoverLayer.canvas.onmousedown = this.onmousedown;
+    this.hoverLayer.canvas.onmouseup = this.onmouseup;
   }
 
   resize() {
@@ -76,8 +98,15 @@ export class Topology {
   }
 
   addNode(node: Node): boolean {
-    if (!drawFns[node.drawFnName]) {
+    if (!drawFns[node.shapeName]) {
       return false;
+    }
+
+    // Calc anchors.
+    if (anchorsFns[node.shapeName]) {
+      anchorsFns[node.shapeName](node);
+    } else {
+      defaultAnchors(node);
     }
 
     this.offscreen.nodes.push.apply(this.offscreen.nodes, this.activeLayer.nodes);
@@ -87,7 +116,6 @@ export class Topology {
     if (this.activeLayer.addNode(node)) {
       this.nodes.push(node);
       this.activeLayer.render();
-      this.lastHover = node;
     }
 
     return true;
@@ -112,26 +140,48 @@ export class Topology {
       const nodes: Node[] = [];
       if (this.hoverNode) {
         nodes.push(this.hoverNode);
+        this.hoverLayer.canvas.style.cursor = 'move';
+      } else {
+        this.hoverLayer.canvas.style.cursor = 'default';
       }
       this.hoverLayer.setNodes(nodes);
       this.hoverLayer.render();
     }
   };
 
-  onclick = () => {
-    if (this.lastHover && this.hoverNode && this.hoverNode !== this.lastHover) {
-      this.offscreen.removeNode(this.hoverNode);
-      this.offscreen.addNode(this.lastHover);
-      this.offscreen.render();
-    }
-
+  onmousedown = (e: MouseEvent) => {
+    this.mouseDown = true;
     if (!this.hoverNode) {
       return;
     }
 
-    this.activeLayer.setNodes([this.hoverNode]);
+    if (e.ctrlKey) {
+      this.activeLayer.addNode(this.hoverNode);
+    } else {
+      this.activeLayer.setNodes([this.hoverNode]);
+    }
+
+    // Set offscreen.
+    this.offscreen.nodes = [];
+    for (const item of this.nodes) {
+      let found = false;
+      for (const n of this.activeLayer.nodes) {
+        if (item.id === n.id) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        this.offscreen.nodes.push(item);
+      }
+    }
+
+    this.offscreen.render();
     this.activeLayer.render();
-    this.lastHover = this.hoverNode;
+  };
+
+  onmouseup = (e: MouseEvent) => {
+    this.mouseDown = false;
   };
 
   getHoverNode(e: MouseEvent, nodes: Node[]) {

@@ -19,7 +19,7 @@ export class HomeComponent implements OnInit {
           data: {
             width: 100,
             height: 100,
-            drawFnName: 'roundRect'
+            shapeName: 'roundRect'
           }
         },
         {
@@ -28,7 +28,7 @@ export class HomeComponent implements OnInit {
           data: {
             width: 100,
             height: 100,
-            drawFnName: 'rect'
+            shapeName: 'rect'
           }
         },
         {
@@ -37,7 +37,7 @@ export class HomeComponent implements OnInit {
           data: {
             width: 100,
             height: 100,
-            drawFnName: 'circle'
+            shapeName: 'circle'
           }
         },
         {
@@ -46,7 +46,7 @@ export class HomeComponent implements OnInit {
           data: {
             width: 100,
             height: 100,
-            drawFnName: 'triangle'
+            shapeName: 'triangle'
           }
         },
         {
@@ -55,7 +55,7 @@ export class HomeComponent implements OnInit {
           data: {
             width: 100,
             height: 100,
-            drawFnName: 'diamond'
+            shapeName: 'diamond'
           }
         },
         {
@@ -64,7 +64,7 @@ export class HomeComponent implements OnInit {
           data: {
             width: 100,
             height: 100,
-            drawFnName: 'arrow'
+            shapeName: 'arrow'
           }
         },
         {
@@ -74,7 +74,7 @@ export class HomeComponent implements OnInit {
             text: '这是测试文本：This is a text.',
             width: 100,
             height: 100,
-            drawFnName: 'text'
+            shapeName: 'text'
           }
         },
         {
@@ -83,7 +83,7 @@ export class HomeComponent implements OnInit {
           data: {
             width: 100,
             height: 100,
-            drawFnName: 'image',
+            shapeName: 'image',
             image: '/assets/img/logo.png'
           }
         },
@@ -93,7 +93,7 @@ export class HomeComponent implements OnInit {
           data: {
             width: 100,
             height: 100,
-            drawFnName: 'line'
+            shapeName: 'line'
           }
         }
       ]

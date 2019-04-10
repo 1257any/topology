@@ -1,6 +1,6 @@
-import { Node } from '../../models/node';
+import { Rect } from '../../models/rect';
 
-export function roundRect(ctx: CanvasRenderingContext2D, node: Node) {
+export function roundRect(ctx: CanvasRenderingContext2D, node: Rect) {
   const r = 5;
   ctx.beginPath();
   ctx.moveTo(node.x + r, node.y);

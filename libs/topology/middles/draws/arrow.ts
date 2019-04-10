@@ -1,6 +1,6 @@
-import { Node } from '../../models/node';
+import { Rect } from '../../models/rect';
 
-export function arrow(ctx: CanvasRenderingContext2D, node: Node) {
+export function arrow(ctx: CanvasRenderingContext2D, node: Rect) {
   ctx.beginPath();
   // tslint:disable-next-line:no-bitwise
   ctx.moveTo(node.x, (node.y + (node.height / 3 + 0.5)) << 0);

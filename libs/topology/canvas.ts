@@ -28,12 +28,24 @@ export class Canvas {
   }
 
   addNode(node: Node): boolean {
-    if (!drawFns[node.drawFnName]) {
+    if (!drawFns[node.shapeName]) {
       return false;
     }
 
-    this.nodes.push(node);
-    return true;
+    let found = false;
+    for (const item of this.nodes) {
+      if (item.id === node.id) {
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      this.nodes.push(node);
+      return true;
+    }
+
+    return false;
   }
 
   removeNode(node: Node) {
@@ -58,11 +70,13 @@ export class Canvas {
     this.canvas.height = this.canvas.height;
 
     const ctx = this.canvas.getContext('2d');
+    ctx.textAlign = 'center';
+    ctx.font = `${this.options.style.fontSize}px/${this.options.style.lineHeight} ${this.options.style.fontFamily}`;
     ctx.strokeStyle = this.options.style.strokeStyle;
     ctx.lineWidth = this.options.style.lineWidth;
     for (const item of this.nodes) {
       // Draw shape.
-      drawFns[item.drawFnName](ctx, item);
+      drawFns[item.shapeName](ctx, item);
       // Draw image.
       if (!item.image) {
         continue;

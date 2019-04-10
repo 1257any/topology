@@ -75,7 +75,10 @@ export function fillText(
 
 export function text(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.beginPath();
-  ctx.textAlign = 'center';
+  if (node.style.font) {
+    ctx.font = node.style.font;
+    ctx.save();
+  }
   fillText(
     ctx,
     getLines(ctx, getWords(node.text), node.width),
@@ -86,6 +89,9 @@ export function text(ctx: CanvasRenderingContext2D, node: Node) {
     node.textRect.width,
     node.textRect.height,
     // tslint:disable-next-line:no-bitwise
-    ((node.style.fontSize || 12) * 1.5) << 0
+    ((node.style.fontSize || 12) * (node.style.lineHeight || 1.5)) << 0
   );
+  if (node.style.font) {
+    ctx.restore();
+  }
 }

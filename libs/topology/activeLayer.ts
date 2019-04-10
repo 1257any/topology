@@ -8,7 +8,7 @@ export class ActiveLayer extends Canvas {
     super(options);
     this.options.activeStyle = options.activeStyle || {};
     if (!this.options.activeStyle || !this.options.activeStyle.fillStyle) {
-      this.options.activeStyle.strokeStyle = '#c73203';
+      this.options.activeStyle.strokeStyle = '#804a4a';
     }
     this.canvas.style.position = 'absolute';
     this.canvas.style.left = '0';
@@ -25,9 +25,49 @@ export class ActiveLayer extends Canvas {
     }
 
     const ctx = this.canvas.getContext('2d');
-    ctx.strokeStyle = this.options.activeStyle.strokeStyle;
+
+    // Territory
+    ctx.strokeStyle = this.options.activeStyle.strokeStyle + '50';
+    ctx.lineWidth = 1;
     ctx.beginPath();
-    ctx.strokeRect(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6);
+    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
     ctx.stroke();
+
+    // Line.
+    ctx.beginPath();
+    // tslint:disable-next-line:no-bitwise
+    ctx.moveTo(rect.x + ((rect.width / 2 + 0.5) << 0), rect.y);
+    // tslint:disable-next-line:no-bitwise
+    ctx.lineTo(rect.x + ((rect.width / 2 + 0.5) << 0), rect.y - 25);
+    ctx.stroke();
+
+    // Anchors
+    ctx.strokeStyle = this.options.activeStyle.strokeStyle;
+    ctx.fillStyle = '#fff';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(
+      // tslint:disable-next-line:no-bitwise
+      rect.x + ((rect.width / 2 + 0.5) << 0),
+      rect.y - 25,
+      5,
+      0,
+      Math.PI * 2
+    );
+    ctx.stroke();
+    ctx.fill();
+
+    ctx.strokeStyle = this.options.activeStyle.strokeStyle + 'e0';
+    ctx.strokeRect(rect.x - 4, rect.y - 4, 8, 8);
+    ctx.fillRect(rect.x - 4, rect.y - 4, 8, 8);
+
+    ctx.strokeRect(rect.x + rect.width - 4, rect.y - 4, 8, 8);
+    ctx.fillRect(rect.x + rect.width - 4, rect.y - 4, 8, 8);
+
+    ctx.strokeRect(rect.x + rect.width - 4, rect.y + rect.height - 4, 8, 8);
+    ctx.fillRect(rect.x + rect.width - 4, rect.y + rect.height - 4, 8, 8);
+
+    ctx.strokeRect(rect.x - 4, rect.y + rect.height - 4, 8, 8);
+    ctx.fillRect(rect.x - 4, rect.y + rect.height - 4, 8, 8);
   }
 }

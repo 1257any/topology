@@ -3,6 +3,7 @@ import { s8 } from '../uuid/uuid';
 
 export class Node extends Rect {
   id: string;
+  shapeName: string;
   icon: string;
   image: string;
   img: HTMLImageElement;
@@ -14,17 +15,16 @@ export class Node extends Rect {
   style: any;
   styleHover: any;
   data: any;
-  drawFnName: string;
 
   constructor(json: any) {
     super(json.x, json.y, json.width, json.height);
     this.icon = json.icon;
     this.image = json.image;
     this.text = json.text;
-    this.style = json.style;
-    this.styleHover = json.styleHover;
+    this.style = json.style || {};
+    this.styleHover = json.styleHover || {};
     this.data = json.data;
-    this.drawFnName = json.drawFnName;
+    this.shapeName = json.shapeName;
     if (json.children) {
       this.children = [];
       for (const item of json.children) {
@@ -37,8 +37,6 @@ export class Node extends Rect {
 
   init() {
     this.id = s8();
-    this.style = this.style || {};
-    this.styleHover = this.styleHover || {};
 
     if (!this.iconRect) {
       this.calcIconRect();
@@ -51,7 +49,7 @@ export class Node extends Rect {
 
   calcIconRect() {
     if (this.icon || this.image) {
-      if (this.drawFnName === 'image') {
+      if (this.shapeName === 'image') {
         this.iconRect = new Rect(this.x, this.y, this.width, this.height);
       } else {
         // tslint:disable-next-line:no-bitwise
