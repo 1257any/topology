@@ -5,9 +5,13 @@ export class Node extends Rect {
   id: string;
   shapeName: string;
   icon: string;
+  iconFamily: string;
+  iconSize: number;
+  iconColor: string;
   image: string;
   img: HTMLImageElement;
   text: string;
+  textMaxLine: number;
   iconRect: Rect;
   textRect: Rect;
   anchors: Rect[] = [];
@@ -19,8 +23,12 @@ export class Node extends Rect {
   constructor(json: any) {
     super(json.x, json.y, json.width, json.height);
     this.icon = json.icon;
+    this.iconFamily = json.iconFamily;
+    this.iconSize = +json.iconSize;
+    this.iconColor = json.iconColor;
     this.image = json.image;
     this.text = json.text;
+    this.textMaxLine = +json.textMaxLine;
     this.style = json.style || {};
     this.styleHover = json.styleHover || {};
     this.data = json.data;
@@ -62,7 +70,7 @@ export class Node extends Rect {
     if (this.iconRect) {
       this.textRect = new Rect(this.x + 10, this.y + 60, this.width - 20, this.height - 70);
     } else {
-      this.textRect = new Rect(this.x + 10, this.y + 60, this.width - 20, this.height - 70);
+      this.textRect = new Rect(this.x + 10, this.y + 10, this.width - 20, this.height - 20);
     }
   }
 }

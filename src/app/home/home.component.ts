@@ -17,6 +17,12 @@ export class HomeComponent implements OnInit {
           name: 'roundRect',
           icon: 'icon-round-rect',
           data: {
+            text: '带图标的圆角矩形',
+            textMaxLine: 1,
+            icon: '\uec46',
+            iconFamily: 'iconfont',
+            iconSize: 40,
+            iconColor: '#fa8c16',
             width: 100,
             height: 100,
             shapeName: 'roundRect'
@@ -26,6 +32,7 @@ export class HomeComponent implements OnInit {
           name: 'rect',
           icon: 'icon-rect',
           data: {
+            text: '矩形',
             width: 100,
             height: 100,
             shapeName: 'rect'
@@ -35,6 +42,7 @@ export class HomeComponent implements OnInit {
           name: 'circle',
           icon: 'icon-circle',
           data: {
+            text: '圆',
             width: 100,
             height: 100,
             shapeName: 'circle'
@@ -44,6 +52,7 @@ export class HomeComponent implements OnInit {
           name: 'triangle',
           icon: 'icon-triangle',
           data: {
+            text: '三角形',
             width: 100,
             height: 100,
             shapeName: 'triangle'
@@ -53,6 +62,7 @@ export class HomeComponent implements OnInit {
           name: 'diamond',
           icon: 'icon-diamond',
           data: {
+            text: '菱形',
             width: 100,
             height: 100,
             shapeName: 'diamond'
@@ -62,6 +72,7 @@ export class HomeComponent implements OnInit {
           name: 'arrow',
           icon: 'icon-arrow-right',
           data: {
+            text: '箭头',
             width: 100,
             height: 100,
             shapeName: 'arrow'
@@ -71,7 +82,7 @@ export class HomeComponent implements OnInit {
           name: 'text',
           icon: 'icon-text',
           data: {
-            text: '这是测试文本：This is a text.',
+            text: '这是一段测试文本，用来测试换行：This is a text.',
             width: 100,
             height: 100,
             shapeName: 'text'

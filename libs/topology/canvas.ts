@@ -2,6 +2,8 @@ import { Node } from './models/node';
 import { drawFns } from './middles/index';
 import { Store } from './store/store';
 import { Options } from './options';
+import { iconfont } from './middles/draws/iconfont';
+import { text } from './middles/draws/text';
 
 export class Canvas {
   canvas = document.createElement('canvas');
@@ -71,36 +73,51 @@ export class Canvas {
 
     const ctx = this.canvas.getContext('2d');
     ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
     ctx.font = `${this.options.style.fontSize}px/${this.options.style.lineHeight} ${this.options.style.fontFamily}`;
     ctx.strokeStyle = this.options.style.strokeStyle;
     ctx.lineWidth = this.options.style.lineWidth;
     for (const item of this.nodes) {
       // Draw shape.
       drawFns[item.shapeName](ctx, item);
-      // Draw image.
-      if (!item.image) {
-        continue;
+
+      // Draw text.
+      if (item.shapeName !== 'text' && item.text) {
+        text(ctx, item);
       }
-      // There is the cache of image.
-      if (item.img) {
-        ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
+
+      // Draw image.
+      if (item.image) {
+        // There is the cache of image.
+        if (item.img) {
+          ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
+          continue;
+        } else {
+          // Load image and draw it.
+          item.img = new Image();
+          item.img.crossOrigin = 'anonymous';
+          item.img.src = item.image;
+          item.img.onload = () => {
+            ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
+            this.emitRender();
+          };
+        }
+
         continue;
       }
 
-      // Load image and draw it.
-      item.img = new Image();
-      item.img.crossOrigin = 'anonymous';
-      item.img.src = item.image;
-      item.img.onload = () => {
-        ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
-        this.emitRender();
-      };
+      // Draw icon
+      if (item.icon) {
+        iconfont(ctx, item, item.iconRect);
+      }
     }
 
     if (update) {
       this.emitRender();
     }
   }
+
+  icon() {}
 
   emitRender() {
     let r = Store.get('render') || 0;

@@ -56,8 +56,6 @@ export function fillText(
     maxLineLen = lines.length;
   }
 
-  // tslint:disable-next-line:no-bitwise
-  y = (y + (height - lineHeight * maxLineLen) / 2 - lineHeight / 2) << 0;
   for (let i = 0; i < maxLineLen - 1; ++i) {
     ctx.fillText(lines[i], x, y + i * lineHeight);
   }
@@ -74,24 +72,37 @@ export function fillText(
 }
 
 export function text(ctx: CanvasRenderingContext2D, node: Node) {
+  const lines = getLines(ctx, getWords(node.text), node.textRect.width);
+  const maxLineLen = node.textMaxLine || lines.length;
+
+  // tslint:disable-next-line:no-bitwise
+  const lineHeight = ((node.style.fontSize || 12) * (node.style.lineHeight || 1.5)) << 0;
+
+  // tslint:disable-next-line:no-bitwise
+  let x = (node.textRect.x + node.textRect.width / 2) << 0;
+
+  // tslint:disable-next-line:no-bitwise
+  let y = (node.textRect.y + (node.textRect.height - lineHeight * maxLineLen) / 2 + (lineHeight * 4) / 7) << 0;
+
   ctx.beginPath();
-  if (node.style.font) {
+  if (node.style.font || node.style.color || node.style.textAlign || node.style.textBaseline) {
     ctx.font = node.style.font;
+    ctx.fillStyle = node.style.color;
+    ctx.textAlign = node.style.textAlign;
+    ctx.textBaseline = node.style.textBaseline;
+
+    // textAlign = 'center'，是基于x
+    if (node.style.textAlign !== 'center') {
+      x = node.textRect.x;
+    }
+
+    if (node.style.textBaseline !== 'middle') {
+      y = node.textRect.y;
+    }
     ctx.save();
   }
-  fillText(
-    ctx,
-    getLines(ctx, getWords(node.text), node.width),
-    // textAlign = 'center'，是基于x
-    // tslint:disable-next-line:no-bitwise
-    (node.textRect.x + node.textRect.width / 2) << 0,
-    node.textRect.y,
-    node.textRect.width,
-    node.textRect.height,
-    // tslint:disable-next-line:no-bitwise
-    ((node.style.fontSize || 12) * (node.style.lineHeight || 1.5)) << 0
-  );
-  if (node.style.font) {
+  fillText(ctx, lines, x, y, node.textRect.width, node.textRect.height, lineHeight, node.textMaxLine);
+  if (node.style.font || node.style.color || node.style.textAlign || node.style.textBaseline) {
     ctx.restore();
   }
 }
