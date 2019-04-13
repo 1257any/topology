@@ -1,5 +1,8 @@
 import { Rect } from './rect';
 import { s8 } from '../uuid/uuid';
+import { anchorsFns, iconRectFns, textRectFns } from '../middles';
+import { defaultAnchors } from '../middles/anchors/default';
+import { defaultIconRect, defaultTextRect } from '../middles/rects/default';
 
 export class Node extends Rect {
   id: string;
@@ -22,6 +25,7 @@ export class Node extends Rect {
 
   constructor(json: any) {
     super(json.x, json.y, json.width, json.height);
+    this.id = json.id || s8();
     this.icon = json.icon;
     this.iconFamily = json.iconFamily;
     this.iconSize = +json.iconSize;
@@ -44,14 +48,26 @@ export class Node extends Rect {
   }
 
   init() {
-    this.id = s8();
-
-    if (!this.iconRect) {
-      this.calcIconRect();
+    // Calc rect of icon.
+    if (iconRectFns[this.shapeName]) {
+      iconRectFns[this.shapeName](this);
+    } else {
+      defaultIconRect(this);
     }
 
-    if (!this.textRect) {
-      this.calcTextRect();
+    // Calc rect of text.
+    if (textRectFns[this.shapeName]) {
+      textRectFns[this.shapeName](this);
+    } else {
+      defaultTextRect(this);
+    }
+
+    // Calc anchors.
+    this.anchors = [];
+    if (anchorsFns[this.shapeName]) {
+      anchorsFns[this.shapeName](this);
+    } else {
+      defaultAnchors(this);
     }
   }
 
@@ -60,7 +76,6 @@ export class Node extends Rect {
       if (this.shapeName === 'image') {
         this.iconRect = new Rect(this.x, this.y, this.width, this.height);
       } else {
-        // tslint:disable-next-line:no-bitwise
         this.iconRect = new Rect((this.x + (this.width - 50) / 2) << 0, this.y + 10, 50, 50);
       }
     }

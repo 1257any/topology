@@ -9,6 +9,7 @@ export class Canvas {
   canvas = document.createElement('canvas');
   nodes: Node[] = [];
   options: Options;
+  rendering = false;
   constructor(options) {
     this.options = options || {};
     this.options.style = options.style || {};
@@ -64,57 +65,63 @@ export class Canvas {
   }
 
   render(update = true) {
-    if (!this.nodes.length) {
+    if (this.rendering) {
       return;
     }
+
+    this.rendering = true;
 
     // Clear the canvas.
     this.canvas.height = this.canvas.height;
 
-    const ctx = this.canvas.getContext('2d');
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.font = `${this.options.style.fontSize}px/${this.options.style.lineHeight} ${this.options.style.fontFamily}`;
-    ctx.strokeStyle = this.options.style.strokeStyle;
-    ctx.lineWidth = this.options.style.lineWidth;
-    for (const item of this.nodes) {
-      // Draw shape.
-      drawFns[item.shapeName](ctx, item);
+    if (this.nodes.length) {
+      const ctx = this.canvas.getContext('2d');
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.font = `${this.options.style.fontSize}px/${this.options.style.lineHeight} ${this.options.style.fontFamily}`;
+      ctx.strokeStyle = this.options.style.strokeStyle;
+      ctx.lineWidth = this.options.style.lineWidth;
+      for (const item of this.nodes) {
+        // Draw shape.
+        drawFns[item.shapeName](ctx, item);
 
-      // Draw text.
-      if (item.shapeName !== 'text' && item.text) {
-        text(ctx, item);
-      }
-
-      // Draw image.
-      if (item.image) {
-        // There is the cache of image.
-        if (item.img) {
-          ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
-          continue;
-        } else {
-          // Load image and draw it.
-          item.img = new Image();
-          item.img.crossOrigin = 'anonymous';
-          item.img.src = item.image;
-          item.img.onload = () => {
-            ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
-            this.emitRender();
-          };
+        // Draw text.
+        if (item.shapeName !== 'text' && item.text) {
+          text(ctx, item);
         }
 
-        continue;
-      }
+        // Draw image.
+        if (item.image) {
+          // There is the cache of image.
+          if (item.img) {
+            ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
+            continue;
+          } else {
+            // Load image and draw it.
+            item.img = new Image();
+            item.img.crossOrigin = 'anonymous';
+            item.img.src = item.image;
+            item.img.onload = () => {
+              ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
+              this.emitRender();
+            };
+          }
 
-      // Draw icon
-      if (item.icon) {
-        iconfont(ctx, item, item.iconRect);
+          continue;
+        }
+
+        // Draw icon
+        if (item.icon) {
+          iconfont(ctx, item, item.iconRect);
+        }
       }
     }
 
     if (update) {
       this.emitRender();
     }
+
+    this.rendering = false;
   }
 
   icon() {}

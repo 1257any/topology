@@ -13,11 +13,15 @@ export function iconfont(ctx: CanvasRenderingContext2D, node: Node, rect: Rect) 
 
   ctx.fillText(
     node.icon,
-    // tslint:disable-next-line:no-bitwise
+
     (rect.x + node.iconSize / 2 + (rect.width - node.iconSize) / 2) << 0,
-    // tslint:disable-next-line:no-bitwise
+
     (rect.y + (node.iconSize * 4) / 7 + (rect.height - node.iconSize) / 2) << 0
   );
 
   ctx.restore();
+
+  ctx.beginPath();
+  ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+  ctx.stroke();
 }

@@ -45,7 +45,12 @@ export class HomeComponent implements OnInit {
             text: '圆',
             width: 100,
             height: 100,
-            shapeName: 'circle'
+            shapeName: 'circle',
+            textMaxLine: 1,
+            // icon: '\uec46',
+            iconFamily: 'iconfont',
+            iconSize: 40,
+            iconColor: '#fa8c16'
           }
         },
         {

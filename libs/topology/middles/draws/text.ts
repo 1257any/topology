@@ -75,13 +75,10 @@ export function text(ctx: CanvasRenderingContext2D, node: Node) {
   const lines = getLines(ctx, getWords(node.text), node.textRect.width);
   const maxLineLen = node.textMaxLine || lines.length;
 
-  // tslint:disable-next-line:no-bitwise
   const lineHeight = ((node.style.fontSize || 12) * (node.style.lineHeight || 1.5)) << 0;
 
-  // tslint:disable-next-line:no-bitwise
   let x = (node.textRect.x + node.textRect.width / 2) << 0;
 
-  // tslint:disable-next-line:no-bitwise
   let y = (node.textRect.y + (node.textRect.height - lineHeight * maxLineLen) / 2 + (lineHeight * 4) / 7) << 0;
 
   ctx.beginPath();
@@ -105,4 +102,8 @@ export function text(ctx: CanvasRenderingContext2D, node: Node) {
   if (node.style.font || node.style.color || node.style.textAlign || node.style.textBaseline) {
     ctx.restore();
   }
+
+  ctx.beginPath();
+  ctx.strokeRect(node.textRect.x, node.textRect.y, node.textRect.width, node.textRect.height);
+  ctx.stroke();
 }

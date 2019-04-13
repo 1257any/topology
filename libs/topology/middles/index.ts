@@ -11,8 +11,11 @@ import { line } from './draws/line';
 import { triangleAnchors } from './anchors/triangle';
 import { arrowAnchors } from './anchors/arrow';
 import { lineAnchors } from './anchors/line';
+import { circleIconRect, circleTextRect } from './rects/circle';
 
 export const drawFns: any = {};
+export const iconRectFns: any = {};
+export const textRectFns: any = {};
 export const anchorsFns: any = {};
 
 export function registerShape(
@@ -32,7 +35,7 @@ export function registerShape(
 }
 
 function init() {
-  console.log('Middles init.');
+  console.log('Init middles.');
   drawFns.roundRect = roundRect;
   drawFns.rect = rect;
   drawFns.circle = circle;
@@ -47,5 +50,8 @@ function init() {
   anchorsFns.arrow = arrowAnchors;
   anchorsFns.line = lineAnchors;
   anchorsFns.text = (node: Rect) => {};
+
+  iconRectFns.circle = circleIconRect;
+  textRectFns.circle = circleTextRect;
 }
 init();

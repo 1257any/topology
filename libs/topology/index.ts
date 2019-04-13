@@ -6,21 +6,22 @@ import { Store } from './store/store';
 import { Observer } from './store/observer';
 import { HoverLayer } from './hoverLayer';
 import { ActiveLayer } from './activeLayer';
-import { defaultAnchors } from './middles/anchors/default';
 import { Rect } from './models/rect';
+
+const resizeCursors = ['nw-resize', 'ne-resize', 'se-resize', 'sw-resize'];
 
 export class Topology {
   parentElem: HTMLElement;
   canvas = document.createElement('canvas');
   offscreen: Canvas;
-  hoverLayer: ActiveLayer;
+  hoverLayer: HoverLayer;
   activeLayer: ActiveLayer;
   nodes: Node[] = [];
   options: Options;
   subcribe: Observer;
 
   hoverNode: Node;
-  mouseDown = false;
+  mouseDown: MouseEvent;
   selectedRect = new Rect(0, 0, 0, 0);
   constructor(parent: string | HTMLElement, options?: Options) {
     this.options = options || {};
@@ -90,9 +91,9 @@ export class Topology {
   ondrop(event: DragEvent) {
     event.preventDefault();
     const node = JSON.parse(event.dataTransfer.getData('Text'));
-    // tslint:disable-next-line:no-bitwise
+
     node.x = event.offsetX - ((node.width / 2 + 0.5) << 0);
-    // tslint:disable-next-line:no-bitwise
+
     node.y = event.offsetY - ((node.height / 2 + 0.5) << 0);
     this.addNode(new Node(node));
   }
@@ -100,13 +101,6 @@ export class Topology {
   addNode(node: Node): boolean {
     if (!drawFns[node.shapeName]) {
       return false;
-    }
-
-    // Calc anchors.
-    if (anchorsFns[node.shapeName]) {
-      anchorsFns[node.shapeName](node);
-    } else {
-      defaultAnchors(node);
     }
 
     this.offscreen.nodes.push.apply(this.offscreen.nodes, this.activeLayer.nodes);
@@ -135,14 +129,47 @@ export class Topology {
   }
 
   onMouseMove = (e: MouseEvent) => {
-    if (!this.hoverNode || !this.hoverNode.hit(e)) {
+    let inAnchors = false;
+    if (this.activeLayer.occupy) {
+      for (let i = 0; i < this.activeLayer.anchors.length; ++i) {
+        if (this.mouseDown) {
+          if (this.hoverLayer.canvas.style.cursor === resizeCursors[i]) {
+            inAnchors = true;
+            this.activeLayer.resizeNodes(
+              i,
+              new Rect(e.offsetX, e.offsetY, e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY)
+            );
+            this.hoverLayer.render();
+            break;
+          }
+        } else if (this.activeLayer.anchors[i].hit(e)) {
+          inAnchors = true;
+          this.hoverLayer.canvas.style.cursor = resizeCursors[i];
+          this.activeLayer.saveRects();
+          break;
+        }
+      }
+    }
+
+    // Resizing.
+    if (this.mouseDown && inAnchors) {
+      return;
+    }
+
+    const hitHover = this.hoverNode && this.hoverNode.hit(e);
+    if (!inAnchors) {
+      if (hitHover) {
+        this.hoverLayer.canvas.style.cursor = 'move';
+      } else {
+        this.hoverLayer.canvas.style.cursor = 'default';
+      }
+    }
+
+    if (!this.mouseDown && this.hoverLayer.canvas.style.cursor !== 'move') {
       this.hoverNode = this.getHoverNode(e, this.nodes);
       const nodes: Node[] = [];
       if (this.hoverNode) {
         nodes.push(this.hoverNode);
-        this.hoverLayer.canvas.style.cursor = 'move';
-      } else {
-        this.hoverLayer.canvas.style.cursor = 'default';
       }
       this.hoverLayer.setNodes(nodes);
       this.hoverLayer.render();
@@ -150,7 +177,7 @@ export class Topology {
   };
 
   onmousedown = (e: MouseEvent) => {
-    this.mouseDown = true;
+    this.mouseDown = e;
     if (!this.hoverNode) {
       return;
     }
@@ -181,7 +208,7 @@ export class Topology {
   };
 
   onmouseup = (e: MouseEvent) => {
-    this.mouseDown = false;
+    this.mouseDown = null;
   };
 
   getHoverNode(e: MouseEvent, nodes: Node[]) {
