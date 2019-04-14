@@ -9,6 +9,12 @@ import { ActiveLayer } from './activeLayer';
 import { Rect } from './models/rect';
 
 const resizeCursors = ['nw-resize', 'ne-resize', 'se-resize', 'sw-resize'];
+enum MoveInType {
+  None,
+  Nodes,
+  ActiveAnchors,
+  HoverAnchors
+}
 
 export class Topology {
   parentElem: HTMLElement;
@@ -20,8 +26,14 @@ export class Topology {
   options: Options;
   subcribe: Observer;
 
+  lastHover: Node;
   hoverNode: Node;
   mouseDown: MouseEvent;
+  moveIn = {
+    type: MoveInType.None,
+    activeAnchorIndex: 0,
+    hoverAnchorIndex: 0
+  };
   selectedRect = new Rect(0, 0, 0, 0);
   constructor(parent: string | HTMLElement, options?: Options) {
     this.options = options || {};
@@ -129,62 +141,52 @@ export class Topology {
   }
 
   onMouseMove = (e: MouseEvent) => {
-    let inAnchors = false;
-    if (this.activeLayer.occupy) {
-      for (let i = 0; i < this.activeLayer.anchors.length; ++i) {
-        if (this.mouseDown) {
-          if (this.hoverLayer.canvas.style.cursor === resizeCursors[i]) {
-            inAnchors = true;
-            this.activeLayer.resizeNodes(
-              i,
-              new Rect(e.offsetX, e.offsetY, e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY)
-            );
-            this.hoverLayer.render();
-            break;
-          }
-        } else if (this.activeLayer.anchors[i].hit(e)) {
-          inAnchors = true;
-          this.hoverLayer.canvas.style.cursor = resizeCursors[i];
-          this.activeLayer.saveRects();
-          break;
-        }
-      }
-    }
+    this.getMoveIn(e);
 
-    // Resizing.
-    if (this.mouseDown && inAnchors) {
+    if (!this.mouseDown) {
+      // Render hover anchors.
+      if (this.hoverNode) {
+        this.hoverLayer.setNodes([this.hoverNode]);
+        this.hoverLayer.render();
+      } else if (this.lastHover) {
+        // Clear hover anchors.
+        this.hoverLayer.canvas.height = this.hoverLayer.canvas.height;
+      }
+
       return;
     }
 
-    const hitHover = this.hoverNode && this.hoverNode.hit(e);
-    if (!inAnchors) {
-      if (hitHover) {
-        this.hoverLayer.canvas.style.cursor = 'move';
-      } else {
-        this.hoverLayer.canvas.style.cursor = 'default';
-      }
-    }
-
-    if (!this.mouseDown && this.hoverLayer.canvas.style.cursor !== 'move') {
-      this.hoverNode = this.getHoverNode(e, this.nodes);
-      const nodes: Node[] = [];
-      if (this.hoverNode) {
-        nodes.push(this.hoverNode);
-      }
-      this.hoverLayer.setNodes(nodes);
-      this.hoverLayer.render();
+    switch (this.moveIn.type) {
+      case MoveInType.None:
+        break;
+      case MoveInType.Nodes:
+        this.activeLayer.moveNodes(
+          new Rect(e.offsetX, e.offsetY, e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY)
+        );
+        break;
+      case MoveInType.ActiveAnchors:
+        this.activeLayer.resizeNodes(
+          this.moveIn.activeAnchorIndex,
+          new Rect(e.offsetX, e.offsetY, e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY)
+        );
+        this.hoverLayer.render();
+        break;
+      case MoveInType.HoverAnchors:
+        break;
     }
   };
 
   onmousedown = (e: MouseEvent) => {
     this.mouseDown = e;
+    this.activeLayer.saveRects();
+
     if (!this.hoverNode) {
       return;
     }
 
     if (e.ctrlKey) {
       this.activeLayer.addNode(this.hoverNode);
-    } else {
+    } else if (!this.activeLayer.hasNode(this.hoverNode)) {
       this.activeLayer.setNodes([this.hoverNode]);
     }
 
@@ -214,8 +216,9 @@ export class Topology {
   getHoverNode(e: MouseEvent, nodes: Node[]) {
     let node: Node;
     for (let i = nodes.length - 1; i >= 0; --i) {
-      if (nodes[i].hit(e)) {
+      if (nodes[i].hit(e, 4)) {
         node = nodes[i];
+        this.moveIn.type = MoveInType.Nodes;
         if (!nodes[i].children || !nodes[i].children.length) {
           break;
         }
@@ -228,6 +231,54 @@ export class Topology {
     }
 
     return node;
+  }
+
+  getMoveIn(e: MouseEvent) {
+    if (this.mouseDown) {
+      return;
+    }
+
+    this.moveIn.type = MoveInType.None;
+
+    // In nodes
+    this.lastHover = this.hoverNode;
+    this.hoverNode = this.getHoverNode(e, this.nodes);
+    if (this.hoverNode) {
+      this.hoverLayer.canvas.style.cursor = 'move';
+    } else {
+      this.hoverLayer.canvas.style.cursor = 'default';
+    }
+
+    // In activeLayer
+    if (this.activeLayer.occupy) {
+      if (this.activeLayer.occupy.hit(e)) {
+        this.moveIn.type = MoveInType.Nodes;
+        this.hoverLayer.canvas.style.cursor = 'move';
+      }
+
+      for (let i = 0; i < this.activeLayer.anchors.length; ++i) {
+        if (this.activeLayer.anchors[i].hit(e)) {
+          this.moveIn.type = MoveInType.ActiveAnchors;
+          this.moveIn.activeAnchorIndex = i;
+          this.hoverLayer.canvas.style.cursor = resizeCursors[i];
+          break;
+        }
+      }
+    }
+
+    if (this.moveIn.type === MoveInType.ActiveAnchors || !this.hoverNode) {
+      return;
+    }
+
+    // In anchors of hoverNode
+    for (let i = 0; i < this.hoverNode.anchors.length; ++i) {
+      if (this.hoverNode.anchors[i].hit(e)) {
+        this.moveIn.type = MoveInType.HoverAnchors;
+        this.moveIn.hoverAnchorIndex = i;
+        this.hoverLayer.canvas.style.cursor = 'crosshair';
+        break;
+      }
+    }
   }
 
   destory() {

@@ -10,7 +10,12 @@ export class Rect {
     this.ey = this.y + this.height;
   }
 
-  hit(e: MouseEvent) {
-    return e.offsetX > this.x && e.offsetX < this.ex && e.offsetY > this.y && e.offsetY < this.ey;
+  hit(e: MouseEvent, padding = 0) {
+    return (
+      e.offsetX > this.x - padding &&
+      e.offsetX < this.ex + padding &&
+      e.offsetY > this.y - padding &&
+      e.offsetY < this.ey + padding
+    );
   }
 }

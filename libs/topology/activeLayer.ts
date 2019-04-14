@@ -136,4 +136,18 @@ export class ActiveLayer extends Canvas {
 
     this.render();
   }
+
+  moveNodes(pos: Rect) {
+    let i = 0;
+    for (const item of this.nodes) {
+      item.x = this.rects[i].x + pos.width;
+      item.y = this.rects[i].y + pos.height;
+      item.ex = item.x + item.width;
+      item.ey = item.y + item.height;
+      item.init();
+      ++i;
+    }
+
+    this.render();
+  }
 }

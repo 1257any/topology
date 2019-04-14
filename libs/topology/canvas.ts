@@ -60,6 +60,18 @@ export class Canvas {
     }
   }
 
+  hasNode(node: Node) {
+    let found = false;
+    for (const item of this.nodes) {
+      if (item.id === node.id) {
+        found = true;
+        break;
+      }
+    }
+
+    return found;
+  }
+
   clearNodes() {
     this.nodes = [];
   }
