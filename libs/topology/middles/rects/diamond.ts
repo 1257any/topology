@@ -1,36 +1,36 @@
 import { Node } from '../../models/node';
 import { Rect } from '../../models/rect';
 
-export function circleIconRect(node: Node) {
-  let w = node.width / 2;
-  let h = node.height / 2;
+export function diamondIconRect(node: Node) {
+  let w = node.width / 3;
+  let h = node.height / 3;
   if (w > h) {
     w = h;
   } else {
     h = w;
   }
-  let top = node.height / 10;
+  let top = node.width / 5;
   if (top < 10) {
     top = 10;
   }
   node.iconRect = new Rect(node.x + (node.width - w) / 2, node.y + top, w, h);
 }
 
-export function circleTextRect(node: Node) {
+export function diamondTextRect(node: Node) {
   if (node.icon || node.image) {
-    let bottom = node.height / 20;
+    let bottom = node.height / 10;
     if (bottom < 5) {
       bottom = 0;
     }
     node.textRect = new Rect(
-      node.x + node.width / 4,
+      node.x + node.width / 3,
       node.y + (node.height * 2) / 3 - bottom,
-      node.width / 2,
+      node.width / 3,
       node.height / 3 - 5
     );
   } else {
-    const w = (node.width * 5) / 7;
-    const h = (node.height * 5) / 7;
-    node.textRect = new Rect(node.x + (node.width - w) / 2, node.y + (node.height - h) / 2, w, h);
+    const w = node.width / 2;
+    const h = (node.height * 1) / 2;
+    node.textRect = new Rect(node.x + (node.width - w) / 2, node.y + node.height / 4, w, h);
   }
 }

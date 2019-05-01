@@ -3,5 +3,6 @@ export interface Options {
   height?: string | number;
   style?: any;
   hoverStyle?: any;
+  dragStyle?: any;
   activeStyle?: any;
 }

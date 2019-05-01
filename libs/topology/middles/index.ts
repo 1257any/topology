@@ -1,6 +1,4 @@
 import { Rect } from '../models/rect';
-import { Node } from '../models/node';
-import { roundRect } from './draws/roundRect';
 import { rect } from './draws/rect';
 import { circle } from './draws/circle';
 import { triangle } from './draws/triangle';
@@ -12,6 +10,10 @@ import { triangleAnchors } from './anchors/triangle';
 import { arrowAnchors } from './anchors/arrow';
 import { lineAnchors } from './anchors/line';
 import { circleIconRect, circleTextRect } from './rects/circle';
+import { triangleIconRect, triangleTextRect } from './rects/triangle';
+import { diamondIconRect, diamondTextRect } from './rects/diamond';
+import { arrowIconRect, arrowTextRect } from './rects/arrow';
+import { lineIconRect, lineTextRect } from './rects/line';
 
 export const drawFns: any = {};
 export const iconRectFns: any = {};
@@ -36,7 +38,6 @@ export function registerShape(
 
 function init() {
   console.log('Init middles.');
-  drawFns.roundRect = roundRect;
   drawFns.rect = rect;
   drawFns.circle = circle;
   drawFns.triangle = triangle;
@@ -53,5 +54,13 @@ function init() {
 
   iconRectFns.circle = circleIconRect;
   textRectFns.circle = circleTextRect;
+  iconRectFns.triangle = triangleIconRect;
+  textRectFns.triangle = triangleTextRect;
+  iconRectFns.diamond = diamondIconRect;
+  textRectFns.diamond = diamondTextRect;
+  iconRectFns.arrow = arrowIconRect;
+  textRectFns.arrow = arrowTextRect;
+  iconRectFns.line = lineIconRect;
+  textRectFns.line = lineTextRect;
 }
 init();

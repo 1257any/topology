@@ -102,8 +102,4 @@ export function text(ctx: CanvasRenderingContext2D, node: Node) {
   if (node.style.font || node.style.color || node.style.textAlign || node.style.textBaseline) {
     ctx.restore();
   }
-
-  ctx.beginPath();
-  ctx.strokeRect(node.textRect.x, node.textRect.y, node.textRect.width, node.textRect.height);
-  ctx.stroke();
 }

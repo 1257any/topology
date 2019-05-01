@@ -20,8 +20,4 @@ export function iconfont(ctx: CanvasRenderingContext2D, node: Node, rect: Rect) 
   );
 
   ctx.restore();
-
-  ctx.beginPath();
-  ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
-  ctx.stroke();
 }

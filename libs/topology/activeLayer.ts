@@ -7,6 +7,7 @@ export class ActiveLayer extends Canvas {
   nodes: Node[] = [];
   // 总面积
   occupy: Rect;
+  initialOccupy: Rect;
   // 改变大小的锚点
   anchors: Rect[] = [];
   // 备份初始位置，方便移动事件处理
@@ -14,8 +15,8 @@ export class ActiveLayer extends Canvas {
   constructor(parent: HTMLElement, options: any) {
     super(options);
     this.options.activeStyle = options.activeStyle || {};
-    if (!this.options.activeStyle || !this.options.activeStyle.fillStyle) {
-      this.options.activeStyle.strokeStyle = '#804a4a';
+    if (!this.options.activeStyle || !this.options.activeStyle.strokeStyle) {
+      this.options.activeStyle.strokeStyle = '#2f54eb';
     }
     this.canvas.style.position = 'absolute';
     this.canvas.style.left = '0';
@@ -24,7 +25,7 @@ export class ActiveLayer extends Canvas {
   }
 
   render() {
-    super.render(false);
+    super.render(false, true);
 
     this.occupy = occupyRect(this.nodes);
     if (!this.occupy) {
@@ -47,10 +48,8 @@ export class ActiveLayer extends Canvas {
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.strokeRect(this.occupy.x, this.occupy.y, this.occupy.width, this.occupy.height);
-    ctx.stroke();
 
     // Line.
-    ctx.beginPath();
     ctx.moveTo(this.occupy.x + ((this.occupy.width / 2 + 0.5) << 0), this.occupy.y);
     ctx.lineTo(this.occupy.x + ((this.occupy.width / 2 + 0.5) << 0), this.occupy.y - 25);
     ctx.stroke();
@@ -72,64 +71,78 @@ export class ActiveLayer extends Canvas {
     }
   }
 
+  // 即将缩放选中的nodes，备份nodes最初大小，方便缩放比例计算
   saveRects() {
     this.rects = [];
     for (const item of this.nodes) {
       this.rects.push(new Rect(item.x, item.y, item.width, item.height));
     }
+    if (this.occupy) {
+      this.initialOccupy = new Rect(this.occupy.x, this.occupy.y, this.occupy.width, this.occupy.height);
+    }
   }
 
-  resizeNodes(type: number, pos: Rect) {
+  resizeNodes(type: number, e: MouseEvent) {
     let i = 0;
+    let newOccupy: Rect;
+    let x;
+    let y;
+    let w;
+    let h;
     for (const item of this.nodes) {
       switch (type) {
         // nw-resize
         case 0:
-          if (this.rects[i].width - pos.width > 20) {
-            item.x = this.rects[i].x + pos.width;
-            item.width = this.rects[i].width - pos.width;
-          }
-
-          if (this.rects[i].height - pos.height > 20) {
-            item.y = this.rects[i].y + pos.height;
-            item.height = this.rects[i].height - pos.height;
-          }
+          x = e.offsetX;
+          y = e.offsetY;
+          w = this.initialOccupy.ex - e.offsetX;
+          h = this.initialOccupy.ey - e.offsetY;
+          newOccupy = new Rect(
+            w > 30 ? x : this.initialOccupy.ex - 30,
+            h > 30 ? y : this.initialOccupy.ey - 30,
+            w > 30 ? w : 30,
+            h > 30 ? h : 30
+          );
           break;
         // ne-resize
         case 1:
-          if (this.rects[i].width + pos.width > 20) {
-            item.width = this.rects[i].width + pos.width;
-          }
-
-          if (this.rects[i].height - pos.height > 20) {
-            item.y = this.rects[i].y + pos.height;
-            item.height = this.rects[i].height - pos.height;
-          }
+          y = e.offsetY;
+          w = e.offsetX - this.initialOccupy.x;
+          h = this.initialOccupy.ey - e.offsetY;
+          newOccupy = new Rect(
+            this.initialOccupy.x,
+            h > 30 ? y : this.initialOccupy.ey - 30,
+            w > 30 ? w : 30,
+            h > 30 ? h : 30
+          );
           break;
         // se-resize
         case 2:
-          if (this.rects[i].width + pos.width > 20) {
-            item.width = this.rects[i].width + pos.width;
-          }
-
-          if (this.rects[i].height + pos.height > 20) {
-            item.height = this.rects[i].height + pos.height;
-          }
+          w = e.offsetX - this.initialOccupy.x;
+          h = e.offsetY - this.initialOccupy.y;
+          newOccupy = new Rect(this.initialOccupy.x, this.initialOccupy.y, w > 30 ? w : 30, h > 30 ? h : 30);
           break;
         // sw-resize
         case 3:
-          if (this.rects[i].width - pos.width > 20) {
-            item.x = this.rects[i].x + pos.width;
-            item.width = this.rects[i].width - pos.width;
-          }
-
-          if (this.rects[i].height + pos.height > 20) {
-            item.height = this.rects[i].height + pos.height;
-          }
+          x = e.offsetX;
+          w = this.initialOccupy.ex - e.offsetX;
+          h = e.offsetY - this.initialOccupy.y;
+          newOccupy = new Rect(
+            w > 30 ? x : this.initialOccupy.ex - 30,
+            this.initialOccupy.y,
+            w > 30 ? w : 30,
+            h > 30 ? h : 30
+          );
           break;
       }
-      item.ex = item.x + item.width;
-      item.ey = item.y + item.height;
+
+      this.calcRelPos(
+        item,
+        this.rects[i],
+        newOccupy,
+        newOccupy.width / this.initialOccupy.width,
+        newOccupy.height / this.initialOccupy.height
+      );
       item.init();
       ++i;
     }
@@ -137,7 +150,24 @@ export class ActiveLayer extends Canvas {
     this.render();
   }
 
+  // 当initialOccupy缩放为occupy后，计算node在occupy中的新位置
+  // initNode - node的原始位置
+  // xScale - x坐标缩放比例
+  // yScale - y坐标缩放比例
+  calcRelPos(node: Rect, initNode: Rect, occupy: Rect, xScale: number, yScale: number) {
+    node.x = occupy.x + (initNode.x - this.initialOccupy.x) * xScale;
+    node.y = occupy.y + (initNode.y - this.initialOccupy.y) * yScale;
+    node.width = initNode.width * xScale;
+    node.height = initNode.height * yScale;
+    node.ex = node.x + node.width;
+    node.ey = node.y + node.height;
+  }
+
   moveNodes(pos: Rect) {
+    if (this.rects.length !== this.nodes.length) {
+      return;
+    }
+
     let i = 0;
     for (const item of this.nodes) {
       item.x = this.rects[i].x + pos.width;

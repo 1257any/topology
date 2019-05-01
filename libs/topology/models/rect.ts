@@ -18,4 +18,13 @@ export class Rect {
       e.offsetY < this.ey + padding
     );
   }
+
+  hitRect(rect: Rect) {
+    return (
+      (rect.x > this.x && rect.x < this.ex && rect.y > this.y && rect.y < this.ey) ||
+      (rect.ex > this.x && rect.ex < this.ex && rect.y > this.y && rect.y < this.ey) ||
+      (rect.ex > this.x && rect.ex < this.ex && rect.ey > this.y && rect.ey < this.ey) ||
+      (rect.x > this.x && rect.x < this.ex && rect.ey > this.y && rect.ey < this.ey)
+    );
+  }
 }

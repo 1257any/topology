@@ -35,6 +35,7 @@ export class Topology {
     hoverAnchorIndex: 0
   };
   selectedRect = new Rect(0, 0, 0, 0);
+  scheduledAnimationFrame = false;
   constructor(parent: string | HTMLElement, options?: Options) {
     this.options = options || {};
 
@@ -141,56 +142,99 @@ export class Topology {
   }
 
   onMouseMove = (e: MouseEvent) => {
-    this.getMoveIn(e);
-
-    if (!this.mouseDown) {
-      // Render hover anchors.
-      if (this.hoverNode) {
-        this.hoverLayer.setNodes([this.hoverNode]);
-        this.hoverLayer.render();
-      } else if (this.lastHover) {
-        // Clear hover anchors.
-        this.hoverLayer.canvas.height = this.hoverLayer.canvas.height;
-      }
-
+    if (this.scheduledAnimationFrame) {
       return;
     }
 
-    switch (this.moveIn.type) {
-      case MoveInType.None:
-        break;
-      case MoveInType.Nodes:
-        this.activeLayer.moveNodes(
-          new Rect(e.offsetX, e.offsetY, e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY)
-        );
-        break;
-      case MoveInType.ActiveAnchors:
-        this.activeLayer.resizeNodes(
-          this.moveIn.activeAnchorIndex,
-          new Rect(e.offsetX, e.offsetY, e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY)
-        );
-        this.hoverLayer.render();
-        break;
-      case MoveInType.HoverAnchors:
-        break;
-    }
+    this.scheduledAnimationFrame = true;
+    requestAnimationFrame(() => {
+      this.scheduledAnimationFrame = false;
+      this.getMoveIn(e);
+
+      if (!this.mouseDown) {
+        // Render hover anchors.
+        if (this.hoverNode) {
+          this.hoverLayer.setNodes([this.hoverNode]);
+          this.hoverLayer.render();
+        } else if (this.lastHover) {
+          // Clear hover anchors.
+          this.hoverLayer.nodes = [];
+          this.hoverLayer.canvas.height = this.hoverLayer.canvas.height;
+        }
+
+        return;
+      }
+
+      switch (this.moveIn.type) {
+        case MoveInType.None:
+          this.hoverLayer.dragRect = new Rect(
+            this.mouseDown.offsetX,
+            this.mouseDown.offsetY,
+            e.offsetX - this.mouseDown.offsetX,
+            e.offsetY - this.mouseDown.offsetY
+          );
+          this.hoverLayer.render();
+          break;
+        case MoveInType.Nodes:
+          this.activeLayer.moveNodes(
+            new Rect(e.offsetX, e.offsetY, e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY)
+          );
+          this.hoverLayer.render();
+          break;
+        case MoveInType.ActiveAnchors:
+          this.activeLayer.resizeNodes(this.moveIn.activeAnchorIndex, e);
+          this.hoverLayer.render();
+          break;
+        case MoveInType.HoverAnchors:
+          break;
+      }
+    });
   };
 
   onmousedown = (e: MouseEvent) => {
     this.mouseDown = e;
-    this.activeLayer.saveRects();
 
-    if (!this.hoverNode) {
+    // Click the space.
+    if (!this.hoverNode && (!this.activeLayer.occupy || !this.activeLayer.occupy.hit(e, 5))) {
+      this.offscreen.nodes.push.apply(this.offscreen.nodes, this.activeLayer.nodes);
+      this.offscreen.render();
+
+      this.activeLayer.nodes = [];
+      this.activeLayer.canvas.height = this.activeLayer.canvas.height;
       return;
     }
 
+    // Select more.
     if (e.ctrlKey) {
       this.activeLayer.addNode(this.hoverNode);
-    } else if (!this.activeLayer.hasNode(this.hoverNode)) {
+    } else if (this.hoverNode && !this.activeLayer.hasNode(this.hoverNode)) {
       this.activeLayer.setNodes([this.hoverNode]);
     }
 
-    // Set offscreen.
+    this.offscreenNodes();
+
+    // Save the rects for move.
+    this.activeLayer.saveRects();
+
+    this.activeLayer.render();
+    this.offscreen.render();
+  };
+
+  onmouseup = (e: MouseEvent) => {
+    this.mouseDown = null;
+
+    if (this.hoverLayer.dragRect) {
+      this.getSelectedNodes(this.nodes, this.hoverLayer.dragRect);
+      this.offscreenNodes();
+      this.offscreen.render();
+      this.activeLayer.render();
+    }
+
+    this.hoverLayer.dragRect = null;
+    this.hoverLayer.render();
+  };
+
+  offscreenNodes() {
     this.offscreen.nodes = [];
     for (const item of this.nodes) {
       let found = false;
@@ -204,19 +248,12 @@ export class Topology {
         this.offscreen.nodes.push(item);
       }
     }
-
-    this.offscreen.render();
-    this.activeLayer.render();
-  };
-
-  onmouseup = (e: MouseEvent) => {
-    this.mouseDown = null;
-  };
+  }
 
   getHoverNode(e: MouseEvent, nodes: Node[]) {
     let node: Node;
     for (let i = nodes.length - 1; i >= 0; --i) {
-      if (nodes[i].hit(e, 4)) {
+      if (nodes[i].hit(e, 10)) {
         node = nodes[i];
         this.moveIn.type = MoveInType.Nodes;
         if (!nodes[i].children || !nodes[i].children.length) {
@@ -272,11 +309,33 @@ export class Topology {
 
     // In anchors of hoverNode
     for (let i = 0; i < this.hoverNode.anchors.length; ++i) {
-      if (this.hoverNode.anchors[i].hit(e)) {
+      if (this.hoverNode.anchors[i].hit(e, 7)) {
         this.moveIn.type = MoveInType.HoverAnchors;
         this.moveIn.hoverAnchorIndex = i;
         this.hoverLayer.canvas.style.cursor = 'crosshair';
         break;
+      }
+    }
+  }
+
+  getSelectedNodes(nodes: Node[], rect: Rect) {
+    if (rect.width < 0) {
+      rect.width = -rect.width;
+      rect.x = rect.ex;
+      rect.ex = rect.x + rect.width;
+    }
+    if (rect.height < 0) {
+      rect.height = -rect.height;
+      rect.y = rect.ey;
+      rect.ey = rect.y + rect.height;
+    }
+    for (const item of nodes) {
+      if (rect.hitRect(item)) {
+        this.activeLayer.addNode(item);
+      }
+
+      if (item.children) {
+        this.getSelectedNodes(item.children, rect);
       }
     }
   }

@@ -76,7 +76,7 @@ export class Canvas {
     this.nodes = [];
   }
 
-  render(update = true) {
+  render(update = true, isActive = false) {
     if (this.rendering) {
       return;
     }
@@ -91,7 +91,12 @@ export class Canvas {
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.font = `${this.options.style.fontSize}px/${this.options.style.lineHeight} ${this.options.style.fontFamily}`;
-      ctx.strokeStyle = this.options.style.strokeStyle;
+
+      if (isActive) {
+        ctx.strokeStyle = this.options.activeStyle.strokeStyle;
+      } else {
+        ctx.strokeStyle = this.options.style.strokeStyle;
+      }
       ctx.lineWidth = this.options.style.lineWidth;
       for (const item of this.nodes) {
         // Draw shape.
@@ -135,8 +140,6 @@ export class Canvas {
 
     this.rendering = false;
   }
-
-  icon() {}
 
   emitRender() {
     let r = Store.get('render') || 0;

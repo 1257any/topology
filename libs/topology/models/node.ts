@@ -6,6 +6,8 @@ import { defaultIconRect, defaultTextRect } from '../middles/rects/default';
 
 export class Node extends Rect {
   id: string;
+  // 0 -1 之间的小数
+  borderRadius: number;
   shapeName: string;
   icon: string;
   iconFamily: string;
@@ -26,6 +28,10 @@ export class Node extends Rect {
   constructor(json: any) {
     super(json.x, json.y, json.width, json.height);
     this.id = json.id || s8();
+    this.borderRadius = +json.borderRadius || 0;
+    if (this.borderRadius > 1) {
+      this.borderRadius = 1;
+    }
     this.icon = json.icon;
     this.iconFamily = json.iconFamily;
     this.iconSize = +json.iconSize;
@@ -68,24 +74,6 @@ export class Node extends Rect {
       anchorsFns[this.shapeName](this);
     } else {
       defaultAnchors(this);
-    }
-  }
-
-  calcIconRect() {
-    if (this.icon || this.image) {
-      if (this.shapeName === 'image') {
-        this.iconRect = new Rect(this.x, this.y, this.width, this.height);
-      } else {
-        this.iconRect = new Rect((this.x + (this.width - 50) / 2) << 0, this.y + 10, 50, 50);
-      }
-    }
-  }
-
-  calcTextRect() {
-    if (this.iconRect) {
-      this.textRect = new Rect(this.x + 10, this.y + 60, this.width - 20, this.height - 70);
-    } else {
-      this.textRect = new Rect(this.x + 10, this.y + 10, this.width - 20, this.height - 20);
     }
   }
 }

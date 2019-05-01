@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Topology } from 'libs/topology';
-import { drawFns } from 'libs/topology/middles/index';
 
 @Component({
   selector: 'app-home',
@@ -14,7 +13,7 @@ export class HomeComponent implements OnInit {
       group: '基本形状',
       children: [
         {
-          name: 'roundRect',
+          name: 'rect',
           icon: 'icon-round-rect',
           data: {
             text: '带图标的圆角矩形',
@@ -22,10 +21,11 @@ export class HomeComponent implements OnInit {
             icon: '\uec46',
             iconFamily: 'iconfont',
             iconSize: 40,
-            iconColor: '#fa8c16',
-            width: 100,
+            iconColor: '#2f54eb',
+            width: 200,
             height: 100,
-            shapeName: 'roundRect'
+            borderRadius: 0.1,
+            shapeName: 'rect'
           }
         },
         {
@@ -35,7 +35,11 @@ export class HomeComponent implements OnInit {
             text: '矩形',
             width: 100,
             height: 100,
-            shapeName: 'rect'
+            shapeName: 'rect',
+            icon: '\uec46',
+            iconFamily: 'iconfont',
+            iconSize: 40,
+            iconColor: '#2f54eb'
           }
         },
         {
@@ -46,11 +50,7 @@ export class HomeComponent implements OnInit {
             width: 100,
             height: 100,
             shapeName: 'circle',
-            textMaxLine: 1,
-            // icon: '\uec46',
-            iconFamily: 'iconfont',
-            iconSize: 40,
-            iconColor: '#fa8c16'
+            textMaxLine: 1
           }
         },
         {
@@ -107,6 +107,7 @@ export class HomeComponent implements OnInit {
           name: 'line',
           icon: 'icon-line',
           data: {
+            text: '直线',
             width: 100,
             height: 100,
             shapeName: 'line'
