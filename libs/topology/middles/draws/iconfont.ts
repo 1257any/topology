@@ -1,23 +1,18 @@
-import { Rect } from '../../models/rect';
 import { Node } from '../../models/node';
 
-export function iconfont(ctx: CanvasRenderingContext2D, node: Node, rect: Rect) {
+export function iconfont(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.save();
-  ctx.beginPath();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
   ctx.font = `${node.iconSize}px ${node.iconFamily}`;
   if (node.iconColor) {
     ctx.fillStyle = node.iconColor;
   }
-
+  ctx.beginPath();
   ctx.fillText(
     node.icon,
-
-    (rect.x + node.iconSize / 2 + (rect.width - node.iconSize) / 2) << 0,
-
-    (rect.y + (node.iconSize * 4) / 7 + (rect.height - node.iconSize) / 2) << 0
+    (node.iconRect.x + node.iconSize / 2 + (node.iconRect.width - node.iconSize) / 2) << 0,
+    (node.iconRect.y + (node.iconSize * 4) / 7 + (node.iconRect.height - node.iconSize) / 2) << 0
   );
-
   ctx.restore();
 }

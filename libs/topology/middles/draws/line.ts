@@ -1,9 +1,9 @@
-import { Rect } from '../../models/rect';
+import { Node } from '../../models/node';
 
-export function line(ctx: CanvasRenderingContext2D, node: Rect) {
+export function line(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.beginPath();
-  const y = (node.y + (node.height / 2 + 0.5)) << 0;
-  ctx.moveTo(node.x, y);
-  ctx.lineTo(node.x + node.width, y);
+  const y = (node.rect.y + (node.rect.height / 2 + 0.5)) << 0;
+  ctx.moveTo(node.rect.x, y);
+  ctx.lineTo(node.rect.x + node.rect.width, y);
   ctx.stroke();
 }

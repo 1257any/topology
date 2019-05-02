@@ -72,34 +72,42 @@ export function fillText(
 }
 
 export function text(ctx: CanvasRenderingContext2D, node: Node) {
+  ctx.save();
+  ctx.beginPath();
+  ctx.font = `${node.font.fontSize}px/${node.font.lineHeight} ${node.font.fontFamily}`;
+  if (node.font.color) {
+    ctx.fillStyle = node.font.color;
+  }
+  if (node.font.textAlign) {
+    ctx.textAlign = node.font.textAlign;
+  }
+  if (node.font.textBaseline) {
+    ctx.textBaseline = node.font.textBaseline;
+  }
+
   const lines = getLines(ctx, getWords(node.text), node.textRect.width);
   const maxLineLen = node.textMaxLine || lines.length;
+  const lineHeight = (node.font.fontSize * node.font.lineHeight) << 0;
 
-  const lineHeight = ((node.style.fontSize || 12) * (node.style.lineHeight || 1.5)) << 0;
-
+  // 默认居中
   let x = (node.textRect.x + node.textRect.width / 2) << 0;
-
   let y = (node.textRect.y + (node.textRect.height - lineHeight * maxLineLen) / 2 + (lineHeight * 4) / 7) << 0;
-
-  ctx.beginPath();
-  if (node.style.font || node.style.color || node.style.textAlign || node.style.textBaseline) {
-    ctx.font = node.style.font;
-    ctx.fillStyle = node.style.color;
-    ctx.textAlign = node.style.textAlign;
-    ctx.textBaseline = node.style.textBaseline;
-
-    // textAlign = 'center'，是基于x
-    if (node.style.textAlign !== 'center') {
+  switch (ctx.textAlign) {
+    case 'left':
       x = node.textRect.x;
-    }
-
-    if (node.style.textBaseline !== 'middle') {
-      y = node.textRect.y;
-    }
-    ctx.save();
+      break;
+    case 'right':
+      x = node.textRect.x + node.textRect.width;
+      break;
+  }
+  switch (ctx.textBaseline) {
+    case 'top':
+      y = (node.textRect.y + (lineHeight - node.font.fontSize) / 2) << 0;
+      break;
+    case 'bottom':
+      y = node.textRect.ey - lineHeight * lines.length + lineHeight;
+      break;
   }
   fillText(ctx, lines, x, y, node.textRect.width, node.textRect.height, lineHeight, node.textMaxLine);
-  if (node.style.font || node.style.color || node.style.textAlign || node.style.textBaseline) {
-    ctx.restore();
-  }
+  ctx.restore();
 }

@@ -1,52 +1,67 @@
+import { Pen } from './pen';
 import { Rect } from './rect';
 import { s8 } from '../uuid/uuid';
-import { anchorsFns, iconRectFns, textRectFns } from '../middles';
+import { anchorsFns, iconRectFns, textRectFns, drawFns } from '../middles';
 import { defaultAnchors } from '../middles/anchors/default';
 import { defaultIconRect, defaultTextRect } from '../middles/rects/default';
+import { text } from '../middles/draws/text';
+import { iconfont } from '../middles/draws/iconfont';
+import { Store } from '../store/store';
 
-export class Node extends Rect {
+export class Node extends Pen {
   id: string;
+  rect: Rect;
+
+  shapeName: string;
+
   // 0 -1 之间的小数
   borderRadius: number;
-  shapeName: string;
+
+  // icon
   icon: string;
   iconFamily: string;
   iconSize: number;
   iconColor: string;
+  iconRect: Rect;
+
   image: string;
   img: HTMLImageElement;
+
   text: string;
   textMaxLine: number;
-  iconRect: Rect;
   textRect: Rect;
+
   anchors: Rect[] = [];
   children: Node[];
-  style: any;
-  styleHover: any;
   data: any;
 
   constructor(json: any) {
-    super(json.x, json.y, json.width, json.height);
+    super();
     this.id = json.id || s8();
+    this.rect = new Rect(json.x, json.y, json.width, json.height);
+
+    this.shapeName = json.shapeName;
+
     this.borderRadius = +json.borderRadius || 0;
     if (this.borderRadius > 1) {
       this.borderRadius = 1;
     }
+
     this.icon = json.icon;
     this.iconFamily = json.iconFamily;
     this.iconSize = +json.iconSize;
     this.iconColor = json.iconColor;
+
     this.image = json.image;
     this.text = json.text;
     this.textMaxLine = +json.textMaxLine;
-    this.style = json.style || {};
-    this.styleHover = json.styleHover || {};
+
     this.data = json.data;
-    this.shapeName = json.shapeName;
+
     if (json.children) {
       this.children = [];
       for (const item of json.children) {
-        this.children.push(new Node(item));
+        item.children.push(new Node(item));
       }
     }
 
@@ -76,6 +91,46 @@ export class Node extends Rect {
       defaultAnchors(this);
     }
   }
+
+  draw(ctx: CanvasRenderingContext2D) {
+    // Draw shape.
+    drawFns[this.shapeName](ctx, this);
+
+    // Draw text.
+    if (this.shapeName !== 'text' && this.text) {
+      text(ctx, this);
+    }
+
+    // Draw image.
+    if (this.image) {
+      // There is the cache of image.
+      if (this.img) {
+        ctx.drawImage(this.img, this.iconRect.x, this.iconRect.y, this.iconRect.width, this.iconRect.height);
+        return;
+      } else {
+        // Load image and draw it.
+        this.img = new Image();
+        this.img.crossOrigin = 'anonymous';
+        this.img.src = this.image;
+        this.img.onload = () => {
+          ctx.drawImage(this.img, this.iconRect.x, this.iconRect.y, this.iconRect.width, this.iconRect.height);
+          this.emitRender();
+        };
+      }
+
+      return;
+    }
+
+    // Draw icon
+    if (this.icon) {
+      iconfont(ctx, this);
+    }
+  }
+
+  emitRender() {
+    let r = Store.get('render') || 0;
+    Store.set('render', ++r);
+  }
 }
 
 export function occupyRect(nodes: Node[]) {
@@ -89,17 +144,17 @@ export function occupyRect(nodes: Node[]) {
   let y2 = -99999;
 
   for (const item of nodes) {
-    if (x1 > item.x) {
-      x1 = item.x;
+    if (x1 > item.rect.x) {
+      x1 = item.rect.x;
     }
-    if (y1 > item.y) {
-      y1 = item.y;
+    if (y1 > item.rect.y) {
+      y1 = item.rect.y;
     }
-    if (x2 < item.ex) {
-      x2 = item.ex;
+    if (x2 < item.rect.ex) {
+      x2 = item.rect.ex;
     }
-    if (y2 < item.ey) {
-      y2 = item.ey;
+    if (y2 < item.rect.ey) {
+      y2 = item.rect.ey;
     }
 
     const childrenRect = occupyRect(item.children);

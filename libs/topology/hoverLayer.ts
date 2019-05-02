@@ -1,22 +1,20 @@
 import { Rect } from './models/rect';
 import { Node } from './models/node';
+import { Line, ArrowType, Point } from './models/line';
 import { Canvas } from './canvas';
 
 export class HoverLayer extends Canvas {
-  canvas = document.createElement('canvas');
-  nodes: Node[] = [];
+  line: Line;
   dragRect: Rect;
   constructor(parent: HTMLElement, options: any) {
     super(options);
-    this.options.hoverStyle = options.hoverStyle || {};
-    if (!this.options.hoverStyle || !this.options.hoverStyle.strokeStyle) {
-      this.options.hoverStyle.strokeStyle = '#389e0d';
+    if (!this.options.hoverColor) {
+      this.options.hoverColor = '#389e0d';
     }
 
     // 鼠标按下框选演示
-    this.options.dragStyle = options.dragStyle || {};
-    if (!this.options.dragStyle || !this.options.dragStyle.strokeStyle) {
-      this.options.dragStyle.strokeStyle = '#1890ff';
+    if (!this.options.dragColor) {
+      this.options.dragColor = '#1890ff';
     }
 
     this.canvas.style.position = 'absolute';
@@ -25,12 +23,36 @@ export class HoverLayer extends Canvas {
     parent.appendChild(this.canvas);
   }
 
+  setLine(anchor: Rect, fromArrow: ArrowType = ArrowType.None) {
+    this.line = new Line({
+      x: anchor.x + anchor.width / 2,
+      y: anchor.y + anchor.height / 2
+    });
+    this.line.activeStrokeStyle = this.options.hoverColor;
+    this.line.fromArrow = fromArrow;
+    this.lines = [this.line];
+  }
+
+  lineTo(to: Point, toArrow: ArrowType = ArrowType.TriangleSolid) {
+    this.line.to = to;
+    this.line.toArrow = toArrow;
+  }
+
+  clearLines() {
+    this.line = null;
+    this.lines = [];
+  }
+
   render() {
     // 清空背景
     this.canvas.height = this.canvas.height;
 
+    this.renderLines();
+
     const ctx = this.canvas.getContext('2d');
-    ctx.strokeStyle = this.options.hoverStyle.strokeStyle;
+
+    // anchors
+    ctx.strokeStyle = this.options.hoverColor;
     ctx.fillStyle = '#fff';
     ctx.lineWidth = 2;
     ctx.translate(0, 0);
@@ -49,9 +71,10 @@ export class HoverLayer extends Canvas {
       }
     }
 
+    // Select nodes by drag.
     if (this.dragRect) {
-      ctx.strokeStyle = this.options.dragStyle.strokeStyle;
-      ctx.fillStyle = this.options.dragStyle.strokeStyle + '30';
+      ctx.strokeStyle = this.options.dragColor;
+      ctx.fillStyle = this.options.dragColor + '30';
       ctx.lineWidth = 1;
       ctx.translate(0.5, 0.5);
       ctx.beginPath();

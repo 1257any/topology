@@ -1,10 +1,9 @@
-import { Node, occupyRect } from './models/node';
+import { occupyRect } from './models/node';
 import { Canvas } from './canvas';
 import { Rect } from './models/rect';
+import { Line } from './models/line';
 
 export class ActiveLayer extends Canvas {
-  canvas = document.createElement('canvas');
-  nodes: Node[] = [];
   // 总面积
   occupy: Rect;
   initialOccupy: Rect;
@@ -14,9 +13,8 @@ export class ActiveLayer extends Canvas {
   rects: Rect[] = [];
   constructor(parent: HTMLElement, options: any) {
     super(options);
-    this.options.activeStyle = options.activeStyle || {};
-    if (!this.options.activeStyle || !this.options.activeStyle.strokeStyle) {
-      this.options.activeStyle.strokeStyle = '#2f54eb';
+    if (!this.options.activeColor) {
+      this.options.activeColor = '#2f54eb';
     }
     this.canvas.style.position = 'absolute';
     this.canvas.style.left = '0';
@@ -25,7 +23,7 @@ export class ActiveLayer extends Canvas {
   }
 
   render() {
-    super.render(false, true);
+    super.render(false);
 
     this.occupy = occupyRect(this.nodes);
     if (!this.occupy) {
@@ -44,7 +42,7 @@ export class ActiveLayer extends Canvas {
 
     const ctx = this.canvas.getContext('2d');
     // Territory
-    ctx.strokeStyle = this.options.activeStyle.strokeStyle + '50';
+    ctx.strokeStyle = this.options.activeColor + '50';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.strokeRect(this.occupy.x, this.occupy.y, this.occupy.width, this.occupy.height);
@@ -54,7 +52,7 @@ export class ActiveLayer extends Canvas {
     ctx.lineTo(this.occupy.x + ((this.occupy.width / 2 + 0.5) << 0), this.occupy.y - 25);
     ctx.stroke();
 
-    ctx.strokeStyle = this.options.activeStyle.strokeStyle;
+    ctx.strokeStyle = this.options.activeColor;
     ctx.fillStyle = '#fff';
     ctx.lineWidth = 2;
 
@@ -64,7 +62,7 @@ export class ActiveLayer extends Canvas {
     ctx.stroke();
     ctx.fill();
 
-    ctx.strokeStyle = this.options.activeStyle.strokeStyle + 'e0';
+    ctx.strokeStyle = this.options.activeColor + 'e0';
     for (const item of this.anchors) {
       ctx.strokeRect(item.x, item.y, item.width, item.height);
       ctx.fillRect(item.x, item.y, item.width, item.height);
@@ -75,7 +73,7 @@ export class ActiveLayer extends Canvas {
   saveRects() {
     this.rects = [];
     for (const item of this.nodes) {
-      this.rects.push(new Rect(item.x, item.y, item.width, item.height));
+      this.rects.push(new Rect(item.rect.x, item.rect.y, item.rect.width, item.rect.height));
     }
     if (this.occupy) {
       this.initialOccupy = new Rect(this.occupy.x, this.occupy.y, this.occupy.width, this.occupy.height);
@@ -137,7 +135,7 @@ export class ActiveLayer extends Canvas {
       }
 
       this.calcRelPos(
-        item,
+        item.rect,
         this.rects[i],
         newOccupy,
         newOccupy.width / this.initialOccupy.width,
@@ -170,10 +168,10 @@ export class ActiveLayer extends Canvas {
 
     let i = 0;
     for (const item of this.nodes) {
-      item.x = this.rects[i].x + pos.width;
-      item.y = this.rects[i].y + pos.height;
-      item.ex = item.x + item.width;
-      item.ey = item.y + item.height;
+      item.rect.x = this.rects[i].x + pos.width;
+      item.rect.y = this.rects[i].y + pos.height;
+      item.rect.ex = item.rect.x + item.rect.width;
+      item.rect.ey = item.rect.y + item.rect.height;
       item.init();
       ++i;
     }

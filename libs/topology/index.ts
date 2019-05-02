@@ -7,6 +7,7 @@ import { Observer } from './store/observer';
 import { HoverLayer } from './hoverLayer';
 import { ActiveLayer } from './activeLayer';
 import { Rect } from './models/rect';
+import { ArrowType } from './models/line';
 
 const resizeCursors = ['nw-resize', 'ne-resize', 'se-resize', 'sw-resize'];
 enum MoveInType {
@@ -35,25 +36,42 @@ export class Topology {
     hoverAnchorIndex: 0
   };
   selectedRect = new Rect(0, 0, 0, 0);
+  arrowType = ArrowType.CircleSolid;
   scheduledAnimationFrame = false;
   constructor(parent: string | HTMLElement, options?: Options) {
     this.options = options || {};
 
-    if (!this.options.style) {
-      this.options.style = {};
+    if (!this.options.font) {
+      this.options.font = {
+        color: '#555',
+        fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
+        fontSize: 12,
+        lineHeight: 1.5,
+        textAlign: 'center',
+        textBaseline: 'middle'
+      };
     }
 
-    if (!this.options.style.fontFamily) {
-      this.options.style.fontFamily = '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial';
+    if (!this.options.font.fontFamily) {
+      this.options.font.fontFamily = '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial';
     }
 
-    if (!this.options.style.fontSize) {
+    if (!this.options.font.color) {
+      this.options.font.color = '#555';
+    }
+    if (!this.options.font.fontSize) {
       // px
-      this.options.style.fontSize = 12;
+      this.options.font.fontSize = 12;
     }
-    if (!this.options.style.lineHeight) {
+    if (!this.options.font.lineHeight) {
       // number
-      this.options.style.lineHeight = 1.5;
+      this.options.font.lineHeight = 1.5;
+    }
+    if (!this.options.font.textAlign) {
+      this.options.font.textAlign = 'center';
+    }
+    if (!this.options.font.textBaseline) {
+      this.options.font.textBaseline = 'middle';
     }
 
     if (typeof parent === 'string') {
@@ -116,14 +134,15 @@ export class Topology {
       return false;
     }
 
-    this.offscreen.nodes.push.apply(this.offscreen.nodes, this.activeLayer.nodes);
+    // Deactive.
+    this.deactiveNodes();
     this.offscreen.render();
 
-    this.activeLayer.clearNodes();
-    if (this.activeLayer.addNode(node)) {
-      this.nodes.push(node);
-      this.activeLayer.render();
-    }
+    // New active.
+    node.activeStrokeStyle = this.options.activeColor;
+    this.activeLayer.nodes = [node];
+    this.nodes.push(node);
+    this.activeLayer.render();
 
     return true;
   }
@@ -154,7 +173,7 @@ export class Topology {
       if (!this.mouseDown) {
         // Render hover anchors.
         if (this.hoverNode) {
-          this.hoverLayer.setNodes([this.hoverNode]);
+          this.hoverLayer.nodes = [this.hoverNode];
           this.hoverLayer.render();
         } else if (this.lastHover) {
           // Clear hover anchors.
@@ -186,6 +205,8 @@ export class Topology {
           this.hoverLayer.render();
           break;
         case MoveInType.HoverAnchors:
+          this.hoverLayer.lineTo({ x: e.offsetX, y: e.offsetY });
+          this.hoverLayer.render();
           break;
       }
     });
@@ -196,22 +217,30 @@ export class Topology {
 
     // Click the space.
     if (!this.hoverNode && (!this.activeLayer.occupy || !this.activeLayer.occupy.hit(e, 5))) {
-      this.offscreen.nodes.push.apply(this.offscreen.nodes, this.activeLayer.nodes);
+      // Deactive.
+      this.deactiveNodes();
+      this.deactiveLines();
       this.offscreen.render();
 
-      this.activeLayer.nodes = [];
       this.activeLayer.canvas.height = this.activeLayer.canvas.height;
       return;
     }
 
-    // Select more.
-    if (e.ctrlKey) {
-      this.activeLayer.addNode(this.hoverNode);
-    } else if (this.hoverNode && !this.activeLayer.hasNode(this.hoverNode)) {
-      this.activeLayer.setNodes([this.hoverNode]);
+    // Draw line.
+    if (this.moveIn.type === MoveInType.HoverAnchors) {
+      this.hoverLayer.setLine(this.hoverNode.anchors[this.moveIn.hoverAnchorIndex]);
     }
 
-    this.offscreenNodes();
+    // Select more.
+    if (e.ctrlKey) {
+      this.hoverNode.activeStrokeStyle = this.options.activeColor;
+      this.activeLayer.addNode(this.hoverNode);
+    } else if (this.hoverNode && !this.activeLayer.hasNode(this.hoverNode)) {
+      this.hoverNode.activeStrokeStyle = this.options.activeColor;
+      this.activeLayer.nodes = [this.hoverNode];
+    }
+
+    this.calcOffscreenNodes();
 
     // Save the rects for move.
     this.activeLayer.saveRects();
@@ -225,16 +254,31 @@ export class Topology {
 
     if (this.hoverLayer.dragRect) {
       this.getSelectedNodes(this.nodes, this.hoverLayer.dragRect);
-      this.offscreenNodes();
+      this.calcOffscreenNodes();
       this.offscreen.render();
       this.activeLayer.render();
+    }
+
+    // Add the line.
+    if (this.moveIn.type === MoveInType.HoverAnchors) {
+      // Deactive.
+      this.deactiveNodes();
+      this.deactiveLines();
+      this.offscreen.render();
+
+      // New active.
+      this.hoverLayer.line.activeStrokeStyle = this.options.activeColor;
+      this.activeLayer.lines = [this.hoverLayer.line];
+      this.activeLayer.render();
+
+      this.hoverLayer.clearLines();
     }
 
     this.hoverLayer.dragRect = null;
     this.hoverLayer.render();
   };
 
-  offscreenNodes() {
+  calcOffscreenNodes() {
     this.offscreen.nodes = [];
     for (const item of this.nodes) {
       let found = false;
@@ -245,15 +289,32 @@ export class Topology {
         }
       }
       if (!found) {
+        item.activeStrokeStyle = '';
         this.offscreen.nodes.push(item);
       }
     }
   }
 
+  deactiveNodes() {
+    for (const item of this.activeLayer.nodes) {
+      item.activeStrokeStyle = '';
+      this.offscreen.nodes.push(item);
+    }
+    this.activeLayer.nodes = [];
+  }
+
+  deactiveLines() {
+    for (const item of this.activeLayer.lines) {
+      item.activeStrokeStyle = '';
+      this.offscreen.lines.push(item);
+    }
+    this.activeLayer.lines = [];
+  }
+
   getHoverNode(e: MouseEvent, nodes: Node[]) {
     let node: Node;
     for (let i = nodes.length - 1; i >= 0; --i) {
-      if (nodes[i].hit(e, 10)) {
+      if (nodes[i].rect.hit(e, 10)) {
         node = nodes[i];
         this.moveIn.type = MoveInType.Nodes;
         if (!nodes[i].children || !nodes[i].children.length) {
@@ -330,7 +391,7 @@ export class Topology {
       rect.ey = rect.y + rect.height;
     }
     for (const item of nodes) {
-      if (rect.hitRect(item)) {
+      if (rect.hitRect(item.rect)) {
         this.activeLayer.addNode(item);
       }
 

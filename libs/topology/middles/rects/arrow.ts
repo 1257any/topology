@@ -6,9 +6,14 @@ export function arrowIconRect(node: Node) {
 }
 
 export function arrowTextRect(node: Node) {
-  let right = node.width / 10;
+  let right = node.rect.width / 10;
   if (right < 10) {
     right = 10;
   }
-  node.textRect = new Rect(node.x + 10, node.y + node.height / 3, node.width - 20 - right, node.height / 3);
+  node.textRect = new Rect(
+    node.rect.x + 10,
+    node.rect.y + node.rect.height / 3,
+    node.rect.width - 20 - right,
+    node.rect.height / 3
+  );
 }

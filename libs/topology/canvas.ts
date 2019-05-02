@@ -1,33 +1,19 @@
 import { Node } from './models/node';
+import { Line } from './models/line';
 import { drawFns } from './middles/index';
 import { Store } from './store/store';
 import { Options } from './options';
-import { iconfont } from './middles/draws/iconfont';
-import { text } from './middles/draws/text';
 
 export class Canvas {
   canvas = document.createElement('canvas');
   nodes: Node[] = [];
-  options: Options;
+  lines: Line[] = [];
   rendering = false;
-  constructor(options) {
-    this.options = options || {};
-    this.options.style = options.style || {};
-    if (!this.options.style.strokeStyle) {
-      this.options.style.strokeStyle = '#555';
-    }
-    if (!this.options.style.lineWidth) {
-      this.options.style.lineWidth = 1;
-    }
-  }
+  constructor(public options: Options = {}) {}
 
   resize(width: number, height: number) {
     this.canvas.width = width;
     this.canvas.height = height;
-  }
-
-  setNodes(nodes: Node[]) {
-    this.nodes = nodes;
   }
 
   addNode(node: Node): boolean {
@@ -72,73 +58,45 @@ export class Canvas {
     return found;
   }
 
-  clearNodes() {
-    this.nodes = [];
-  }
-
-  render(update = true, isActive = false) {
+  render(update = true) {
     if (this.rendering) {
       return;
     }
 
     this.rendering = true;
-
     // Clear the canvas.
     this.canvas.height = this.canvas.height;
-
-    if (this.nodes.length) {
-      const ctx = this.canvas.getContext('2d');
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.font = `${this.options.style.fontSize}px/${this.options.style.lineHeight} ${this.options.style.fontFamily}`;
-
-      if (isActive) {
-        ctx.strokeStyle = this.options.activeStyle.strokeStyle;
-      } else {
-        ctx.strokeStyle = this.options.style.strokeStyle;
-      }
-      ctx.lineWidth = this.options.style.lineWidth;
-      for (const item of this.nodes) {
-        // Draw shape.
-        drawFns[item.shapeName](ctx, item);
-
-        // Draw text.
-        if (item.shapeName !== 'text' && item.text) {
-          text(ctx, item);
-        }
-
-        // Draw image.
-        if (item.image) {
-          // There is the cache of image.
-          if (item.img) {
-            ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
-            continue;
-          } else {
-            // Load image and draw it.
-            item.img = new Image();
-            item.img.crossOrigin = 'anonymous';
-            item.img.src = item.image;
-            item.img.onload = () => {
-              ctx.drawImage(item.img, item.iconRect.x, item.iconRect.y, item.iconRect.width, item.iconRect.height);
-              this.emitRender();
-            };
-          }
-
-          continue;
-        }
-
-        // Draw icon
-        if (item.icon) {
-          iconfont(ctx, item, item.iconRect);
-        }
-      }
-    }
-
+    this.renderLines();
+    this.renderNodes();
     if (update) {
       this.emitRender();
     }
-
     this.rendering = false;
+  }
+
+  renderNodes() {
+    if (!this.nodes.length) {
+      return;
+    }
+
+    const ctx = this.canvas.getContext('2d');
+    for (const item of this.nodes) {
+      item.render(ctx);
+    }
+  }
+
+  renderLines() {
+    if (!this.lines.length) {
+      return;
+    }
+
+    const ctx = this.canvas.getContext('2d');
+    for (const item of this.lines) {
+      if (!item.to) {
+        continue;
+      }
+      item.render(ctx);
+    }
   }
 
   emitRender() {

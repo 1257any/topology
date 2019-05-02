@@ -2,8 +2,8 @@ import { Node } from '../../models/node';
 import { Rect } from '../../models/rect';
 
 export function triangleIconRect(node: Node) {
-  let w = (node.width * 2) / 7;
-  let h = (node.height * 2) / 7;
+  let w = (node.rect.width * 2) / 7;
+  let h = (node.rect.height * 2) / 7;
   if (w > h) {
     w = h;
   } else {
@@ -13,20 +13,20 @@ export function triangleIconRect(node: Node) {
   if (top < 10) {
     top = 10;
   }
-  node.iconRect = new Rect(node.x + (node.width - w) / 2, node.y + top, w, h);
+  node.iconRect = new Rect(node.rect.x + (node.rect.width - w) / 2, node.rect.y + top, w, h);
 }
 
 export function triangleTextRect(node: Node) {
   if (node.icon || node.image) {
     node.textRect = new Rect(
-      node.x + node.width / 4,
-      node.y + (node.height * 2) / 3,
-      node.width / 2,
-      node.height / 3 - 5
+      node.rect.x + node.rect.width / 4,
+      node.rect.y + (node.rect.height * 2) / 3,
+      node.rect.width / 2,
+      node.rect.height / 3 - 5
     );
   } else {
-    const w = node.width / 2;
-    const h = (node.height * 3) / 7;
-    node.textRect = new Rect(node.x + (node.width - w) / 2, node.y + node.height / 2 - 5, w, h);
+    const w = node.rect.width / 2;
+    const h = (node.rect.height * 3) / 7;
+    node.textRect = new Rect(node.rect.x + (node.rect.width - w) / 2, node.rect.y + node.rect.height / 2 - 5, w, h);
   }
 }
