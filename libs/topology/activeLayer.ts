@@ -1,7 +1,6 @@
 import { occupyRect } from './models/node';
 import { Canvas } from './canvas';
 import { Rect } from './models/rect';
-import { Line } from './models/line';
 
 export class ActiveLayer extends Canvas {
   // 总面积
@@ -173,6 +172,17 @@ export class ActiveLayer extends Canvas {
       item.rect.ex = item.rect.x + item.rect.width;
       item.rect.ey = item.rect.y + item.rect.height;
       item.init();
+      // Move lines.
+      for (const line of this.lines) {
+        if (line.from.id === item.id) {
+          line.from.x = (item.anchors[line.from.anchorId].x + item.anchors[line.from.anchorId].width / 2 + 0.5) << 0;
+          line.from.y = (item.anchors[line.from.anchorId].y + item.anchors[line.from.anchorId].height / 2 + 0.5) << 0;
+        }
+        if (line.to.id === item.id) {
+          line.to.x = (item.anchors[line.to.anchorId].x + item.anchors[line.to.anchorId].width / 2 + 0.5) << 0;
+          line.to.y = (item.anchors[line.to.anchorId].y + item.anchors[line.to.anchorId].height / 2 + 0.5) << 0;
+        }
+      }
       ++i;
     }
 
