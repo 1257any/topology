@@ -1,11 +1,11 @@
 import { Pen } from './pen';
 import { Rect } from './rect';
 import { s8 } from '../uuid/uuid';
-import { anchorsFns, iconRectFns, textRectFns, drawFns } from '../middles';
+import { anchorsFns, iconRectFns, textRectFns, drawNodeFns } from '../middles';
 import { defaultAnchors } from '../middles/anchors/default';
 import { defaultIconRect, defaultTextRect } from '../middles/rects/default';
-import { text } from '../middles/draws/text';
-import { iconfont } from '../middles/draws/iconfont';
+import { text } from '../middles/draws/nodes/text';
+import { iconfont } from '../middles/draws/nodes/iconfont';
 import { Store } from '../store/store';
 
 export class Node extends Pen {
@@ -94,7 +94,7 @@ export class Node extends Pen {
 
   draw(ctx: CanvasRenderingContext2D) {
     // Draw shape.
-    drawFns[this.shapeName](ctx, this);
+    drawNodeFns[this.shapeName](ctx, this);
 
     // Draw text.
     if (this.shapeName !== 'text' && this.text) {

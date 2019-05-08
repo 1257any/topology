@@ -1,6 +1,6 @@
 import { Rect } from './models/rect';
-import { Node } from './models/node';
-import { Line, ArrowType, Point } from './models/line';
+import { Point } from './models/point';
+import { Line } from './models/line';
 import { Canvas } from './canvas';
 import { Store } from './store/store';
 
@@ -14,7 +14,7 @@ export class HoverLayer extends Canvas {
       this.options.hoverColor = '#389e0d';
     }
 
-    // 鼠标按下框选演示
+    // The backgournd color of selecting nodes by draging.
     if (!this.options.dragColor) {
       this.options.dragColor = '#1890ff';
     }
@@ -25,7 +25,7 @@ export class HoverLayer extends Canvas {
     parent.appendChild(this.canvas);
   }
 
-  setLine(from: Point, fromArrow: ArrowType = ArrowType.None) {
+  setLine(from: Point, fromArrow?: string) {
     this.line = new Line(from);
     this.line.activeStrokeStyle = this.options.hoverColor;
     this.line.fromArrow = fromArrow;
@@ -33,7 +33,7 @@ export class HoverLayer extends Canvas {
     Store.get('lines').push(this.line);
   }
 
-  lineTo(to: Point, toArrow: ArrowType = ArrowType.TriangleSolid) {
+  lineTo(to: Point, toArrow: string = 'triangleSolid') {
     this.line.to = to;
     this.line.toArrow = toArrow;
   }
@@ -44,7 +44,7 @@ export class HoverLayer extends Canvas {
   }
 
   render() {
-    // 清空背景
+    // clear
     this.canvas.height = this.canvas.height;
 
     this.renderLines();

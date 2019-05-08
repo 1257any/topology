@@ -1,6 +1,6 @@
 import { Node } from './models/node';
 import { Line } from './models/line';
-import { drawFns } from './middles/index';
+import { drawNodeFns } from './middles/index';
 import { Store } from './store/store';
 import { Options } from './options';
 
@@ -17,7 +17,7 @@ export class Canvas {
   }
 
   addNode(node: Node): boolean {
-    if (!drawFns[node.shapeName]) {
+    if (!drawNodeFns[node.shapeName]) {
       return false;
     }
 

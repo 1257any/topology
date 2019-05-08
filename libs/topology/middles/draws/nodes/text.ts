@@ -1,6 +1,6 @@
-import { Node } from '../../models/node';
+import { Node } from '../../../models/node';
 
-// getWords: 拆分一段文本为单词数组。一个汉字算1个单词。
+// getWords: Get the word array from text. A single Chinese character is a word.
 function getWords(txt) {
   const words = [];
   let word = '';
@@ -25,7 +25,9 @@ function getWords(txt) {
   return words;
 }
 
-// getLines：计算绘制文字需要的行数
+// getLines：Get lines of drawing text.
+// words - the word array of text, to avoid spliting a word.
+// maxWidth - the max width of the rect.
 function getLines(ctx: CanvasRenderingContext2D, words: string[], maxWidth: number) {
   const lines = [];
   let currentLine = words[0];
@@ -89,7 +91,7 @@ export function text(ctx: CanvasRenderingContext2D, node: Node) {
   const maxLineLen = node.textMaxLine || lines.length;
   const lineHeight = (node.font.fontSize * node.font.lineHeight) << 0;
 
-  // 默认居中
+  // By default, the text is center aligned.
   let x = (node.textRect.x + node.textRect.width / 2) << 0;
   let y = (node.textRect.y + (node.textRect.height - lineHeight * maxLineLen) / 2 + (lineHeight * 4) / 7) << 0;
   switch (ctx.textAlign) {

@@ -1,7 +1,8 @@
 import { Options } from './options';
 import { Node } from './models/node';
-import { ArrowType, Line, Point } from './models/line';
-import { drawFns } from './middles/index';
+import { Point } from './models/point';
+import { Line } from './models/line';
+import { drawNodeFns } from './middles/index';
 import { Canvas } from './canvas';
 import { Store } from './store/store';
 import { Observer } from './store/observer';
@@ -37,8 +38,8 @@ export class Topology {
     hoverAnchorIndex: 0
   };
   selectedRect = new Rect(0, 0, 0, 0);
-  fromArrowType = ArrowType.None;
-  toArrowType = ArrowType.TriangleSolid;
+  fromArrowType = '';
+  toArrowType = 'triangleSolid';
   scheduledAnimationFrame = false;
   constructor(parent: string | HTMLElement, options?: Options) {
     this.options = options || {};
@@ -134,7 +135,7 @@ export class Topology {
   }
 
   addNode(node: Node): boolean {
-    if (!drawFns[node.shapeName]) {
+    if (!drawNodeFns[node.shapeName]) {
       return false;
     }
 

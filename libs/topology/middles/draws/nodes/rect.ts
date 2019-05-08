@@ -1,4 +1,4 @@
-import { Node } from '../../models/node';
+import { Node } from '../../../models/node';
 
 export function rect(ctx: CanvasRenderingContext2D, node: Node) {
   const wr = node.rect.width * node.borderRadius;
