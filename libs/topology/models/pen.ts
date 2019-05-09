@@ -2,6 +2,8 @@ export abstract class Pen {
   lineWidth = 1;
   strokeStyle = '';
   activeStrokeStyle = '';
+  fillStyle = '';
+  activeFillStyle = '';
   rotate = 0;
   font = {
     color: '',
@@ -13,6 +15,7 @@ export abstract class Pen {
   };
   render(ctx: CanvasRenderingContext2D) {
     ctx.save();
+
     if (this.rotate) {
       ctx.rotate((this.rotate * Math.PI) / 180);
     }
@@ -26,7 +29,15 @@ export abstract class Pen {
     } else if (this.strokeStyle) {
       ctx.strokeStyle = this.strokeStyle;
     }
+
+    if (this.activeFillStyle) {
+      ctx.fillStyle = this.activeFillStyle;
+    } else if (this.fillStyle) {
+      ctx.fillStyle = this.fillStyle;
+    }
+
     this.draw(ctx);
+
     ctx.restore();
   }
 

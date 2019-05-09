@@ -50,8 +50,6 @@ export class HoverLayer extends Canvas {
     this.renderLines();
 
     const ctx = this.canvas.getContext('2d');
-
-    // dock anchor
     ctx.strokeStyle = this.options.hoverColor + '80';
     ctx.fillStyle = this.options.hoverColor + '80';
     ctx.translate(0, 0);

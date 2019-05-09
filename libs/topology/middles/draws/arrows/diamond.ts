@@ -2,8 +2,6 @@ import { Point } from '../../../models/point';
 import { Rect } from '../../../models/rect';
 
 export function diamondSolid(ctx: CanvasRenderingContext2D, from: Point, to: Point, fillStyle?: string) {
-  ctx.save();
-  ctx.beginPath();
   const rect = new Rect(to.x - 16, to.y - 4, 14, 8);
   ctx.translate(to.x, to.y);
   ctx.rotate(Math.atan2(to.y - from.y, to.x - from.x));
@@ -19,7 +17,6 @@ export function diamondSolid(ctx: CanvasRenderingContext2D, from: Point, to: Poi
     ctx.fillStyle = fillStyle;
   }
   ctx.fill();
-  ctx.restore();
 }
 
 export function diamond(ctx: CanvasRenderingContext2D, from: Point, to: Point) {

@@ -19,6 +19,10 @@ export class Line extends Pen {
     }
     this.id = s8();
 
+    this.calcControlPoints();
+  }
+
+  calcControlPoints() {
     if (drawLineFns[this.name]) {
       drawLineFns[this.name].controlPointsFn(this);
     }
@@ -30,15 +34,35 @@ export class Line extends Pen {
     }
 
     // For debug
-    // this.fromArrow = 'lineDown';
-    // this.toArrow = 'lineDown';
+    // this.fromArrow.name = 'triangle';
+    // this.toArrow.name = 'triangle';
     // end.
 
     if (this.fromArrow && drawArrowFns[this.fromArrow]) {
-      drawArrowFns[this.fromArrow](ctx, this.to, this.from, this.fromArrow);
+      ctx.save();
+      ctx.beginPath();
+      if (this.activeStrokeStyle) {
+        ctx.fillStyle = this.activeStrokeStyle;
+      } else if (this.strokeStyle) {
+        ctx.fillStyle = this.strokeStyle;
+      } else {
+        ctx.fillStyle = ctx.strokeStyle;
+      }
+      drawArrowFns[this.fromArrow](ctx, this.to, this.from);
+      ctx.restore();
     }
     if (this.toArrow && drawArrowFns[this.toArrow]) {
-      drawArrowFns[this.toArrow](ctx, this.from, this.to, this.toArrow);
+      ctx.save();
+      ctx.beginPath();
+      if (this.activeStrokeStyle) {
+        ctx.fillStyle = this.activeStrokeStyle;
+      } else if (this.strokeStyle) {
+        ctx.fillStyle = this.strokeStyle;
+      } else {
+        ctx.fillStyle = ctx.strokeStyle;
+      }
+      drawArrowFns[this.toArrow](ctx, this.from, this.to);
+      ctx.restore();
     }
   }
 }

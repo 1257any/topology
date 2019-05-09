@@ -30,6 +30,7 @@ export class Canvas {
     }
 
     if (!found) {
+      node.activeStrokeStyle = this.options.activeColor;
       this.nodes.push(node);
       return true;
     }

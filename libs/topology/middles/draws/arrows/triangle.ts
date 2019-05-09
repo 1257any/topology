@@ -2,8 +2,6 @@ import { Point } from '../../../models/point';
 import { Rect } from '../../../models/rect';
 
 export function triangleSolid(ctx: CanvasRenderingContext2D, from: Point, to: Point, fillStyle?: string) {
-  ctx.save();
-  ctx.beginPath();
   const rect = new Rect(to.x - 17, to.y - 5, 15, 10);
   ctx.translate(to.x, to.y);
   ctx.rotate(Math.atan2(to.y - from.y, to.x - from.x));
@@ -18,7 +16,6 @@ export function triangleSolid(ctx: CanvasRenderingContext2D, from: Point, to: Po
     ctx.fillStyle = fillStyle;
   }
   ctx.fill();
-  ctx.restore();
 }
 
 export function triangle(ctx: CanvasRenderingContext2D, from: Point, to: Point) {

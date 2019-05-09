@@ -2,8 +2,6 @@ import { Point } from '../../../models/point';
 import { Rect } from '../../../models/rect';
 
 export function circleSolid(ctx: CanvasRenderingContext2D, from: Point, to: Point, fillStyle?: string) {
-  ctx.save();
-  ctx.beginPath();
   const rect = new Rect(to.x - 12, to.y - 5, 10, 10);
   ctx.translate(to.x, to.y);
   ctx.rotate(Math.atan2(to.y - from.y, to.x - from.x));
@@ -23,7 +21,6 @@ export function circleSolid(ctx: CanvasRenderingContext2D, from: Point, to: Poin
     ctx.fillStyle = fillStyle;
   }
   ctx.fill();
-  ctx.restore();
 }
 
 export function circle(ctx: CanvasRenderingContext2D, from: Point, to: Point) {

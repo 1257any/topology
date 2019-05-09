@@ -256,11 +256,12 @@ export class Topology {
       this.hoverNode.activeStrokeStyle = this.options.activeColor;
       this.activeLayer.nodes = [this.hoverNode];
     }
+    this.calcActiveLines();
 
     this.calcOffscreenNodes();
     this.calcOffscreenLines();
 
-    // Save the rects for move.
+    // Save initial rects to move.
     this.activeLayer.saveRects();
 
     this.activeLayer.render();
@@ -273,6 +274,8 @@ export class Topology {
 
     if (this.hoverLayer.dragRect) {
       this.getSelectedNodes(this.nodes, this.hoverLayer.dragRect);
+      this.calcActiveLines();
+
       this.calcOffscreenNodes();
       this.offscreen.render();
       this.activeLayer.render();
@@ -283,7 +286,6 @@ export class Topology {
       // Deactive.
       this.deactiveNodes();
       this.deactiveLines();
-      this.offscreen.render();
 
       // New active.
       if (this.hoverLayer.line) {
@@ -292,6 +294,9 @@ export class Topology {
         this.activeLayer.render();
       }
 
+      this.calcOffscreenLines();
+      this.offscreen.render();
+
       this.hoverLayer.clearLines();
     }
 
@@ -299,14 +304,46 @@ export class Topology {
     this.hoverLayer.render();
   };
 
+  calcActiveLines() {
+    this.activeLayer.lines = [];
+    for (const item of this.lines) {
+      let found = false;
+      for (const n of this.hoverLayer.lines) {
+        if (item.id === n.id) {
+          found = true;
+          break;
+        }
+      }
+      if (found) {
+        continue;
+      }
+
+      for (const n of this.activeLayer.nodes) {
+        if (item.from.id === n.id || (item.to && item.to.id === n.id)) {
+          item.activeStrokeStyle = '';
+          this.activeLayer.lines.push(item);
+          break;
+        }
+      }
+    }
+  }
+
   calcOffscreenNodes() {
     this.offscreen.nodes = [];
     for (const item of this.nodes) {
       let found = false;
-      for (const n of this.activeLayer.nodes) {
+      for (const n of this.hoverLayer.nodes) {
         if (item.id === n.id) {
           found = true;
           break;
+        }
+      }
+      if (!found) {
+        for (const n of this.activeLayer.nodes) {
+          if (item.id === n.id) {
+            found = true;
+            break;
+          }
         }
       }
       if (!found) {
@@ -318,18 +355,22 @@ export class Topology {
 
   calcOffscreenLines() {
     this.offscreen.lines = [];
-    this.activeLayer.lines = [];
     for (const item of this.lines) {
-      item.activeStrokeStyle = '';
       let found = false;
-      for (const n of this.activeLayer.nodes) {
-        if (item.from.id === n.id || item.to.id === n.id) {
+      for (const n of this.hoverLayer.lines) {
+        if (item.id === n.id) {
           found = true;
-          this.activeLayer.lines.push(item);
+          break;
+        }
+      }
+      for (const n of this.activeLayer.lines) {
+        if (item.id === n.id) {
+          found = true;
           break;
         }
       }
       if (!found) {
+        item.activeStrokeStyle = '';
         this.offscreen.lines.push(item);
       }
     }
