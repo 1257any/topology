@@ -15,7 +15,8 @@ enum MoveInType {
   None,
   Nodes,
   ActiveAnchors,
-  HoverAnchors
+  HoverAnchors,
+  Line
 }
 
 export class Topology {
@@ -35,7 +36,8 @@ export class Topology {
   moveIn = {
     type: MoveInType.None,
     activeAnchorIndex: 0,
-    hoverAnchorIndex: 0
+    hoverAnchorIndex: 0,
+    activeLine: null
   };
   selectedRect = new Rect(0, 0, 0, 0);
   fromArrowType = '';
@@ -220,15 +222,29 @@ export class Topology {
   onmousedown = (e: MouseEvent) => {
     this.mouseDown = e;
 
-    // Click the space.
-    if (!this.hoverNode && (!this.activeLayer.occupy || !this.activeLayer.occupy.hit(e, 5))) {
+    if (!this.hoverNode) {
       // Deactive.
       this.deactiveNodes();
-      this.deactiveLines();
-      this.offscreen.render();
 
-      this.activeLayer.canvas.height = this.activeLayer.canvas.height;
-      return;
+      // Click a line.
+      if (this.moveIn.type === MoveInType.Line) {
+        this.moveIn.activeLine.activeStrokeStyle = this.options.activeColor;
+        this.activeLayer.lines = [this.moveIn.activeLine];
+        this.activeLayer.render();
+
+        this.calcOffscreenLines();
+        this.offscreen.render();
+        return;
+      }
+
+      // Click the space.
+      if (!this.activeLayer.occupy || !this.activeLayer.occupy.hit(e, 5)) {
+        this.deactiveLines();
+        this.offscreen.render();
+
+        this.activeLayer.canvas.height = this.activeLayer.canvas.height;
+        return;
+      }
     }
 
     // Draw line.
@@ -236,7 +252,7 @@ export class Topology {
       this.hoverLayer.setLine(
         {
           id: this.hoverNode.id,
-          anchorId: this.moveIn.hoverAnchorIndex,
+          anchorIndex: this.moveIn.hoverAnchorIndex,
           x:
             this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].x +
             this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].width / 2,
@@ -288,7 +304,7 @@ export class Topology {
       this.deactiveLines();
 
       // New active.
-      if (this.hoverLayer.line) {
+      if (this.hoverLayer.line && this.hoverLayer.line.to) {
         this.hoverLayer.line.activeStrokeStyle = this.options.activeColor;
         this.activeLayer.lines = [this.hoverLayer.line];
         this.activeLayer.render();
@@ -369,7 +385,7 @@ export class Topology {
           break;
         }
       }
-      if (!found) {
+      if (!found && item.to) {
         item.activeStrokeStyle = '';
         this.offscreen.lines.push(item);
       }
@@ -387,7 +403,9 @@ export class Topology {
   deactiveLines() {
     for (const item of this.activeLayer.lines) {
       item.activeStrokeStyle = '';
-      this.offscreen.lines.push(item);
+      if (item.to) {
+        this.offscreen.lines.push(item);
+      }
     }
     this.activeLayer.lines = [];
   }
@@ -438,16 +456,38 @@ export class Topology {
       }
     }
 
-    if (this.moveIn.type === MoveInType.ActiveAnchors || !this.hoverNode) {
+    if (this.moveIn.type === MoveInType.ActiveAnchors) {
       return;
     }
 
     // In anchors of hoverNode
-    for (let i = 0; i < this.hoverNode.anchors.length; ++i) {
-      if (this.hoverNode.anchors[i].hit(e, 7)) {
-        this.moveIn.type = MoveInType.HoverAnchors;
-        this.moveIn.hoverAnchorIndex = i;
-        this.hoverLayer.canvas.style.cursor = 'crosshair';
+    if (this.hoverNode) {
+      for (let i = 0; i < this.hoverNode.anchors.length; ++i) {
+        if (this.hoverNode.anchors[i].hit(e, 7)) {
+          this.moveIn.type = MoveInType.HoverAnchors;
+          this.moveIn.hoverAnchorIndex = i;
+          this.hoverLayer.canvas.style.cursor = 'crosshair';
+          break;
+        }
+      }
+    }
+
+    if (this.moveIn.type !== MoveInType.None) {
+      return;
+    }
+
+    // In line
+    let index = 0;
+    for (const item of this.lines) {
+      ++index;
+      if (!item.to) {
+        this.lines.splice(index - 1, 1);
+        continue;
+      }
+      if (item.pointIn(e)) {
+        this.moveIn.type = MoveInType.Line;
+        this.moveIn.activeLine = item;
+        this.hoverLayer.canvas.style.cursor = 'pointer';
         break;
       }
     }
@@ -467,9 +507,9 @@ export class Topology {
       for (let i = 0; i < item.anchors.length; ++i) {
         if (item.anchors[i].hit(e, 10)) {
           point.id = item.id;
-          point.anchorId = i;
-          point.x = (item.anchors[point.anchorId].x + item.anchors[point.anchorId].width / 2 + 0.5) << 0;
-          point.y = (item.anchors[point.anchorId].y + item.anchors[point.anchorId].height / 2 + 0.5) << 0;
+          point.anchorIndex = i;
+          point.x = (item.anchors[point.anchorIndex].x + item.anchors[point.anchorIndex].width / 2 + 0.5) << 0;
+          point.y = (item.anchors[point.anchorIndex].y + item.anchors[point.anchorIndex].height / 2 + 0.5) << 0;
           this.hoverLayer.dockAnchor = item.anchors[i];
           break;
         }

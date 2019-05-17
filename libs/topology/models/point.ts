@@ -1,6 +1,6 @@
 export interface Point {
   id?: string;
-  anchorId?: number;
+  anchorIndex?: number;
   x: number;
   y: number;
 }

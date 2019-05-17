@@ -65,4 +65,8 @@ export class Line extends Pen {
       ctx.restore();
     }
   }
+
+  pointIn(e: MouseEvent) {
+    return drawLineFns[this.name].pointIn({ x: e.offsetX, y: e.offsetY }, this);
+  }
 }

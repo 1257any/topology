@@ -25,9 +25,10 @@ import {
   polylineControlPoints,
   polyline2ControlPoints,
   polyline3ControlPoints,
-  polyline4ControlPoints
+  polyline4ControlPoints,
+  pointInPolyline
 } from './draws/lines/polyline';
-import { curve, curveControlPoints } from './draws/lines/curve';
+import { curve, curveControlPoints, pointInCurve } from './draws/lines/curve';
 import { triangleSolid, triangle as arrowTriangle } from './draws/arrows/triangle';
 import { diamondSolid, diamond as arrowDiamond } from './draws/arrows/diamond';
 import { circleSolid, circle as arrowCircle } from './draws/arrows/circle';
@@ -94,27 +95,33 @@ function init() {
   // ********Default lines.*******
   drawLineFns.line = {
     drawFn: line,
-    controlPointsFn: lineControlPoints
+    controlPointsFn: lineControlPoints,
+    pointIn: pointInPolyline
   };
   drawLineFns.polyline = {
     drawFn: polyline,
-    controlPointsFn: polylineControlPoints
+    controlPointsFn: polylineControlPoints,
+    pointIn: pointInPolyline
   };
   drawLineFns.polyline2 = {
     drawFn: polyline2,
-    controlPointsFn: polyline2ControlPoints
+    controlPointsFn: polyline2ControlPoints,
+    pointIn: pointInPolyline
   };
   drawLineFns.polyline3 = {
     drawFn: polyline3,
-    controlPointsFn: polyline3ControlPoints
+    controlPointsFn: polyline3ControlPoints,
+    pointIn: pointInPolyline
   };
   drawLineFns.polyline4 = {
     drawFn: polyline4,
-    controlPointsFn: polyline4ControlPoints
+    controlPointsFn: polyline4ControlPoints,
+    pointIn: pointInPolyline
   };
   drawLineFns.curve = {
     drawFn: curve,
-    controlPointsFn: curveControlPoints
+    controlPointsFn: curveControlPoints,
+    pointIn: pointInCurve
   };
   // ********end********
 
@@ -165,6 +172,7 @@ export function registerLine(
   name: string,
   drawFn: (ctx: CanvasRenderingContext2D, line: Line) => void,
   controlPointsFn?: (line: Line) => void,
+  pointInFn?: (point: Point, line: Line) => boolean,
   force?: boolean
 ) {
   // Exist
@@ -174,7 +182,8 @@ export function registerLine(
 
   drawLineFns[name] = {
     drawFn: drawFn,
-    controlPointsFn: controlPointsFn
+    controlPointsFn: controlPointsFn,
+    pointIn: pointInFn
   };
   return true;
 }
