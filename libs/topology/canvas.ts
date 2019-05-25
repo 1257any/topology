@@ -1,6 +1,6 @@
 import { Node } from './models/node';
 import { Line } from './models/line';
-import { drawNodeFns } from './middles/index';
+import { drawNodeFns, drawLineFns } from './middles/index';
 import { Store } from './store/store';
 import { Options } from './options';
 
@@ -9,6 +9,7 @@ export class Canvas {
   nodes: Node[] = [];
   lines: Line[] = [];
   rendering = false;
+  rotate = 0;
   constructor(public options: Options = {}) {}
 
   resize(width: number, height: number) {
@@ -91,17 +92,40 @@ export class Canvas {
       return;
     }
 
+    const activeLine = Store.get('activeLine');
     const ctx = this.canvas.getContext('2d');
     for (const item of this.lines) {
       if (!item.to) {
         continue;
       }
       item.render(ctx);
+
+      if (activeLine === item && item.controlPoints.length && drawLineFns[item.name]) {
+        ctx.save();
+        ctx.strokeStyle = this.options.hoverColor;
+        ctx.fillStyle = this.options.hoverColor;
+        drawLineFns[item.name].drawControlPointsFn(ctx, item);
+        ctx.restore();
+      }
     }
   }
 
   emitRender() {
     let r = Store.get('render') || 0;
     Store.set('render', ++r);
+  }
+
+  offsetRotate(angle: number) {
+    for (const item of this.nodes) {
+      item.offsetRotate = angle;
+    }
+    this.rotate = angle;
+  }
+
+  updateRotate() {
+    for (const item of this.nodes) {
+      item.rotate += item.offsetRotate;
+      item.offsetRotate = 0;
+    }
   }
 }

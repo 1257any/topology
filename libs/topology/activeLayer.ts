@@ -29,17 +29,16 @@ export class ActiveLayer extends Canvas {
       return;
     }
 
-    this.anchors = [];
-    // Left Top
-    this.anchors.push(new Rect(this.occupy.x - 4, this.occupy.y - 4, 8, 8));
-    // Right Top
-    this.anchors.push(new Rect(this.occupy.x + this.occupy.width - 4, this.occupy.y - 4, 8, 8));
-    // Right Bottom
-    this.anchors.push(new Rect(this.occupy.x + this.occupy.width - 4, this.occupy.y + this.occupy.height - 4, 8, 8));
-    // Left Bottom
-    this.anchors.push(new Rect(this.occupy.x - 4, this.occupy.y + this.occupy.height - 4, 8, 8));
+    this.calcAnchors();
 
     const ctx = this.canvas.getContext('2d');
+
+    if (this.nodes.length === 1) {
+      ctx.translate(this.nodes[0].rect.centerX, this.nodes[0].rect.centerY);
+      ctx.rotate(((this.nodes[0].rotate + this.nodes[0].offsetRotate) * Math.PI) / 180);
+      ctx.translate(-this.nodes[0].rect.centerX, -this.nodes[0].rect.centerY);
+    }
+
     // Territory
     ctx.strokeStyle = this.options.activeColor + '50';
     ctx.lineWidth = 1;
@@ -55,7 +54,7 @@ export class ActiveLayer extends Canvas {
     ctx.fillStyle = '#fff';
     ctx.lineWidth = 2;
 
-    // Circle of anchors
+    // Rotate circle.
     ctx.beginPath();
     ctx.arc(this.occupy.x + ((this.occupy.width / 2 + 0.5) << 0), this.occupy.y - 25, 5, 0, Math.PI * 2);
     ctx.stroke();
@@ -66,6 +65,18 @@ export class ActiveLayer extends Canvas {
       ctx.strokeRect(item.x, item.y, item.width, item.height);
       ctx.fillRect(item.x, item.y, item.width, item.height);
     }
+  }
+
+  calcAnchors() {
+    this.anchors = [];
+    // Left Top
+    this.anchors.push(new Rect(this.occupy.x - 4, this.occupy.y - 4, 8, 8));
+    // Right Top
+    this.anchors.push(new Rect(this.occupy.x + this.occupy.width - 4, this.occupy.y - 4, 8, 8));
+    // Right Bottom
+    this.anchors.push(new Rect(this.occupy.x + this.occupy.width - 4, this.occupy.y + this.occupy.height - 4, 8, 8));
+    // Left Bottom
+    this.anchors.push(new Rect(this.occupy.x - 4, this.occupy.y + this.occupy.height - 4, 8, 8));
   }
 
   // 即将缩放选中的nodes，备份nodes最初大小，方便缩放比例计算
@@ -140,6 +151,7 @@ export class ActiveLayer extends Canvas {
         newOccupy.width / this.initialOccupy.width,
         newOccupy.height / this.initialOccupy.height
       );
+      item.rect.calceCenter();
       item.init();
       ++i;
     }
@@ -171,6 +183,7 @@ export class ActiveLayer extends Canvas {
       item.rect.y = this.rects[i].y + pos.height;
       item.rect.ex = item.rect.x + item.rect.width;
       item.rect.ey = item.rect.y + item.rect.height;
+      item.rect.calceCenter();
       item.init();
       // Move lines.
       for (const line of this.lines) {
@@ -184,6 +197,7 @@ export class ActiveLayer extends Canvas {
           line.to.x = (item.anchors[line.to.anchorIndex].x + item.anchors[line.to.anchorIndex].width / 2 + 0.5) << 0;
           line.to.y = (item.anchors[line.to.anchorIndex].y + item.anchors[line.to.anchorIndex].height / 2 + 0.5) << 0;
         }
+        line.calcControlPoints();
       }
       ++i;
     }

@@ -1,10 +1,15 @@
+import { Point } from './point';
+import { Rect } from './rect';
+
 export abstract class Pen {
+  rect: Rect;
   lineWidth = 1;
   strokeStyle = '';
   activeStrokeStyle = '';
   fillStyle = '';
   activeFillStyle = '';
   rotate = 0;
+  offsetRotate = 0;
   font = {
     color: '',
     fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
@@ -16,8 +21,10 @@ export abstract class Pen {
   render(ctx: CanvasRenderingContext2D) {
     ctx.save();
 
-    if (this.rotate) {
-      ctx.rotate((this.rotate * Math.PI) / 180);
+    if (this.rotate || this.offsetRotate) {
+      ctx.translate(this.rect.centerX, this.rect.centerY);
+      ctx.rotate(((this.rotate + this.offsetRotate) * Math.PI) / 180);
+      ctx.translate(-this.rect.centerX, -this.rect.centerY);
     }
 
     if (this.lineWidth > 1) {

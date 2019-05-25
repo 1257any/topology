@@ -8,6 +8,7 @@ export class HoverLayer extends Canvas {
   line: Line;
   dockAnchor: Rect;
   dragRect: Rect;
+  controlPoint: Point;
   constructor(parent: HTMLElement, options: any) {
     super(options);
     if (!this.options.hoverColor) {
@@ -26,16 +27,16 @@ export class HoverLayer extends Canvas {
   }
 
   setLine(from: Point, fromArrow?: string) {
-    this.line = new Line(from);
+    this.line = new Line();
+    this.line.setFrom(from);
     this.line.activeStrokeStyle = this.options.hoverColor;
-    this.line.fromArrow = fromArrow;
     this.lines = [this.line];
     Store.get('lines').push(this.line);
   }
 
   lineTo(to: Point, toArrow: string = 'triangleSolid') {
-    this.line.to = to;
-    this.line.toArrow = toArrow;
+    this.line.setTo(to, toArrow);
+    this.line.calcControlPoints();
   }
 
   clearLines() {
@@ -83,6 +84,13 @@ export class HoverLayer extends Canvas {
         ctx.stroke();
         ctx.fill();
       }
+    }
+
+    if (this.controlPoint) {
+      ctx.fillStyle = this.options.hoverColor;
+      ctx.beginPath();
+      ctx.arc(this.controlPoint.x, this.controlPoint.y, 5, 0, Math.PI * 2);
+      ctx.fill();
     }
 
     // Select nodes by drag.

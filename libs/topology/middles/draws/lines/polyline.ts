@@ -1,49 +1,57 @@
 import { Point } from '../../../models/point';
 import { Line } from '../../../models/line';
+import { Direction } from '../../../models/direction';
 import { pointInLine } from './utils';
+
+const minDistance = 50;
 
 export function polyline(ctx: CanvasRenderingContext2D, l: Line) {
   ctx.beginPath();
   ctx.moveTo(l.from.x, l.from.y);
+  for (const item of l.controlPoints) {
+    ctx.lineTo(item.x, item.y);
+  }
   ctx.lineTo(l.to.x, l.to.y);
   ctx.stroke();
 }
 
-export function polylineControlPoints(l: Line) {
+export function polylineControlPoints(ctx: CanvasRenderingContext2D, l: Line) {
+  ctx.fillStyle = '#fff';
+  ctx.lineWidth = 2;
+  for (const item of l.controlPoints) {
+    ctx.beginPath();
+    ctx.arc(item.x, item.y, 4, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fill();
+  }
+}
+
+export function calcPolylineControlPoints(l: Line) {
   l.controlPoints = [];
-}
-
-export function polyline2(ctx: CanvasRenderingContext2D, l: Line) {
-  ctx.beginPath();
-  ctx.moveTo(l.from.x, l.from.y);
-  ctx.lineTo(l.to.x, l.to.y);
-  ctx.stroke();
-}
-
-export function polyline2ControlPoints(l: Line) {
-  l.controlPoints = [];
-}
-
-export function polyline3(ctx: CanvasRenderingContext2D, l: Line) {
-  ctx.beginPath();
-  ctx.moveTo(l.from.x, l.from.y);
-  ctx.lineTo(l.to.x, l.to.y);
-  ctx.stroke();
-}
-
-export function polyline3ControlPoints(l: Line) {
-  l.controlPoints = [];
-}
-
-export function polyline4(ctx: CanvasRenderingContext2D, l: Line) {
-  ctx.beginPath();
-  ctx.moveTo(l.from.x, l.from.y);
-  ctx.lineTo(l.to.x, l.to.y);
-  ctx.stroke();
-}
-
-export function polyline4ControlPoints(l: Line) {
-  l.controlPoints = [];
+  const from = getDirectionPoint(l.from);
+  if (l.from.direction) {
+    l.controlPoints.push(from);
+  }
+  const to = getDirectionPoint(l.to);
+  let pts: Point[];
+  switch (from.direction) {
+    case Direction.Up:
+      pts = getNextPointByUp(from, to);
+      break;
+    case Direction.Right:
+      pts = getNextPointByRight(from, to);
+      break;
+    case Direction.Bottom:
+      pts = getNextPointByBottom(from, to);
+      break;
+    case Direction.Left:
+      pts = getNextPointByLeft(from, to);
+      break;
+  }
+  l.controlPoints.push.apply(l.controlPoints, pts);
+  if (l.to.direction) {
+    l.controlPoints.push(to);
+  }
 }
 
 export function pointInPolyline(point: Point, l: Line): boolean {
@@ -65,4 +73,413 @@ export function pointInPolyline(point: Point, l: Line): boolean {
   }
 
   return false;
+}
+
+export function dockPolylineControlPoint(point: Point, l: Line) {
+  const pts: Point[] = [l.from];
+  pts.push.apply(pts, l.controlPoints);
+  pts.push(l.to);
+  for (const item of pts) {
+    if (Math.abs(point.x - item.x) < 7) {
+      point.x = item.x;
+    }
+    if (Math.abs(point.y - item.y) < 7) {
+      point.y = item.y;
+    }
+  }
+}
+
+function getDirectionPoint(p: Point) {
+  const point = Object.assign({}, p);
+  switch (p.direction) {
+    case Direction.Up:
+      point.y -= minDistance;
+      break;
+    case Direction.Right:
+      point.x += minDistance;
+      break;
+    case Direction.Bottom:
+      point.y += minDistance;
+      break;
+    case Direction.Left:
+      point.x -= minDistance;
+      break;
+  }
+  return point;
+}
+
+function getNextPointByUp(from: Point, to: Point) {
+  if (from.x === to.x || from.y === to.y) {
+    return [];
+  }
+
+  // The to point above the from point.
+  if (from.y > to.y) {
+    if (to.direction === Direction.Up && from.y - to.y > 3 * minDistance) {
+      if (from.x < to.x) {
+        if (to.x - from.x < minDistance) {
+          return [
+            {
+              x: from.x - 2 * minDistance,
+              y: from.y
+            },
+            {
+              x: from.x - 2 * minDistance,
+              y: to.y
+            }
+          ];
+        }
+        return [
+          {
+            x: from.x,
+            y: to.y
+          }
+        ];
+      } else {
+        if (from.x - to.x < minDistance) {
+          return [
+            {
+              x: from.x + 2 * minDistance,
+              y: from.y
+            },
+            {
+              x: from.x + 2 * minDistance,
+              y: to.y
+            }
+          ];
+        }
+
+        return [
+          {
+            x: from.x,
+            y: to.y
+          }
+        ];
+      }
+    } else {
+      // Left top
+      if ((to.direction === Direction.Left && from.x > to.x) || (to.direction === Direction.Right && from.x < to.x)) {
+        return [
+          {
+            x: to.x,
+            y: from.y
+          }
+        ];
+      }
+      return [
+        {
+          x: from.x,
+          y: to.y
+        }
+      ];
+    }
+
+    // The to point below the from point.
+  } else {
+    if (to.direction === Direction.Bottom) {
+      if (from.x < to.x) {
+        return getHorizontalPoints(from, to);
+      } else {
+        const pts = getHorizontalPoints(to, from);
+        return [pts[1], pts[0]];
+      }
+    } else {
+      return [
+        {
+          x: to.x,
+          y: from.y
+        }
+      ];
+    }
+  }
+}
+
+function getNextPointByBottom(from: Point, to: Point) {
+  if (from.x === to.x || from.y === to.y) {
+    return [];
+  }
+
+  // The to point below the from point.
+  if (from.y < to.y) {
+    if (to.direction === Direction.Bottom && to.y - from.y > 3 * minDistance) {
+      if (from.x < to.x) {
+        if (to.x - from.x < minDistance) {
+          return [
+            {
+              x: from.x - 2 * minDistance,
+              y: from.y
+            },
+            {
+              x: from.x - 2 * minDistance,
+              y: to.y
+            }
+          ];
+        }
+        return [
+          {
+            x: from.x,
+            y: to.y
+          }
+        ];
+      } else {
+        if (from.x - to.x < minDistance) {
+          return [
+            {
+              x: from.x + 2 * minDistance,
+              y: from.y
+            },
+            {
+              x: from.x + 2 * minDistance,
+              y: to.y
+            }
+          ];
+        }
+        return [
+          {
+            x: from.x,
+            y: to.y
+          }
+        ];
+      }
+    } else {
+      if ((to.direction === Direction.Left && from.x > to.x) || (to.direction === Direction.Right && from.x < to.x)) {
+        return [
+          {
+            x: to.x,
+            y: from.y
+          }
+        ];
+      }
+      return [
+        {
+          x: from.x,
+          y: to.y
+        }
+      ];
+    }
+
+    // The to point below the from point.
+  } else {
+    if (to.direction === Direction.Up) {
+      if (from.x < to.x) {
+        return getHorizontalPoints(from, to);
+      } else {
+        const pts = getHorizontalPoints(to, from);
+        return [pts[1], pts[0]];
+      }
+    } else {
+      return [
+        {
+          x: to.x,
+          y: from.y
+        }
+      ];
+    }
+  }
+}
+
+function getNextPointByLeft(from: Point, to: Point) {
+  if (from.x === to.x || from.y === to.y) {
+    return [];
+  }
+
+  // The to point is on the left.
+  if (from.x > to.x) {
+    if (to.direction === Direction.Left && from.x - to.x > 3 * minDistance) {
+      if (from.y < to.y) {
+        if (to.y - from.y < minDistance) {
+          return [
+            {
+              x: from.x,
+              y: from.y + 2 * minDistance
+            },
+            {
+              x: to.x,
+              y: from.y + 2 * minDistance
+            }
+          ];
+        }
+        return [
+          {
+            x: to.x,
+            y: from.y
+          }
+        ];
+      } else {
+        if (from.y - to.y < minDistance) {
+          return [
+            {
+              x: from.x,
+              y: from.y - 2 * minDistance
+            },
+            {
+              x: to.x,
+              y: from.y - 2 * minDistance
+            }
+          ];
+        }
+
+        return [
+          {
+            x: to.x,
+            y: from.y
+          }
+        ];
+      }
+    } else {
+      if (
+        to.direction === Direction.Left ||
+        (to.direction === Direction.Up && from.y < to.y) ||
+        (to.direction === Direction.Bottom && from.y > to.y)
+      ) {
+        return [
+          {
+            x: to.x,
+            y: from.y
+          }
+        ];
+      }
+      return [
+        {
+          x: from.x,
+          y: to.y
+        }
+      ];
+    }
+
+    // The to point is on the right.
+  } else {
+    if (to.direction === Direction.Left) {
+      if (from.y < to.y) {
+        return getVerticalPoints(from, to);
+      } else {
+        const pts = getVerticalPoints(to, from);
+        return [pts[1], pts[0]];
+      }
+    } else {
+      return [
+        {
+          x: from.x,
+          y: to.y
+        }
+      ];
+    }
+  }
+}
+
+function getNextPointByRight(from: Point, to: Point) {
+  if (from.x === to.x || from.y === to.y) {
+    return [];
+  }
+
+  // The to point is on the right.
+  if (from.x < to.x) {
+    if (to.direction === Direction.Right && to.x - from.x > 3 * minDistance) {
+      if (from.y < to.y) {
+        if (to.y - from.y < minDistance) {
+          return [
+            {
+              x: from.x,
+              y: from.y - 2 * minDistance
+            },
+            {
+              x: to.x,
+              y: from.y - 2 * minDistance
+            }
+          ];
+        }
+        return [
+          {
+            x: to.x,
+            y: from.y
+          }
+        ];
+      } else {
+        if (from.y - to.y < minDistance) {
+          return [
+            {
+              x: from.x,
+              y: from.y + 2 * minDistance
+            },
+            {
+              x: to.x,
+              y: from.y + 2 * minDistance
+            }
+          ];
+        }
+
+        return [
+          {
+            x: to.x,
+            y: from.y
+          }
+        ];
+      }
+    } else {
+      if (
+        to.direction === Direction.Right ||
+        (to.direction === Direction.Up && from.y < to.y) ||
+        (to.direction === Direction.Bottom && from.y > to.y)
+      ) {
+        return [
+          {
+            x: to.x,
+            y: from.y
+          }
+        ];
+      }
+      return [
+        {
+          x: from.x,
+          y: to.y
+        }
+      ];
+    }
+
+    // The to point is on the left.
+  } else {
+    if (to.direction === Direction.Left) {
+      if (from.y < to.y) {
+        return getVerticalPoints(from, to);
+      } else {
+        const pts = getVerticalPoints(to, from);
+        return [pts[1], pts[0]];
+      }
+    } else {
+      return [
+        {
+          x: from.x,
+          y: to.y
+        }
+      ];
+    }
+  }
+}
+
+function getHorizontalPoints(left: Point, right: Point) {
+  const x = (left.x + (right.x - left.x) / 2 + 0.5) << 0;
+  return [
+    {
+      x,
+      y: left.y
+    },
+    {
+      x,
+      y: right.y
+    }
+  ];
+}
+
+function getVerticalPoints(up: Point, bottom: Point) {
+  const y = (up.y + (bottom.y - up.y) / 2 + 0.5) << 0;
+  return [
+    {
+      x: up.x,
+      y
+    },
+    {
+      x: bottom.x,
+      y
+    }
+  ];
 }

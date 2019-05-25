@@ -1,4 +1,5 @@
 import { Node } from '../../../models/node';
+import { Point } from '../../../models/point';
 
 export function rect(ctx: CanvasRenderingContext2D, node: Node) {
   const wr = node.rect.width * node.borderRadius;
@@ -30,4 +31,21 @@ export function rect(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.arcTo(node.rect.x, node.rect.y, node.rect.x + node.rect.width, node.rect.y, r);
   ctx.closePath();
   ctx.stroke();
+}
+
+export function pointInRect(point: Point, pts: Point[]): boolean {
+  let isIn = false;
+
+  let last = pts[3];
+  for (const item of pts) {
+    if ((item.y < point.y && last.y >= point.y) || (item.y >= point.y && last.y < point.y)) {
+      if (item.x + ((point.y - item.y) * (last.x - item.x)) / (last.y - item.y) > point.x) {
+        isIn = !isIn;
+      }
+    }
+
+    last = item;
+  }
+
+  return isIn;
 }

@@ -16,19 +16,15 @@ import { triangleIconRect, triangleTextRect } from './rects/triangle';
 import { diamondIconRect, diamondTextRect } from './rects/diamond';
 import { arrowIconRect, arrowTextRect } from './rects/arrow';
 import { lineIconRect, lineTextRect } from './rects/line';
-import { line, lineControlPoints } from './draws/lines/line';
+import { line, lineControlPoints, calcLineControlPoints } from './draws/lines/line';
 import {
   polyline,
-  polyline2,
-  polyline3,
-  polyline4,
   polylineControlPoints,
-  polyline2ControlPoints,
-  polyline3ControlPoints,
-  polyline4ControlPoints,
-  pointInPolyline
+  pointInPolyline,
+  calcPolylineControlPoints,
+  dockPolylineControlPoint
 } from './draws/lines/polyline';
-import { curve, curveControlPoints, pointInCurve } from './draws/lines/curve';
+import { curve, curveControlPoints, pointInCurve, calcCurveControlPoints } from './draws/lines/curve';
 import { triangleSolid, triangle as arrowTriangle } from './draws/arrows/triangle';
 import { diamondSolid, diamond as arrowDiamond } from './draws/arrows/diamond';
 import { circleSolid, circle as arrowCircle } from './draws/arrows/circle';
@@ -95,32 +91,21 @@ function init() {
   // ********Default lines.*******
   drawLineFns.line = {
     drawFn: line,
-    controlPointsFn: lineControlPoints,
+    drawControlPointsFn: lineControlPoints,
+    controlPointsFn: calcLineControlPoints,
     pointIn: pointInPolyline
   };
   drawLineFns.polyline = {
     drawFn: polyline,
-    controlPointsFn: polylineControlPoints,
-    pointIn: pointInPolyline
-  };
-  drawLineFns.polyline2 = {
-    drawFn: polyline2,
-    controlPointsFn: polyline2ControlPoints,
-    pointIn: pointInPolyline
-  };
-  drawLineFns.polyline3 = {
-    drawFn: polyline3,
-    controlPointsFn: polyline3ControlPoints,
-    pointIn: pointInPolyline
-  };
-  drawLineFns.polyline4 = {
-    drawFn: polyline4,
-    controlPointsFn: polyline4ControlPoints,
+    drawControlPointsFn: polylineControlPoints,
+    controlPointsFn: calcPolylineControlPoints,
+    dockControlPointFn: dockPolylineControlPoint,
     pointIn: pointInPolyline
   };
   drawLineFns.curve = {
     drawFn: curve,
-    controlPointsFn: curveControlPoints,
+    drawControlPointsFn: curveControlPoints,
+    controlPointsFn: calcCurveControlPoints,
     pointIn: pointInCurve
   };
   // ********end********
@@ -143,9 +128,9 @@ function init() {
 init();
 
 // registerNode: Register a custom node.
-// name - the name of node.
-// drawFn - how to draw.
-// anchorsFn - how to get the anchors.
+// name - The name of node.
+// drawFn - How to draw.
+// anchorsFn - How to get the anchors.
 // force - Overwirte the node if exists.
 export function registerNode(
   name: string,
@@ -164,14 +149,18 @@ export function registerNode(
 }
 
 // registerLine: Register a custom line.
-// name - the name of line.
-// drawFn - how to draw.
-// controlPointsFn - how to get the controlPoints.
+// name - The name of line.
+// drawFn - How to draw.
+// drawControlPointsFn - Draw the control points.
+// controlPointsFn - How to get the controlPoints.
+// dockControlPointFn - Dock a point to horizontal/vertial or related position.
 // force - Overwirte the node if exists.
 export function registerLine(
   name: string,
   drawFn: (ctx: CanvasRenderingContext2D, line: Line) => void,
+  drawControlPointsFn?: (ctx: CanvasRenderingContext2D, line: Line) => void,
   controlPointsFn?: (line: Line) => void,
+  dockControlPointFn?: (point: Point, line: Line) => void,
   pointInFn?: (point: Point, line: Line) => boolean,
   force?: boolean
 ) {
@@ -182,7 +171,9 @@ export function registerLine(
 
   drawLineFns[name] = {
     drawFn: drawFn,
+    drawControlPointsFn: drawControlPointsFn,
     controlPointsFn: controlPointsFn,
+    dockControlPointFn: dockControlPointFn,
     pointIn: pointInFn
   };
   return true;

@@ -7,6 +7,8 @@ export function line(ctx: CanvasRenderingContext2D, l: Line) {
   ctx.stroke();
 }
 
-export function lineControlPoints(l: Line) {
+export function lineControlPoints(ctx: CanvasRenderingContext2D, l: Line) {}
+
+export function calcLineControlPoints(l: Line) {
   l.controlPoints = [];
 }

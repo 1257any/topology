@@ -13,4 +13,5 @@ export interface Options {
     textAlign: CanvasTextAlign;
     textBaseline: CanvasTextBaseline;
   };
+  rotateCursor?: string;
 }

@@ -1,5 +1,6 @@
 import { Pen } from './pen';
 import { Rect } from './rect';
+import { Anchor } from './anchor';
 import { s8 } from '../uuid/uuid';
 import { anchorsFns, iconRectFns, textRectFns, drawNodeFns } from '../middles';
 import { defaultAnchors } from '../middles/anchors/default';
@@ -10,7 +11,6 @@ import { Store } from '../store/store';
 
 export class Node extends Pen {
   id: string;
-  rect: Rect;
 
   shapeName: string;
 
@@ -31,7 +31,7 @@ export class Node extends Pen {
   textMaxLine: number;
   textRect: Rect;
 
-  anchors: Rect[] = [];
+  anchors: Anchor[] = [];
   children: Node[];
   data: any;
 
@@ -64,7 +64,6 @@ export class Node extends Pen {
         item.children.push(new Node(item));
       }
     }
-
     this.init();
   }
 

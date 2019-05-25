@@ -1,7 +1,7 @@
 import { Point } from '../../../models/point';
+import { pointInRect } from '../nodes/rect';
 
 export function pointInLine(point: Point, from: Point, to: Point): boolean {
-  let isIn = false;
   const points: Point[] = [
     {
       x: from.x - 5,
@@ -21,16 +21,5 @@ export function pointInLine(point: Point, from: Point, to: Point): boolean {
     }
   ];
 
-  let last = points[3];
-  for (const item of points) {
-    if ((item.y < point.y && last.y >= point.y) || (item.y >= point.y && last.y < point.y)) {
-      if (item.x + ((point.y - item.y) * (last.x - item.x)) / (last.y - item.y) > point.x) {
-        isIn = !isIn;
-      }
-    }
-
-    last = item;
-  }
-
-  return isIn;
+  return pointInRect(point, points);
 }
