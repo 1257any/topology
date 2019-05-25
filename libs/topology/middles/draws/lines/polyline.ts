@@ -118,60 +118,22 @@ function getNextPointByUp(from: Point, to: Point) {
     if (to.direction === Direction.Up && from.y - to.y > 3 * minDistance) {
       if (from.x < to.x) {
         if (to.x - from.x < minDistance) {
-          return [
-            {
-              x: from.x - 2 * minDistance,
-              y: from.y
-            },
-            {
-              x: from.x - 2 * minDistance,
-              y: to.y
-            }
-          ];
+          return [new Point(from.x - 2 * minDistance, from.y), new Point(from.x - 2 * minDistance, to.y)];
         }
-        return [
-          {
-            x: from.x,
-            y: to.y
-          }
-        ];
+        return [new Point(from.x, to.y)];
       } else {
         if (from.x - to.x < minDistance) {
-          return [
-            {
-              x: from.x + 2 * minDistance,
-              y: from.y
-            },
-            {
-              x: from.x + 2 * minDistance,
-              y: to.y
-            }
-          ];
+          return [new Point(from.x + 2 * minDistance, from.y), new Point(from.x + 2 * minDistance, to.y)];
         }
 
-        return [
-          {
-            x: from.x,
-            y: to.y
-          }
-        ];
+        return [new Point(from.x, to.y)];
       }
     } else {
       // Left top
       if ((to.direction === Direction.Left && from.x > to.x) || (to.direction === Direction.Right && from.x < to.x)) {
-        return [
-          {
-            x: to.x,
-            y: from.y
-          }
-        ];
+        return [new Point(to.x, from.y)];
       }
-      return [
-        {
-          x: from.x,
-          y: to.y
-        }
-      ];
+      return [new Point(from.x, to.y)];
     }
 
     // The to point below the from point.
@@ -184,12 +146,7 @@ function getNextPointByUp(from: Point, to: Point) {
         return [pts[1], pts[0]];
       }
     } else {
-      return [
-        {
-          x: to.x,
-          y: from.y
-        }
-      ];
+      return [new Point(to.x, from.y)];
     }
   }
 }
@@ -204,58 +161,20 @@ function getNextPointByBottom(from: Point, to: Point) {
     if (to.direction === Direction.Bottom && to.y - from.y > 3 * minDistance) {
       if (from.x < to.x) {
         if (to.x - from.x < minDistance) {
-          return [
-            {
-              x: from.x - 2 * minDistance,
-              y: from.y
-            },
-            {
-              x: from.x - 2 * minDistance,
-              y: to.y
-            }
-          ];
+          return [new Point(from.x - 2 * minDistance, from.y), new Point(from.x - 2 * minDistance, to.y)];
         }
-        return [
-          {
-            x: from.x,
-            y: to.y
-          }
-        ];
+        return [new Point(from.x, to.y)];
       } else {
         if (from.x - to.x < minDistance) {
-          return [
-            {
-              x: from.x + 2 * minDistance,
-              y: from.y
-            },
-            {
-              x: from.x + 2 * minDistance,
-              y: to.y
-            }
-          ];
+          return [new Point(from.x + 2 * minDistance, from.y), new Point(from.x + 2 * minDistance, to.y)];
         }
-        return [
-          {
-            x: from.x,
-            y: to.y
-          }
-        ];
+        return [new Point(from.x, to.y)];
       }
     } else {
       if ((to.direction === Direction.Left && from.x > to.x) || (to.direction === Direction.Right && from.x < to.x)) {
-        return [
-          {
-            x: to.x,
-            y: from.y
-          }
-        ];
+        return [new Point(to.x, from.y)];
       }
-      return [
-        {
-          x: from.x,
-          y: to.y
-        }
-      ];
+      return [new Point(from.x, to.y)];
     }
 
     // The to point below the from point.
@@ -268,12 +187,7 @@ function getNextPointByBottom(from: Point, to: Point) {
         return [pts[1], pts[0]];
       }
     } else {
-      return [
-        {
-          x: to.x,
-          y: from.y
-        }
-      ];
+      return [new Point(to.x, from.y)];
     }
   }
 }
@@ -288,43 +202,15 @@ function getNextPointByLeft(from: Point, to: Point) {
     if (to.direction === Direction.Left && from.x - to.x > 3 * minDistance) {
       if (from.y < to.y) {
         if (to.y - from.y < minDistance) {
-          return [
-            {
-              x: from.x,
-              y: from.y + 2 * minDistance
-            },
-            {
-              x: to.x,
-              y: from.y + 2 * minDistance
-            }
-          ];
+          return [new Point(from.x, from.y + 2 * minDistance), new Point(to.x, from.y + 2 * minDistance)];
         }
-        return [
-          {
-            x: to.x,
-            y: from.y
-          }
-        ];
+        return [new Point(to.x, from.y)];
       } else {
         if (from.y - to.y < minDistance) {
-          return [
-            {
-              x: from.x,
-              y: from.y - 2 * minDistance
-            },
-            {
-              x: to.x,
-              y: from.y - 2 * minDistance
-            }
-          ];
+          return [new Point(from.x, from.y - 2 * minDistance), new Point(to.x, from.y - 2 * minDistance)];
         }
 
-        return [
-          {
-            x: to.x,
-            y: from.y
-          }
-        ];
+        return [new Point(to.x, from.y)];
       }
     } else {
       if (
@@ -332,19 +218,9 @@ function getNextPointByLeft(from: Point, to: Point) {
         (to.direction === Direction.Up && from.y < to.y) ||
         (to.direction === Direction.Bottom && from.y > to.y)
       ) {
-        return [
-          {
-            x: to.x,
-            y: from.y
-          }
-        ];
+        return [new Point(to.x, from.y)];
       }
-      return [
-        {
-          x: from.x,
-          y: to.y
-        }
-      ];
+      return [new Point(from.x, to.y)];
     }
 
     // The to point is on the right.
@@ -357,12 +233,7 @@ function getNextPointByLeft(from: Point, to: Point) {
         return [pts[1], pts[0]];
       }
     } else {
-      return [
-        {
-          x: from.x,
-          y: to.y
-        }
-      ];
+      return [new Point(from.x, to.y)];
     }
   }
 }
@@ -377,43 +248,15 @@ function getNextPointByRight(from: Point, to: Point) {
     if (to.direction === Direction.Right && to.x - from.x > 3 * minDistance) {
       if (from.y < to.y) {
         if (to.y - from.y < minDistance) {
-          return [
-            {
-              x: from.x,
-              y: from.y - 2 * minDistance
-            },
-            {
-              x: to.x,
-              y: from.y - 2 * minDistance
-            }
-          ];
+          return [new Point(from.x, from.y - 2 * minDistance), new Point(to.x, from.y - 2 * minDistance)];
         }
-        return [
-          {
-            x: to.x,
-            y: from.y
-          }
-        ];
+        return [new Point(to.x, from.y)];
       } else {
         if (from.y - to.y < minDistance) {
-          return [
-            {
-              x: from.x,
-              y: from.y + 2 * minDistance
-            },
-            {
-              x: to.x,
-              y: from.y + 2 * minDistance
-            }
-          ];
+          return [new Point(from.x, from.y + 2 * minDistance), new Point(to.x, from.y + 2 * minDistance)];
         }
 
-        return [
-          {
-            x: to.x,
-            y: from.y
-          }
-        ];
+        return [new Point(to.x, from.y)];
       }
     } else {
       if (
@@ -421,19 +264,9 @@ function getNextPointByRight(from: Point, to: Point) {
         (to.direction === Direction.Up && from.y < to.y) ||
         (to.direction === Direction.Bottom && from.y > to.y)
       ) {
-        return [
-          {
-            x: to.x,
-            y: from.y
-          }
-        ];
+        return [new Point(to.x, from.y)];
       }
-      return [
-        {
-          x: from.x,
-          y: to.y
-        }
-      ];
+      return [new Point(from.x, to.y)];
     }
 
     // The to point is on the left.
@@ -446,40 +279,17 @@ function getNextPointByRight(from: Point, to: Point) {
         return [pts[1], pts[0]];
       }
     } else {
-      return [
-        {
-          x: from.x,
-          y: to.y
-        }
-      ];
+      return [new Point(from.x, to.y)];
     }
   }
 }
 
 function getHorizontalPoints(left: Point, right: Point) {
   const x = (left.x + (right.x - left.x) / 2 + 0.5) << 0;
-  return [
-    {
-      x,
-      y: left.y
-    },
-    {
-      x,
-      y: right.y
-    }
-  ];
+  return [new Point(x, left.y), new Point(x, right.y)];
 }
 
 function getVerticalPoints(up: Point, bottom: Point) {
   const y = (up.y + (bottom.y - up.y) / 2 + 0.5) << 0;
-  return [
-    {
-      x: up.x,
-      y
-    },
-    {
-      x: bottom.x,
-      y
-    }
-  ];
+  return [new Point(up.x, y), new Point(bottom.x, y)];
 }

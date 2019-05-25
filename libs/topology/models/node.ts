@@ -1,6 +1,6 @@
 import { Pen } from './pen';
 import { Rect } from './rect';
-import { Anchor } from './anchor';
+import { Point } from './point';
 import { s8 } from '../uuid/uuid';
 import { anchorsFns, iconRectFns, textRectFns, drawNodeFns } from '../middles';
 import { defaultAnchors } from '../middles/anchors/default';
@@ -31,7 +31,7 @@ export class Node extends Pen {
   textMaxLine: number;
   textRect: Rect;
 
-  anchors: Anchor[] = [];
+  anchors: Point[] = [];
   children: Node[];
   data: any;
 

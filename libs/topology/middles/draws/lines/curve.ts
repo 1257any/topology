@@ -84,11 +84,11 @@ export function getBezierPoint(pos: number, from: Point, cp1: Point, cp2: Point,
     3 * cy1 * pos * (1 - pos) * (1 - pos) +
     3 * cy2 * pos * pos * (1 - pos) +
     y2 * pos * pos * pos;
-  return { x, y };
+  return new Point(x, y);
 }
 
 function getControlPt(pt: Point) {
-  const point: Point = Object.assign({}, pt);
+  const point: Point = new Point(pt.x, pt.y, pt.direction, pt.anchorIndex, pt.id);
   switch (pt.direction) {
     case Direction.Up:
       point.y -= distance;

@@ -1,6 +1,6 @@
 import { Options } from './options';
 import { Node } from './models/node';
-import { Point, hitPoint } from './models/point';
+import { Point } from './models/point';
 import { Line } from './models/line';
 import { drawNodeFns, drawLineFns } from './middles/index';
 import { Canvas } from './canvas';
@@ -287,17 +287,13 @@ export class Topology {
       // Draw line.
       if (this.moveIn.type === MoveInType.HoverAnchors) {
         this.hoverLayer.setLine(
-          {
-            id: this.hoverNode.id,
-            anchorIndex: this.moveIn.hoverAnchorIndex,
-            direction: this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].direction,
-            x:
-              this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].x +
-              this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].width / 2,
-            y:
-              this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].y +
-              this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].height / 2
-          },
+          new Point(
+            this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].x,
+            this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].y,
+            this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].direction,
+            this.moveIn.hoverAnchorIndex,
+            this.hoverNode.id
+          ),
           this.fromArrowType
         );
       }
@@ -543,7 +539,7 @@ export class Topology {
       }
       let i = 0;
       for (const pt of item.controlPoints) {
-        if (hitPoint(e, pt)) {
+        if (pt.hit(e)) {
           pt.id = i;
           this.moveIn.type = MoveInType.LineControlPoint;
           this.moveIn.controlPoint = pt;
@@ -563,7 +559,7 @@ export class Topology {
   }
 
   getLineDock(e: MouseEvent) {
-    const point: Point = { x: e.offsetX, y: e.offsetY };
+    const point: Point = new Point(e.offsetX, e.offsetY);
     this.hoverLayer.dockAnchor = null;
     for (const item of this.nodes) {
       if (item.id === this.hoverNode.id) {
@@ -578,8 +574,8 @@ export class Topology {
           point.id = item.id;
           point.anchorIndex = i;
           point.direction = item.anchors[point.anchorIndex].direction;
-          point.x = item.anchors[point.anchorIndex].x + item.anchors[point.anchorIndex].width / 2;
-          point.y = item.anchors[point.anchorIndex].y + item.anchors[point.anchorIndex].height / 2;
+          point.x = item.anchors[point.anchorIndex].x;
+          point.y = item.anchors[point.anchorIndex].y;
           this.hoverLayer.dockAnchor = item.anchors[i];
           break;
         }

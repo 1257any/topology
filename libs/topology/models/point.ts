@@ -1,29 +1,33 @@
 import { Direction } from './direction';
 
-export interface Point {
+export class Point {
   id?: number | string;
   direction?: Direction;
   anchorIndex?: number;
-  x: number;
-  y: number;
-}
+  constructor(public x: number, public y: number, direction?: Direction, achorIndex?: number, id?: number | string) {
+    this.x = (this.x + 0.5) << 0;
+    this.y = (this.y + 0.5) << 0;
+    this.direction = direction;
+    this.anchorIndex = achorIndex;
+    this.id = id;
+  }
 
-export function hitPoint(e: MouseEvent, point: Point, padding = 3) {
-  return (
-    e.offsetX > point.x - padding &&
-    e.offsetX < point.x + padding &&
-    e.offsetY > point.y - padding &&
-    e.offsetY < point.y + padding
-  );
-}
+  hit(e: MouseEvent, radius = 5) {
+    return (
+      e.offsetX > this.x - radius &&
+      e.offsetX < this.x + radius &&
+      e.offsetY > this.y - radius &&
+      e.offsetY < this.y + radius
+    );
+  }
 
-// angle - 顺时针弧度
-export function rotatePoint(point: Point, angle: number) {
-  let atan2 = Math.atan2(point.y, point.x);
-  atan2 += angle;
-  const r = Math.sqrt(point.x * point.x + point.y * point.y);
-  return {
-    x: Math.cos(atan2) * r,
-    y: Math.sin(atan2) * r
-  };
+  rotate(angle: number) {
+    let atan2 = Math.atan2(this.y, this.x);
+    atan2 += angle;
+    const r = Math.sqrt(this.x * this.x + this.y * this.y);
+    return {
+      x: Math.cos(atan2) * r,
+      y: Math.sin(atan2) * r
+    };
+  }
 }

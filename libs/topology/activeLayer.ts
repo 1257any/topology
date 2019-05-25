@@ -188,14 +188,12 @@ export class ActiveLayer extends Canvas {
       // Move lines.
       for (const line of this.lines) {
         if (line.from.id === item.id) {
-          line.from.x =
-            (item.anchors[line.from.anchorIndex].x + item.anchors[line.from.anchorIndex].width / 2 + 0.5) << 0;
-          line.from.y =
-            (item.anchors[line.from.anchorIndex].y + item.anchors[line.from.anchorIndex].height / 2 + 0.5) << 0;
+          line.from.x = item.anchors[line.from.anchorIndex].x;
+          line.from.y = item.anchors[line.from.anchorIndex].y;
         }
         if (line.to.id === item.id) {
-          line.to.x = (item.anchors[line.to.anchorIndex].x + item.anchors[line.to.anchorIndex].width / 2 + 0.5) << 0;
-          line.to.y = (item.anchors[line.to.anchorIndex].y + item.anchors[line.to.anchorIndex].height / 2 + 0.5) << 0;
+          line.to.x = item.anchors[line.to.anchorIndex].x;
+          line.to.y = item.anchors[line.to.anchorIndex].y;
         }
         line.calcControlPoints();
       }
