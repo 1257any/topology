@@ -245,6 +245,7 @@ export class Topology {
         case MoveInType.Rotate:
           if (this.activeLayer.occupy) {
             this.activeLayer.offsetRotate(this.getAngle(e));
+            this.activeLayer.updateLines();
             this.activeLayer.render();
           }
           break;
@@ -258,23 +259,23 @@ export class Topology {
     Store.set('activeLine', null);
 
     if (this.moveIn.type !== MoveInType.Rotate) {
+      // Click a line.
+      if (this.moveIn.type === MoveInType.Line || this.moveIn.type === MoveInType.LineControlPoint) {
+        this.moveIn.activeLine.activeStrokeStyle = this.options.activeColor;
+        this.activeLayer.lines = [this.moveIn.activeLine];
+        Store.set('activeLine', this.moveIn.activeLine);
+        this.activeLayer.render();
+
+        this.calcOffscreenLines();
+        this.offscreen.render();
+        return;
+      }
+
+      // Click the space.
       if (!this.hoverNode) {
         // Deactive.
         this.deactiveNodes();
 
-        // Click a line.
-        if (this.moveIn.type === MoveInType.Line || this.moveIn.type === MoveInType.LineControlPoint) {
-          this.moveIn.activeLine.activeStrokeStyle = this.options.activeColor;
-          this.activeLayer.lines = [this.moveIn.activeLine];
-          Store.set('activeLine', this.moveIn.activeLine);
-          this.activeLayer.render();
-
-          this.calcOffscreenLines();
-          this.offscreen.render();
-          return;
-        }
-
-        // Click the space.
         if (!this.activeLayer.occupy || !this.activeLayer.occupy.hit(e, 5)) {
           this.deactiveLines();
           this.offscreen.render();
@@ -288,9 +289,9 @@ export class Topology {
       if (this.moveIn.type === MoveInType.HoverAnchors) {
         this.hoverLayer.setLine(
           new Point(
-            this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].x,
-            this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].y,
-            this.hoverNode.anchors[this.moveIn.hoverAnchorIndex].direction,
+            this.hoverNode.rotateAnchors[this.moveIn.hoverAnchorIndex].x,
+            this.hoverNode.rotateAnchors[this.moveIn.hoverAnchorIndex].y,
+            this.hoverNode.rotateAnchors[this.moveIn.hoverAnchorIndex].direction,
             this.moveIn.hoverAnchorIndex,
             this.hoverNode.id
           ),
@@ -375,7 +376,6 @@ export class Topology {
       if (found) {
         continue;
       }
-
       for (const n of this.activeLayer.nodes) {
         if (item.from.id === n.id || (item.to && item.to.id === n.id)) {
           item.activeStrokeStyle = '';
@@ -515,8 +515,8 @@ export class Topology {
 
     // In anchors of hoverNode
     if (this.hoverNode) {
-      for (let i = 0; i < this.hoverNode.anchors.length; ++i) {
-        if (this.hoverNode.anchors[i].hit(e, 7)) {
+      for (let i = 0; i < this.hoverNode.rotateAnchors.length; ++i) {
+        if (this.hoverNode.rotateAnchors[i].hit(e, 7)) {
           this.moveIn.type = MoveInType.HoverAnchors;
           this.moveIn.hoverAnchorIndex = i;
           this.hoverLayer.canvas.style.cursor = 'crosshair';
@@ -569,14 +569,14 @@ export class Topology {
       if (item.rect.hit(e, 10)) {
         this.hoverLayer.nodes.push(item);
       }
-      for (let i = 0; i < item.anchors.length; ++i) {
-        if (item.anchors[i].hit(e, 10)) {
+      for (let i = 0; i < item.rotateAnchors.length; ++i) {
+        if (item.rotateAnchors[i].hit(e, 10)) {
           point.id = item.id;
           point.anchorIndex = i;
-          point.direction = item.anchors[point.anchorIndex].direction;
-          point.x = item.anchors[point.anchorIndex].x;
-          point.y = item.anchors[point.anchorIndex].y;
-          this.hoverLayer.dockAnchor = item.anchors[i];
+          point.direction = item.rotateAnchors[point.anchorIndex].direction;
+          point.x = item.rotateAnchors[point.anchorIndex].x;
+          point.y = item.rotateAnchors[point.anchorIndex].y;
+          this.hoverLayer.dockAnchor = item.rotateAnchors[i];
           break;
         }
       }

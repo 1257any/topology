@@ -156,6 +156,7 @@ export class ActiveLayer extends Canvas {
       ++i;
     }
 
+    this.updateLines();
     this.render();
   }
 
@@ -185,21 +186,26 @@ export class ActiveLayer extends Canvas {
       item.rect.ey = item.rect.y + item.rect.height;
       item.rect.calceCenter();
       item.init();
-      // Move lines.
-      for (const line of this.lines) {
-        if (line.from.id === item.id) {
-          line.from.x = item.anchors[line.from.anchorIndex].x;
-          line.from.y = item.anchors[line.from.anchorIndex].y;
-        }
-        if (line.to.id === item.id) {
-          line.to.x = item.anchors[line.to.anchorIndex].x;
-          line.to.y = item.anchors[line.to.anchorIndex].y;
-        }
-        line.calcControlPoints();
-      }
       ++i;
     }
 
+    this.updateLines();
     this.render();
+  }
+
+  updateLines() {
+    for (const item of this.nodes) {
+      for (const line of this.lines) {
+        if (line.from.id === item.id) {
+          line.from.x = item.rotateAnchors[line.from.anchorIndex].x;
+          line.from.y = item.rotateAnchors[line.from.anchorIndex].y;
+        }
+        if (line.to.id === item.id) {
+          line.to.x = item.rotateAnchors[line.to.anchorIndex].x;
+          line.to.y = item.rotateAnchors[line.to.anchorIndex].y;
+        }
+        line.calcControlPoints();
+      }
+    }
   }
 }

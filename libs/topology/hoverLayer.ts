@@ -67,7 +67,7 @@ export class HoverLayer extends Canvas {
     ctx.fillStyle = '#fff';
     ctx.lineWidth = 2;
     for (const item of this.nodes) {
-      for (const pt of item.anchors) {
+      for (const pt of item.rotateAnchors) {
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, this.anchorRadius, 0, Math.PI * 2);
         ctx.stroke();

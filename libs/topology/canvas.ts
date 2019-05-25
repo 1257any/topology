@@ -118,6 +118,7 @@ export class Canvas {
   offsetRotate(angle: number) {
     for (const item of this.nodes) {
       item.offsetRotate = angle;
+      item.calcRotateAnchors(item.rotate + item.offsetRotate);
     }
     this.rotate = angle;
   }

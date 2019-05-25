@@ -32,6 +32,7 @@ export class Node extends Pen {
   textRect: Rect;
 
   anchors: Point[] = [];
+  rotateAnchors: Point[] = [];
   children: Node[];
   data: any;
 
@@ -89,6 +90,8 @@ export class Node extends Pen {
     } else {
       defaultAnchors(this);
     }
+
+    this.calcRotateAnchors();
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -129,6 +132,16 @@ export class Node extends Pen {
   emitRender() {
     let r = Store.get('render') || 0;
     Store.set('render', ++r);
+  }
+
+  calcRotateAnchors(angle?: number) {
+    if (angle === undefined) {
+      angle = this.rotate;
+    }
+    this.rotateAnchors = [];
+    for (const item of this.anchors) {
+      this.rotateAnchors.push(item.clone().rotate(angle, { x: this.rect.centerX, y: this.rect.centerY }));
+    }
   }
 }
 
