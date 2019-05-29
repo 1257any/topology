@@ -208,6 +208,18 @@ export class Topology {
         return;
       }
 
+      const out = e.offsetX + 50 > this.hoverLayer.canvas.width || e.offsetY + 50 > this.hoverLayer.canvas.height;
+      if (out) {
+        this.canvas.width += 300;
+        this.canvas.height += 300;
+        this.offscreen.canvas.width = this.canvas.width;
+        this.offscreen.canvas.height = this.canvas.height;
+        this.hoverLayer.canvas.width = this.canvas.width;
+        this.hoverLayer.canvas.height = this.canvas.height;
+        this.activeLayer.canvas.width = this.canvas.width;
+        this.activeLayer.canvas.height = this.canvas.height;
+      }
+
       switch (this.moveIn.type) {
         case MoveInType.None:
           this.hoverLayer.dragRect = new Rect(
@@ -216,21 +228,29 @@ export class Topology {
             e.offsetX - this.mouseDown.offsetX,
             e.offsetY - this.mouseDown.offsetY
           );
-          this.hoverLayer.render();
+          if (!out) {
+            this.hoverLayer.render();
+          }
           break;
         case MoveInType.Nodes:
           this.activeLayer.moveNodes(
             new Rect(e.offsetX, e.offsetY, e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY)
           );
-          this.hoverLayer.render();
+          if (!out) {
+            this.hoverLayer.render();
+          }
           break;
         case MoveInType.ResizeCP:
           this.activeLayer.resizeNodes(this.moveIn.activeAnchorIndex, e);
-          this.hoverLayer.render();
+          if (!out) {
+            this.hoverLayer.render();
+          }
           break;
         case MoveInType.HoverAnchors:
           this.hoverLayer.lineTo(this.getLineDock(e), this.toArrowType);
-          this.hoverLayer.render();
+          if (!out) {
+            this.hoverLayer.render();
+          }
           break;
         case MoveInType.LineControlPoint:
           this.moveIn.activeLine.controlPoints[this.moveIn.lineControlPoint.id].x = e.offsetX;
@@ -241,16 +261,27 @@ export class Topology {
               this.moveIn.activeLine
             );
           }
-          this.activeLayer.render();
-          this.hoverLayer.render();
+          if (!out) {
+            this.activeLayer.render();
+            this.hoverLayer.render();
+          }
           break;
         case MoveInType.Rotate:
           if (this.activeLayer.nodes.length) {
             this.activeLayer.offsetRotate(this.getAngle(e));
             this.activeLayer.updateLines();
-            this.activeLayer.render();
+            if (!out) {
+              this.activeLayer.render();
+            }
           }
           break;
+      }
+
+      if (out) {
+        this.hoverLayer.render();
+        this.activeLayer.render();
+        this.offscreen.render();
+        this.render();
       }
     });
   };
