@@ -33,7 +33,7 @@ export function rect(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.stroke();
 }
 
-export function pointInRect(point: Point, pts: Point[]): boolean {
+export function pointInRect(point: { x: number; y: number }, pts: Point[]): boolean {
   let isIn = false;
 
   let last = pts[3];

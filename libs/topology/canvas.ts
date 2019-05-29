@@ -114,19 +114,4 @@ export class Canvas {
     let r = Store.get('render') || 0;
     Store.set('render', ++r);
   }
-
-  offsetRotate(angle: number) {
-    for (const item of this.nodes) {
-      item.offsetRotate = angle;
-      item.calcRotateAnchors(item.rotate + item.offsetRotate);
-    }
-    this.rotate = angle;
-  }
-
-  updateRotate() {
-    for (const item of this.nodes) {
-      item.rotate += item.offsetRotate;
-      item.offsetRotate = 0;
-    }
-  }
 }

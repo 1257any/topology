@@ -1,8 +1,9 @@
+import { Point } from './point';
+
 export class Rect {
   ex: number;
   ey: number;
-  centerX: number;
-  centerY: number;
+  center: Point = new Point(0, 0);
   constructor(public x: number, public y: number, public width: number, public height: number) {
     this.x = (this.x + 0.5) << 0;
     this.y = (this.y + 0.5) << 0;
@@ -13,7 +14,11 @@ export class Rect {
     this.calceCenter();
   }
 
-  hit(e: MouseEvent, padding = 0) {
+  clone(): Rect {
+    return new Rect(this.x, this.y, this.width, this.height);
+  }
+
+  hit(e: { offsetX: number; offsetY: number }, padding = 0) {
     return (
       e.offsetX > this.x - padding &&
       e.offsetX < this.ex + padding &&
@@ -32,7 +37,16 @@ export class Rect {
   }
 
   calceCenter() {
-    this.centerX = (this.x + this.width / 2 + 0.5) << 0;
-    this.centerY = (this.y + this.height / 2 + 0.5) << 0;
+    this.center.x = (this.x + this.width / 2 + 0.5) << 0;
+    this.center.y = (this.y + this.height / 2 + 0.5) << 0;
+  }
+
+  toPoints() {
+    return [
+      new Point(this.x, this.y),
+      new Point(this.ex, this.y),
+      new Point(this.ex, this.ey),
+      new Point(this.x, this.ey)
+    ];
   }
 }

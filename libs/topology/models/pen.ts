@@ -1,5 +1,5 @@
-import { Point } from './point';
 import { Rect } from './rect';
+import { pointInRect } from '../middles/draws/nodes/rect';
 
 export abstract class Pen {
   rect: Rect;
@@ -22,9 +22,9 @@ export abstract class Pen {
     ctx.save();
 
     if (this.rotate || this.offsetRotate) {
-      ctx.translate(this.rect.centerX, this.rect.centerY);
+      ctx.translate(this.rect.center.x, this.rect.center.y);
       ctx.rotate(((this.rotate + this.offsetRotate) * Math.PI) / 180);
-      ctx.translate(-this.rect.centerX, -this.rect.centerY);
+      ctx.translate(-this.rect.center.x, -this.rect.center.y);
     }
 
     if (this.lineWidth > 1) {
@@ -46,6 +46,18 @@ export abstract class Pen {
     this.draw(ctx);
 
     ctx.restore();
+  }
+
+  hit(e: { offsetX: number; offsetY: number }, padding = 0) {
+    if (!this.rotate) {
+      return this.rect.hit(e, padding);
+    }
+
+    const pts = this.rect.toPoints();
+    for (const pt of pts) {
+      pt.rotate(this.rotate, this.rect.center);
+    }
+    return pointInRect({ x: e.offsetX, y: e.offsetY }, pts);
   }
 
   abstract draw(ctx: CanvasRenderingContext2D): void;

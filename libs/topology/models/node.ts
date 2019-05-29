@@ -32,7 +32,7 @@ export class Node extends Pen {
   textRect: Rect;
 
   anchors: Point[] = [];
-  rotateAnchors: Point[] = [];
+  rotatedAnchors: Point[] = [];
   children: Node[];
   data: any;
 
@@ -138,53 +138,9 @@ export class Node extends Pen {
     if (angle === undefined) {
       angle = this.rotate;
     }
-    this.rotateAnchors = [];
+    this.rotatedAnchors = [];
     for (const item of this.anchors) {
-      this.rotateAnchors.push(item.clone().rotate(angle, { x: this.rect.centerX, y: this.rect.centerY }));
+      this.rotatedAnchors.push(item.clone().rotate(angle, this.rect.center));
     }
   }
-}
-
-export function occupyRect(nodes: Node[]) {
-  if (!nodes || !nodes.length) {
-    return;
-  }
-
-  let x1 = 99999;
-  let y1 = 99999;
-  let x2 = -99999;
-  let y2 = -99999;
-
-  for (const item of nodes) {
-    if (x1 > item.rect.x) {
-      x1 = item.rect.x;
-    }
-    if (y1 > item.rect.y) {
-      y1 = item.rect.y;
-    }
-    if (x2 < item.rect.ex) {
-      x2 = item.rect.ex;
-    }
-    if (y2 < item.rect.ey) {
-      y2 = item.rect.ey;
-    }
-
-    const childrenRect = occupyRect(item.children);
-    if (childrenRect) {
-      if (x1 > childrenRect.x) {
-        x1 = childrenRect.x;
-      }
-      if (y1 > childrenRect.y) {
-        y1 = childrenRect.y;
-      }
-      if (x2 < childrenRect.ex) {
-        x2 = childrenRect.ex;
-      }
-      if (y2 < childrenRect.ey) {
-        y2 = childrenRect.ey;
-      }
-    }
-  }
-
-  return new Rect(x1, y1, x2 - x1, y2 - y1);
 }

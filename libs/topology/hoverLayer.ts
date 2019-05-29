@@ -6,9 +6,10 @@ import { Store } from './store/store';
 
 export class HoverLayer extends Canvas {
   line: Line;
+  // The dock of to point of line.
   dockAnchor: Point;
   dragRect: Rect;
-  controlPoint: Point;
+  lineControlPoint: Point;
   anchorRadius = 4;
   constructor(parent: HTMLElement, options: any) {
     super(options);
@@ -67,7 +68,7 @@ export class HoverLayer extends Canvas {
     ctx.fillStyle = '#fff';
     ctx.lineWidth = 2;
     for (const item of this.nodes) {
-      for (const pt of item.rotateAnchors) {
+      for (const pt of item.rotatedAnchors) {
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, this.anchorRadius, 0, Math.PI * 2);
         ctx.stroke();
@@ -75,10 +76,10 @@ export class HoverLayer extends Canvas {
       }
     }
 
-    if (this.controlPoint) {
+    if (this.lineControlPoint) {
       ctx.fillStyle = this.options.hoverColor;
       ctx.beginPath();
-      ctx.arc(this.controlPoint.x, this.controlPoint.y, 5, 0, Math.PI * 2);
+      ctx.arc(this.lineControlPoint.x, this.lineControlPoint.y, 5, 0, Math.PI * 2);
       ctx.fill();
     }
 
