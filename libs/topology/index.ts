@@ -126,7 +126,7 @@ export class Topology {
     if (this.options.height && this.options.height !== 'auto') {
       this.canvas.height = +this.options.height;
     } else {
-      this.canvas.height = this.parentElem.clientHeight;
+      this.canvas.height = this.parentElem.clientHeight - 8;
     }
 
     this.offscreen.resize(this.canvas.width, this.canvas.height);
@@ -191,10 +191,20 @@ export class Topology {
         if (this.hoverNode) {
           this.hoverLayer.nodes = [this.hoverNode];
           this.hoverLayer.render();
+
+          // Send a move event.
+          if (this.options.on) {
+            this.options.on('moveInNode', this.hoverNode);
+          }
         } else if (this.lastHover) {
           // Clear hover anchors.
           this.hoverLayer.nodes = [];
           this.hoverLayer.canvas.height = this.hoverLayer.canvas.height;
+
+          // Send a move event.
+          if (this.options.on) {
+            this.options.on('moveOutNode', null);
+          }
         }
 
         if (this.moveIn.type === MoveInType.LineControlPoint) {
@@ -210,14 +220,27 @@ export class Topology {
 
       const out = e.offsetX + 50 > this.hoverLayer.canvas.width || e.offsetY + 50 > this.hoverLayer.canvas.height;
       if (out) {
-        this.canvas.width += 300;
-        this.canvas.height += 300;
+        if (e.offsetX + 50 > this.hoverLayer.canvas.width) {
+          this.canvas.width += 200;
+        }
+        if (e.offsetY + 50 > this.hoverLayer.canvas.height) {
+          this.canvas.height += 200;
+        }
+
         this.offscreen.canvas.width = this.canvas.width;
         this.offscreen.canvas.height = this.canvas.height;
         this.hoverLayer.canvas.width = this.canvas.width;
         this.hoverLayer.canvas.height = this.canvas.height;
         this.activeLayer.canvas.width = this.canvas.width;
         this.activeLayer.canvas.height = this.canvas.height;
+
+        // Send a resize event.
+        if (this.options.on) {
+          this.options.on('resize', {
+            width: this.canvas.width,
+            height: this.canvas.height
+          });
+        }
       }
 
       switch (this.moveIn.type) {
@@ -301,6 +324,10 @@ export class Topology {
 
         this.calcOffscreenLines();
         this.offscreen.render();
+
+        if (this.options.on) {
+          this.options.on('line', this.moveIn.activeLine);
+        }
         return;
       }
 
@@ -308,6 +335,10 @@ export class Topology {
       if (this.moveIn.type < MoveInType.Nodes) {
         // Deactive.
         this.deactiveNodes();
+
+        if (this.options.on) {
+          this.options.on('space', null);
+        }
 
         if (!pointInRect({ x: e.offsetX, y: e.offsetY }, this.activeLayer.sizeCPs)) {
           this.deactiveLines();
@@ -336,9 +367,17 @@ export class Topology {
       if (e.ctrlKey) {
         this.hoverNode.activeStrokeStyle = this.options.activeColor;
         this.activeLayer.addNode(this.hoverNode);
+
+        if (this.options.on) {
+          this.options.on('nodes', this.activeLayer.nodes);
+        }
       } else if (this.hoverNode && !this.activeLayer.hasNode(this.hoverNode)) {
         this.hoverNode.activeStrokeStyle = this.options.activeColor;
         this.activeLayer.setNodes([this.hoverNode]);
+
+        if (this.options.on) {
+          this.options.on('node', this.hoverNode);
+        }
       }
     }
 
@@ -364,6 +403,10 @@ export class Topology {
       this.calcOffscreenNodes();
       this.offscreen.render();
       this.activeLayer.render();
+
+      if (this.options.on) {
+        this.options.on('nodes', this.activeLayer.nodes);
+      }
     }
 
     switch (this.moveIn.type) {

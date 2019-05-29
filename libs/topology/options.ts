@@ -14,4 +14,5 @@ export interface Options {
     textBaseline: CanvasTextBaseline;
   };
   rotateCursor?: string;
+  on?: (event: string, data: any) => void;
 }
