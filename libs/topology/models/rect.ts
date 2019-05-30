@@ -1,4 +1,5 @@
 import { Point } from './point';
+import { pointInRect } from '../middles/draws/nodes/rect';
 
 export class Rect {
   ex: number;
@@ -34,6 +35,15 @@ export class Rect {
       (rect.ex > this.x && rect.ex < this.ex && rect.ey > this.y && rect.ey < this.ey) ||
       (rect.x > this.x && rect.x < this.ex && rect.ey > this.y && rect.ey < this.ey)
     );
+  }
+
+  hitRotate(e: { offsetX: number; offsetY: number }, rotate: number, center: Point) {
+    const pts = this.toPoints();
+    for (const pt of pts) {
+      pt.rotate(rotate, center);
+    }
+
+    return pointInRect({ x: e.offsetX, y: e.offsetY }, pts);
   }
 
   calceCenter() {

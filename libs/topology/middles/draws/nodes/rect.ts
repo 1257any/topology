@@ -34,9 +34,12 @@ export function rect(ctx: CanvasRenderingContext2D, node: Node) {
 }
 
 export function pointInRect(point: { x: number; y: number }, pts: Point[]): boolean {
+  if (pts.length < 3) {
+    return false;
+  }
   let isIn = false;
 
-  let last = pts[3];
+  let last = pts[pts.length - 1];
   for (const item of pts) {
     if ((item.y < point.y && last.y >= point.y) || (item.y >= point.y && last.y < point.y)) {
       if (item.x + ((point.y - item.y) * (last.x - item.x)) / (last.y - item.y) > point.x) {

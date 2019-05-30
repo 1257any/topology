@@ -35,6 +35,8 @@ export class Topology {
 
   lastHover: Node;
   hoverNode: Node;
+  input = document.createElement('input');
+  inputNode: Node;
   mouseDown: MouseEvent;
   moveIn = {
     type: MoveInType.None,
@@ -115,6 +117,16 @@ export class Topology {
     this.hoverLayer.canvas.onmousemove = this.onMouseMove;
     this.hoverLayer.canvas.onmousedown = this.onmousedown;
     this.hoverLayer.canvas.onmouseup = this.onmouseup;
+    this.hoverLayer.canvas.ondblclick = this.ondblclick;
+
+    this.input.style.position = 'absolute';
+    this.input.style.zIndex = '-1';
+    this.input.style.left = '-1000px';
+    this.input.style.width = '0';
+    this.input.style.height = '0';
+    this.input.style.outline = 'none';
+    this.input.style.border = '1px solid #cdcdcd';
+    this.parentElem.appendChild(this.input);
   }
 
   resize() {
@@ -314,6 +326,14 @@ export class Topology {
 
     Store.set('activeLine', null);
 
+    if (this.inputNode) {
+      this.inputNode.text = this.input.value;
+      this.input.style.zIndex = '-1';
+      this.input.style.left = '-1000px';
+      this.input.style.width = '0';
+      this.inputNode = null;
+    }
+
     if (this.moveIn.type !== MoveInType.Rotate) {
       // Click a line.
       if (this.moveIn.type === MoveInType.Line || this.moveIn.type === MoveInType.LineControlPoint) {
@@ -437,6 +457,21 @@ export class Topology {
 
     this.hoverLayer.dragRect = null;
     this.hoverLayer.render();
+  };
+
+  ondblclick = (e: MouseEvent) => {
+    switch (this.moveIn.type) {
+      case MoveInType.Nodes:
+        if (this.hoverNode) {
+          if (this.hoverNode.textRect.hitRotate(e, this.hoverNode.rotate, this.hoverNode.rect.center)) {
+            this.showInput(this.hoverNode.textRect);
+          }
+          if (this.options.on) {
+            this.options.on('dblclick', this.hoverNode);
+          }
+        }
+        break;
+    }
   };
 
   calcActiveLines() {
@@ -590,6 +625,10 @@ export class Topology {
           break;
         }
       }
+
+      if (this.hoverNode.textRect.hitRotate(e, this.hoverNode.rotate, this.hoverNode.rect.center)) {
+        this.hoverLayer.canvas.style.cursor = 'text';
+      }
     }
 
     if (this.moveIn.type !== MoveInType.None) {
@@ -701,6 +740,16 @@ export class Topology {
       return angle - this.activeLayer.nodes[0].rotate;
     }
     return angle;
+  }
+
+  showInput(pos: Rect) {
+    this.inputNode = this.hoverNode;
+    this.input.value = this.hoverNode.text;
+    this.input.style.left = pos.x + 'px';
+    this.input.style.top = pos.y + 'px';
+    this.input.style.width = pos.width + 'px';
+    this.input.style.height = pos.height + 'px';
+    this.input.style.zIndex = '1000';
   }
 
   destory() {
