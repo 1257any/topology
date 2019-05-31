@@ -88,7 +88,7 @@ export function text(ctx: CanvasRenderingContext2D, node: Node) {
   }
 
   const lines = getLines(ctx, getWords(node.text), node.textRect.width);
-  const maxLineLen = node.textMaxLine || lines.length;
+  const maxLineLen = node.textMaxLine || lines.length || 1;
   const lineHeight = (node.font.fontSize * node.font.lineHeight) << 0;
 
   // By default, the text is center aligned.

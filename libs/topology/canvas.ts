@@ -18,7 +18,7 @@ export class Canvas {
   }
 
   addNode(node: Node): boolean {
-    if (!drawNodeFns[node.shapeName]) {
+    if (!drawNodeFns[node.name]) {
       return false;
     }
 

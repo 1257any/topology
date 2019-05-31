@@ -1,7 +1,6 @@
 import { Pen } from './pen';
 import { Rect } from './rect';
 import { Point } from './point';
-import { s8 } from '../uuid/uuid';
 import { anchorsFns, iconRectFns, textRectFns, drawNodeFns } from '../middles';
 import { defaultAnchors } from '../middles/anchors/default';
 import { defaultIconRect, defaultTextRect } from '../middles/rects/default';
@@ -10,10 +9,6 @@ import { iconfont } from '../middles/draws/nodes/iconfont';
 import { Store } from '../store/store';
 
 export class Node extends Pen {
-  id: string;
-
-  shapeName: string;
-
   // 0 -1 之间的小数
   borderRadius: number;
 
@@ -34,14 +29,9 @@ export class Node extends Pen {
   anchors: Point[] = [];
   rotatedAnchors: Point[] = [];
   children: Node[];
-  data: any;
 
   constructor(json: any) {
-    super();
-    this.id = json.id || s8();
-    this.rect = new Rect(json.x, json.y, json.width, json.height);
-
-    this.shapeName = json.shapeName;
+    super(json);
 
     this.borderRadius = +json.borderRadius || 0;
     if (this.borderRadius > 1) {
@@ -55,9 +45,7 @@ export class Node extends Pen {
 
     this.image = json.image;
     this.text = json.text;
-    this.textMaxLine = +json.textMaxLine;
-
-    this.data = json.data;
+    this.textMaxLine = +json.textMaxLine || 1;
 
     if (json.children) {
       this.children = [];
@@ -70,23 +58,23 @@ export class Node extends Pen {
 
   init() {
     // Calc rect of icon.
-    if (iconRectFns[this.shapeName]) {
-      iconRectFns[this.shapeName](this);
+    if (iconRectFns[this.name]) {
+      iconRectFns[this.name](this);
     } else {
       defaultIconRect(this);
     }
 
     // Calc rect of text.
-    if (textRectFns[this.shapeName]) {
-      textRectFns[this.shapeName](this);
+    if (textRectFns[this.name]) {
+      textRectFns[this.name](this);
     } else {
       defaultTextRect(this);
     }
 
     // Calc anchors.
     this.anchors = [];
-    if (anchorsFns[this.shapeName]) {
-      anchorsFns[this.shapeName](this);
+    if (anchorsFns[this.name]) {
+      anchorsFns[this.name](this);
     } else {
       defaultAnchors(this);
     }
@@ -96,10 +84,10 @@ export class Node extends Pen {
 
   draw(ctx: CanvasRenderingContext2D) {
     // Draw shape.
-    drawNodeFns[this.shapeName](ctx, this);
+    drawNodeFns[this.name](ctx, this);
 
     // Draw text.
-    if (this.shapeName !== 'text' && this.text) {
+    if (this.name !== 'text' && this.text) {
       text(ctx, this);
     }
 

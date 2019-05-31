@@ -1,8 +1,11 @@
+import { s8 } from '../uuid/uuid';
 import { Rect } from './rect';
 import { pointInRect } from '../middles/draws/nodes/rect';
 
 export abstract class Pen {
-  rect: Rect;
+  id = '';
+  name = '';
+  rect: Rect = new Rect(0, 0, 0, 0);
   lineWidth = 1;
   strokeStyle = '';
   activeStrokeStyle = '';
@@ -18,6 +21,29 @@ export abstract class Pen {
     textAlign: 'center' as CanvasTextAlign,
     textBaseline: 'middle' as CanvasTextBaseline
   };
+  // For users.
+  data: any;
+  constructor(json?: any) {
+    if (json) {
+      this.id = json.id || s8();
+      this.name = json.name || '';
+      if (json.rect) {
+        this.rect = new Rect(json.rect.x, json.rect.y, json.rect.width, json.rect.height);
+      }
+      this.lineWidth = json.lineWidth || 1;
+      this.strokeStyle = json.strokeStyle || '';
+      this.fillStyle = json.fillStyle || '';
+      this.rotate = json.rotate || 0;
+      this.offsetRotate = json.offsetRotate || 0;
+      if (json.font) {
+        this.font = json.font;
+      }
+
+      this.data = json.data || '';
+    } else {
+      this.id = s8();
+    }
+  }
   render(ctx: CanvasRenderingContext2D) {
     ctx.save();
 

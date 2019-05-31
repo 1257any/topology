@@ -1,4 +1,3 @@
-import { s8 } from '../uuid/uuid';
 import { Pen } from './pen';
 import { Point } from './point';
 import { drawLineFns, drawArrowFns } from '../middles';
@@ -10,11 +9,17 @@ export class Line extends Pen {
   controlPoints: Point[] = [];
   fromArrow: string;
   toArrow: string;
-  constructor(public id: string = '', public name = 'curve') {
-    super();
+  constructor(json?: any) {
+    super(json);
 
-    if (!id) {
-      this.id = s8();
+    if (json) {
+      this.from = new Point(json.from.x, json.from.y, json.from.direction, json.from.achorIndex, json.from.id);
+      this.to = new Point(json.to.x, json.to.y, json.to.direction, json.to.achorIndex, json.to.id);
+      for (const item of json.controlPoints) {
+        this.controlPoints.push(new Point(item.x, item.y, item.direction, item.achorIndex, item.id));
+      }
+      this.fromArrow = json.fromArrow;
+      this.toArrow = json.toArrow;
     }
   }
 

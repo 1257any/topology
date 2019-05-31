@@ -4,7 +4,11 @@ import { Topology } from 'libs/topology';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  // tslint:disable-next-line:use-host-property-decorator
+  host: {
+    '(document:keydown)': 'onkeyDocument($event)'
+  }
 })
 export class HomeComponent implements OnInit {
   @ViewChild('workspace') workspace: ElementRef;
@@ -22,10 +26,12 @@ export class HomeComponent implements OnInit {
             iconFamily: 'iconfont',
             iconSize: 40,
             iconColor: '#2f54eb',
-            width: 200,
-            height: 100,
+            rect: {
+              width: 200,
+              height: 100
+            },
             borderRadius: 0.1,
-            shapeName: 'rect'
+            name: 'rect'
           }
         },
         {
@@ -33,9 +39,11 @@ export class HomeComponent implements OnInit {
           icon: 'icon-rect',
           data: {
             text: '矩形',
-            width: 100,
-            height: 100,
-            shapeName: 'rect',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'rect',
             icon: '\uec46',
             iconFamily: 'iconfont',
             iconSize: 40,
@@ -47,9 +55,11 @@ export class HomeComponent implements OnInit {
           icon: 'icon-circle',
           data: {
             text: '圆',
-            width: 100,
-            height: 100,
-            shapeName: 'circle',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'circle',
             textMaxLine: 1
           }
         },
@@ -58,9 +68,11 @@ export class HomeComponent implements OnInit {
           icon: 'icon-triangle',
           data: {
             text: '三角形',
-            width: 100,
-            height: 100,
-            shapeName: 'triangle'
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'triangle'
           }
         },
         {
@@ -68,19 +80,23 @@ export class HomeComponent implements OnInit {
           icon: 'icon-diamond',
           data: {
             text: '菱形',
-            width: 100,
-            height: 100,
-            shapeName: 'diamond'
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'diamond'
           }
         },
         {
           name: 'arrow',
-          icon: 'icon-arrow-right',
+          icon: 'icon-arrow',
           data: {
             text: '箭头',
-            width: 100,
-            height: 100,
-            shapeName: 'arrow'
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'arrow'
           }
         },
         {
@@ -88,18 +104,22 @@ export class HomeComponent implements OnInit {
           icon: 'icon-text',
           data: {
             text: '这是一段测试文本，用来测试换行：This is a text.',
-            width: 100,
-            height: 100,
-            shapeName: 'text'
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'text'
           }
         },
         {
           name: 'image',
           icon: 'icon-image',
           data: {
-            width: 100,
-            height: 100,
-            shapeName: 'image',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'image',
             image: '/assets/img/logo.png'
           }
         },
@@ -108,9 +128,11 @@ export class HomeComponent implements OnInit {
           icon: 'icon-line',
           data: {
             text: '直线',
-            width: 100,
-            height: 100,
-            shapeName: 'line'
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'line'
           }
         }
       ]
@@ -125,5 +147,20 @@ export class HomeComponent implements OnInit {
 
   onDrag(event: DragEvent, node: any) {
     event.dataTransfer.setData('Text', JSON.stringify(node.data));
+  }
+
+  onkeyDocument(key: KeyboardEvent) {
+    switch (key.keyCode) {
+      case 89:
+        if (key.ctrlKey) {
+          this.canvas.redo();
+        }
+        break;
+      case 90:
+        if (key.ctrlKey) {
+          this.canvas.undo();
+        }
+        break;
+    }
   }
 }

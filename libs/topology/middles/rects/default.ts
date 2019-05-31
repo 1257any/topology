@@ -2,7 +2,7 @@ import { Node } from '../../models/node';
 import { Rect } from '../../models/rect';
 
 export function defaultIconRect(node: Node) {
-  if (node.shapeName === 'image') {
+  if (node.name === 'image') {
     node.iconRect = new Rect(node.rect.x, node.rect.y, node.rect.width, node.rect.height);
   } else {
     let w = (node.rect.width * 2) / 3;
