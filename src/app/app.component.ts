@@ -20,6 +20,8 @@ export class AppComponent implements OnInit, OnDestroy {
   ngOnInit() {}
 
   onkeyDocument(event: KeyboardEvent) {
+    event.returnValue = false;
+
     // tslint:disable-next-line:triple-equals
     if (event.keyCode != 27) {
       return;

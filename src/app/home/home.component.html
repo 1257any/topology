@@ -9,13 +9,13 @@
       </a>
       <div class="dropdown">
         <div class="item">
-          <a class="flex ">
+          <a class="flex" (click)="onNew()">
             新建文件
-            <span class="ml50">Ctrl + N</span>
+            <span class="ml50">Ctrl + Alt + N</span>
           </a>
         </div>
         <div class="item">
-          <a>
+          <a (click)="onOpen()">
             打开文件...
             <span class="ml50">Ctrl + O</span>
           </a>
@@ -23,20 +23,26 @@
         <div class="item line"></div>
         <div class="item">
           <a>
-            保存
+            保存到云端
             <span class="ml50">Ctrl + S</span>
           </a>
         </div>
         <div class="item">
           <a>
-            另存为...
+            另存为...（在云端）
             <span class="ml50">Ctrl + Shift + S</span>
+          </a>
+        </div>
+        <div class="item">
+          <a (click)="onSaveLocal()">
+            保存到本地
+            <span class="ml50">Alt + Shift + S</span>
           </a>
         </div>
         <div class="item line"></div>
         <div class="item">
-          <a>
-            下载
+          <a (click)="onSavePng()">
+            下载PNG
             <span class="ml50">Ctrl + D</span>
           </a>
         </div>
@@ -46,13 +52,13 @@
       <a>编辑</a>
       <div class="dropdown">
         <div class="item">
-          <a>
+          <a (click)="canvas.undo()">
             撤消
             <span class="ml50">Ctrl + Z</span>
           </a>
         </div>
         <div class="item">
-          <a>
+          <a (click)="canvas.redo()">
             恢复
             <span class="ml50">Ctrl + Y</span>
           </a>
@@ -194,7 +200,7 @@
           </a>
         </div>
         <div class="item">
-          <a title="下载PNG">
+          <a title="保存到本地" (click)="onSaveLocal()">
             <i class="iconfont icon-download"></i>
           </a>
         </div>

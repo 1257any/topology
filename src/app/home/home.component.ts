@@ -1,6 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Topology } from 'libs/topology';
 
+import * as FileSaver from 'file-saver';
+
 @Component({
   selector: 'app-home',
   templateUrl: 'home.component.html',
@@ -150,7 +152,35 @@ export class HomeComponent implements OnInit {
   }
 
   onkeyDocument(key: KeyboardEvent) {
+    console.log(key.keyCode);
     switch (key.keyCode) {
+      case 68:
+        if (key.ctrlKey) {
+          this.onSavePng();
+        }
+        break;
+      case 78:
+        if (key.ctrlKey) {
+          this.onNew();
+        }
+        break;
+      case 79:
+        if (key.ctrlKey) {
+          this.onOpen();
+        }
+        break;
+      case 83:
+        if (key.ctrlKey) {
+          if (key.shiftKey) {
+            // Save as
+          } else {
+            // Save
+          }
+        }
+        if (key.altKey && key.shiftKey) {
+          this.onSaveLocal();
+        }
+        break;
       case 89:
         if (key.ctrlKey) {
           this.canvas.redo();
@@ -162,5 +192,44 @@ export class HomeComponent implements OnInit {
         }
         break;
     }
+
+    return false;
+  }
+
+  onNew() {
+    this.canvas.render({ nodes: [], lines: [] });
+  }
+
+  onOpen() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.onchange = event => {
+      const elem: any = event.srcElement || event.target;
+      if (elem.files && elem.files[0]) {
+        const reader = new FileReader();
+        reader.onload = (e: any) => {
+          const text = e.target.result + '';
+          try {
+            const data = JSON.parse(text);
+            if (data && Array.isArray(data.nodes) && Array.isArray(data.lines)) {
+              this.canvas.render(data, true);
+            }
+          } catch (e) {
+            return false;
+          }
+        };
+        reader.readAsText(elem.files[0]);
+      }
+    };
+    input.click();
+  }
+
+  onSaveLocal() {
+    const data = this.canvas.save();
+    FileSaver.saveAs(new Blob([data], { type: 'text/plain;charset=utf-8' }), 'le5le.topology.json');
+  }
+
+  onSavePng() {
+    this.canvas.saveAsPng();
   }
 }

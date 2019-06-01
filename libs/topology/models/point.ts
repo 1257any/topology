@@ -1,15 +1,14 @@
 import { Direction } from './direction';
-import { Rect } from './rect';
 
 export class Point {
-  id?: number | string;
-  direction?: Direction;
-  anchorIndex?: number;
-  constructor(public x: number, public y: number, direction?: Direction, achorIndex?: number, id?: number | string) {
+  id: number | string;
+  direction: Direction;
+  anchorIndex: number;
+  constructor(public x: number, public y: number, direction?: Direction, anchorIndex?: number, id?: number | string) {
     this.x = (this.x + 0.5) << 0;
     this.y = (this.y + 0.5) << 0;
     this.direction = direction;
-    this.anchorIndex = achorIndex;
+    this.anchorIndex = anchorIndex;
     this.id = id;
   }
 

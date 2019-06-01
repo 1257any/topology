@@ -224,7 +224,6 @@ export class ActiveLayer extends Canvas {
       ++i;
     }
     this.calcControlPoints();
-
     this.updateLines();
     this.render();
   }

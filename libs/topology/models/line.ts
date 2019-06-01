@@ -13,13 +13,20 @@ export class Line extends Pen {
     super(json);
 
     if (json) {
-      this.from = new Point(json.from.x, json.from.y, json.from.direction, json.from.achorIndex, json.from.id);
-      this.to = new Point(json.to.x, json.to.y, json.to.direction, json.to.achorIndex, json.to.id);
-      for (const item of json.controlPoints) {
-        this.controlPoints.push(new Point(item.x, item.y, item.direction, item.achorIndex, item.id));
+      if (json.from) {
+        this.from = new Point(json.from.x, json.from.y, json.from.direction, json.from.anchorIndex, json.from.id);
       }
-      this.fromArrow = json.fromArrow;
-      this.toArrow = json.toArrow;
+      if (json.to) {
+        this.to = new Point(json.to.x, json.to.y, json.to.direction, json.to.anchorIndex, json.to.id);
+      }
+      for (const item of json.controlPoints) {
+        this.controlPoints.push(new Point(item.x, item.y, item.direction, item.anchorIndex, item.id));
+      }
+      this.fromArrow = json.fromArrow || '';
+      this.toArrow = json.toArrow || '';
+    } else {
+      this.name = 'curve';
+      this.fromArrow = 'triangleSolid';
     }
   }
 

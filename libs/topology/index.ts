@@ -116,7 +116,6 @@ export class Topology {
     }
 
     this.offscreen = new Canvas(this.options);
-
     this.parentElem.appendChild(this.canvas);
     this.activeLayer = new ActiveLayer(this.parentElem, this.options);
     this.hoverLayer = new HoverLayer(this.parentElem, this.options);
@@ -199,7 +198,7 @@ export class Topology {
     return true;
   }
 
-  render(data?: ICanvasData) {
+  render(data?: ICanvasData, json?: boolean) {
     if (data) {
       this.activeLayer.nodes = [];
       this.activeLayer.lines = [];
@@ -208,10 +207,20 @@ export class Topology {
       this.offscreen.nodes = [];
       this.offscreen.lines = [];
 
-      this.nodes = [];
-      this.lines = [];
-      this.nodes.push.apply(this.nodes, data.nodes);
-      this.lines.push.apply(this.lines, data.lines);
+      this.nodes.splice(0, this.nodes.length);
+      this.lines.splice(0, this.lines.length);
+      if (json) {
+        for (const item of data.nodes) {
+          this.nodes.push(new Node(item));
+        }
+        for (const item of data.lines) {
+          this.lines.push(new Line(item));
+        }
+      } else {
+        this.nodes.push.apply(this.nodes, data.nodes);
+        this.lines.push.apply(this.lines, data.lines);
+      }
+
       this.offscreen.nodes.push.apply(this.offscreen.nodes, this.nodes);
       this.offscreen.lines.push.apply(this.offscreen.lines, this.lines);
       this.offscreen.render();
@@ -503,6 +512,7 @@ export class Topology {
       this.cache();
     }
     this.nodesMoved = false;
+    this.moveIn.hoverLine = null;
   };
 
   private ondblclick = (e: MouseEvent) => {
@@ -574,7 +584,7 @@ export class Topology {
         continue;
       }
       for (const n of this.activeLayer.nodes) {
-        if (item.from.id === n.id || (item.to && item.to.id === n.id)) {
+        if (item.to && (item.from.id === n.id || item.to.id === n.id)) {
           item.activeStrokeStyle = '';
           this.activeLayer.lines.push(item);
           break;
@@ -840,7 +850,7 @@ export class Topology {
     this.input.style.zIndex = '1000';
   }
 
-  cache() {
+  private cache() {
     const c = {
       nodes: [],
       lines: []
@@ -849,7 +859,7 @@ export class Topology {
       c.nodes.push(new Node(item));
     }
     for (const item of this.lines) {
-      c.nodes.push(new Line(item));
+      c.lines.push(new Line(item));
     }
     if (this.caches.index < this.caches.list.length - 1) {
       this.caches.list.splice(this.caches.index + 1, this.caches.list.length - this.caches.index - 1, c);
@@ -874,6 +884,30 @@ export class Topology {
     }
 
     this.render(this.caches.list[++this.caches.index]);
+  }
+
+  save(): string {
+    return JSON.stringify({
+      nodes: this.nodes,
+      lines: this.lines
+    });
+  }
+
+  saveAsPng(name?: string) {
+    this.deactiveNodes();
+    this.deactiveLines();
+    this.offscreen.render();
+    // 清空画布
+    this.canvas.height = this.canvas.height;
+    const ctx = this.canvas.getContext('2d');
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.drawImage(this.offscreen.canvas, 0, 0);
+
+    const a = document.createElement('a');
+    a.setAttribute('download', name || 'le5le.topology.png');
+    a.setAttribute('href', this.canvas.toDataURL());
+    a.click();
   }
 
   destory() {

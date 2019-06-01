@@ -94,8 +94,10 @@ export class Canvas {
 
     const activeLine = Store.get('activeLine');
     const ctx = this.canvas.getContext('2d');
+    let i = 0;
     for (const item of this.lines) {
       if (!item.to) {
+        this.lines.splice(i++, 1);
         continue;
       }
       item.render(ctx);
@@ -107,6 +109,7 @@ export class Canvas {
         drawLineFns[item.name].drawControlPointsFn(ctx, item);
         ctx.restore();
       }
+      ++i;
     }
   }
 
