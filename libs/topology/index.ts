@@ -10,6 +10,7 @@ import { HoverLayer } from './hoverLayer';
 import { ActiveLayer } from './activeLayer';
 import { Rect } from './models/rect';
 import { pointInRect } from './middles/draws/nodes/rect';
+import { s8 } from './uuid/uuid';
 
 const resizeCursors = ['nw-resize', 'ne-resize', 'se-resize', 'sw-resize'];
 enum MoveInType {
@@ -59,6 +60,8 @@ export class Topology {
 
   fromArrowType = '';
   toArrowType = 'triangleSolid';
+
+  clipboard: ICanvasData;
 
   private scheduledAnimationFrame = false;
 
@@ -429,6 +432,8 @@ export class Topology {
           ),
           this.fromArrowType
         );
+      } else {
+        this.activeLayer.lines.splice(0, this.activeLayer.lines.length);
       }
 
       // Select more.
@@ -908,6 +913,117 @@ export class Topology {
     a.setAttribute('download', name || 'le5le.topology.png');
     a.setAttribute('href', this.canvas.toDataURL());
     a.click();
+  }
+
+  cut() {
+    this.clipboard = {
+      nodes: [],
+      lines: []
+    };
+    for (const item of this.activeLayer.nodes) {
+      this.clipboard.nodes.push(new Node(item));
+
+      let i = 0;
+      for (const node of this.nodes) {
+        if (item.id === node.id) {
+          this.nodes.splice(i, 1);
+        }
+        ++i;
+      }
+    }
+    for (const item of this.activeLayer.lines) {
+      if (item.activeStrokeStyle) {
+        item.activeStrokeStyle = '';
+        this.clipboard.lines.push(new Line(item));
+      }
+
+      let i = 0;
+      for (const line of this.lines) {
+        if (item.id === line.id) {
+          this.lines.splice(i, 1);
+        }
+        ++i;
+      }
+    }
+
+    this.cache();
+
+    this.activeLayer.nodes = [];
+    this.activeLayer.lines = [];
+    this.activeLayer.render();
+
+    this.hoverLayer.nodes = [];
+    this.hoverLayer.lines = [];
+    this.hoverLayer.render();
+
+    this.moveIn.hoverLine = null;
+    this.moveIn.hoverNode = null;
+  }
+
+  copy() {
+    this.clipboard = {
+      nodes: [],
+      lines: []
+    };
+    for (const item of this.activeLayer.nodes) {
+      item.activeStrokeStyle = '';
+      this.clipboard.nodes.push(new Node(item));
+    }
+
+    for (const item of this.activeLayer.lines) {
+      if (item.activeStrokeStyle) {
+        item.activeStrokeStyle = '';
+        this.clipboard.lines.push(new Line(item));
+      }
+    }
+  }
+
+  parse() {
+    if (!this.clipboard) {
+      return;
+    }
+
+    this.hoverLayer.nodes = [];
+    this.hoverLayer.lines = [];
+    this.hoverLayer.line = null;
+    this.hoverLayer.render();
+
+    this.activeLayer.nodes = [];
+    this.activeLayer.lines = [];
+
+    for (const item of this.clipboard.nodes) {
+      item.id = s8();
+      item.rect.x += 20;
+      item.rect.ex += 20;
+      item.rect.y += 20;
+      item.rect.ey += 20;
+
+      this.nodes.push(new Node(item));
+
+      const node = new Node(item);
+      node.activeStrokeStyle = this.options.activeColor;
+      this.activeLayer.nodes.push(node);
+    }
+    for (const item of this.clipboard.lines) {
+      item.id = s8();
+      item.from = new Point(item.from.x + 20, item.from.y + 20, item.from.direction);
+      item.to = new Point(item.to.x + 20, item.to.y + 20, item.to.direction);
+
+      this.lines.push(new Line(item));
+
+      const line = new Line(item);
+      line.activeStrokeStyle = this.options.activeColor;
+      this.activeLayer.lines.push(line);
+      Store.set('activeLine', line);
+    }
+
+    this.offscreen.nodes.push.apply(this.offscreen.nodes, this.nodes);
+    this.offscreen.lines.push.apply(this.offscreen.lines, this.lines);
+    this.offscreen.render(true);
+    this.activeLayer.render();
+    this.render();
+
+    this.cache();
   }
 
   destory() {

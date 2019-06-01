@@ -60,24 +60,24 @@
         <div class="item">
           <a (click)="canvas.redo()">
             恢复
-            <span class="ml50">Ctrl + Y</span>
+            <span class="ml50">Ctrl + Shift+ Z</span>
           </a>
         </div>
         <div class="item line"></div>
         <div class="item">
-          <a>
+          <a (click)="onCut()">
             剪切
             <span class="ml50">Ctrl + X</span>
           </a>
         </div>
         <div class="item">
-          <a>
+          <a (click)="onCopy()">
             复制
             <span class="ml50">Ctrl + C</span>
           </a>
         </div>
         <div class="item">
-          <a>
+          <a (click)="onParse()">
             粘贴
             <span class="ml50">Ctrl + V</span>
           </a>

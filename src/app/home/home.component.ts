@@ -145,6 +145,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     this.canvas = new Topology(this.workspace.nativeElement);
+    window.canvas = this.canvas;
   }
 
   onDrag(event: DragEvent, node: any) {
@@ -152,7 +153,6 @@ export class HomeComponent implements OnInit {
   }
 
   onkeyDocument(key: KeyboardEvent) {
-    console.log(key.keyCode);
     switch (key.keyCode) {
       case 68:
         if (key.ctrlKey) {
@@ -181,6 +181,21 @@ export class HomeComponent implements OnInit {
           this.onSaveLocal();
         }
         break;
+      case 88:
+        if (key.ctrlKey) {
+          this.onCut();
+        }
+        break;
+      case 67:
+        if (key.ctrlKey) {
+          this.onCopy();
+        }
+        break;
+      case 86:
+        if (key.ctrlKey) {
+          this.onParse();
+        }
+        break;
       case 89:
         if (key.ctrlKey) {
           this.canvas.redo();
@@ -188,7 +203,11 @@ export class HomeComponent implements OnInit {
         break;
       case 90:
         if (key.ctrlKey) {
-          this.canvas.undo();
+          if (key.shiftKey) {
+            this.canvas.redo();
+          } else {
+            this.canvas.undo();
+          }
         }
         break;
     }
@@ -231,5 +250,15 @@ export class HomeComponent implements OnInit {
 
   onSavePng() {
     this.canvas.saveAsPng();
+  }
+
+  onCut() {
+    this.canvas.cut();
+  }
+  onCopy() {
+    this.canvas.copy();
+  }
+  onParse() {
+    this.canvas.parse();
   }
 }
