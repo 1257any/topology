@@ -152,7 +152,7 @@
         </div>
         <div class="item">
           <a class="flex ">
-            API教程
+            API开发教程
           </a>
         </div>
         <div class="item line"></div>
@@ -234,7 +234,7 @@
           <a
             *ngFor="let button of item.children"
             [title]="button.name"
-            draggable="true"
+            [draggable]="button.data"
             (dragstart)="onDrag($event, button)"
           >
             <i class="iconfont {{ button.icon }}"></i>
@@ -243,7 +243,47 @@
       </div>
     </div>
     <div class="full" #workspace></div>
-    <div class="props"></div>
+    <div class="props">
+      <div class="title">
+        <span class="nowrap line one">{{ filename }}</span>
+        <span class="mh5" *ngIf="selectedNodes || selectedLine">/</span>
+        <span class="line one">
+          <span *ngFor="let item of selectedNodes; let i = index"
+            >欢迎使用le5le-topology！{{ item.text + (i < selectedNodes.length - 1 ? ', ' : '') }}</span
+          >
+        </span>
+      </div>
+      <div class="pv5">
+        <div *ngIf="!selectedNodes && !selectedLine">
+          <div class="ph15">
+            欢迎使用le5le-topology！<br />
+            le5le-topology愿景是以便捷、开放、可扩展、云存储、社区互动等方式帮助我们快速的创建微服务拓扑图、微服务流量图、软件项目设计图、流程图、活动图、时序图、类图、甚至UML各种图。
+            <br /><br />
+            当然，还有更多你想要的，只要你想。le5le-topology定义和实现了框架和主流程，以中间件的方式可以进行无限扩展，你要画什么图，一切都交给你；还能通过npm基础库的方式分享，让我们人人都可以成为设计师分享、互动和绽放！
+            <br />
+            <br />
+            <a>使用教程</a><br />
+            <a>API开发教程</a><br />
+            <a>联系我们</a>
+          </div>
+          <div class="title mt20">[Todo] 未来规划</div>
+          <ul class="ml30 mb20">
+            <li>动画</li>
+            <li>编辑/只读模式</li>
+            <li>流程图</li>
+            <li>活动图</li>
+            <li>类图</li>
+            <li>账户与云存储</li>
+            <li>官网</li>
+            <li>使用文档</li>
+            <li>API开发文档</li>
+            <li>社区与分享</li>
+          </ul>
+        </div>
+        <div *ngIf="selectedNodes"></div>
+        <div *ngIf="selectedLine"></div>
+      </div>
+    </div>
   </div>
 </div>
 

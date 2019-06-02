@@ -78,7 +78,7 @@ $head-height: 0.4rem;
 
     .tools {
       flex-shrink: 0;
-      width: 2.4rem;
+      width: 1.65rem;
       background-color: #f8f8f8;
       border-right: 1px solid #ddd;
 
@@ -90,15 +90,17 @@ $head-height: 0.4rem;
       }
 
       .buttons {
-        padding: 0.05rem 0;
+        padding: 0.1rem 0;
         a {
           display: inline-block;
           color: $color;
-          line-height: 1.2;
-          margin: 0 0.05rem;
+          line-height: 1;
+          width: 0.4rem;
+          height: 0.4rem;
+          text-align: center;
 
           .iconfont {
-            font-size: 0.36rem;
+            font-size: 0.3rem;
           }
         }
       }
@@ -116,6 +118,13 @@ $head-height: 0.4rem;
       width: 2.4rem;
       background-color: #f8f8f8;
       border-left: 1px solid #ddd;
+      overflow: auto;
+
+      .title {
+        padding: 0.05rem 0.15rem;
+        border-bottom: 1px solid #ddd;
+        display: flex;
+      }
     }
   }
 }

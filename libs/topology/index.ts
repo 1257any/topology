@@ -198,6 +198,10 @@ export class Topology {
 
     this.cache();
 
+    if (this.options.on) {
+      this.options.on('node', node);
+    }
+
     return true;
   }
 
@@ -255,7 +259,7 @@ export class Topology {
           this.hoverLayer.render();
 
           // Send a move event.
-          if (this.options.on) {
+          if (!this.lastHoverNode && this.options.on) {
             this.options.on('moveInNode', this.moveIn.hoverNode);
           }
         } else if (this.lastHoverNode) {
@@ -441,7 +445,7 @@ export class Topology {
         this.moveIn.hoverNode.activeStrokeStyle = this.options.activeColor;
         this.activeLayer.addNode(this.moveIn.hoverNode);
 
-        if (this.options.on) {
+        if (this.options.on && this.activeLayer.nodes && this.activeLayer.nodes.length) {
           this.options.on('nodes', this.activeLayer.nodes);
         }
       } else if (this.moveIn.hoverNode && !this.activeLayer.hasNode(this.moveIn.hoverNode)) {
@@ -477,7 +481,7 @@ export class Topology {
       this.offscreen.render(true);
       this.activeLayer.render();
 
-      if (this.options.on) {
+      if (this.options.on && this.activeLayer.nodes && this.activeLayer.nodes.length) {
         this.options.on('nodes', this.activeLayer.nodes);
       }
     }

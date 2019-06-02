@@ -1,5 +1,8 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Topology } from 'libs/topology';
+import { Node } from 'libs/topology/models/node';
+import { Line } from 'libs/topology/models/line';
+import { Options } from 'libs/topology/options';
 
 import * as FileSaver from 'file-saver';
 
@@ -22,15 +25,11 @@ export class HomeComponent implements OnInit {
           name: 'rect',
           icon: 'icon-round-rect',
           data: {
-            text: '带图标的圆角矩形',
+            text: '圆角矩形',
             textMaxLine: 1,
-            icon: '\uec46',
-            iconFamily: 'iconfont',
-            iconSize: 40,
-            iconColor: '#2f54eb',
             rect: {
               width: 200,
-              height: 100
+              height: 50
             },
             borderRadius: 0.1,
             name: 'rect'
@@ -136,16 +135,160 @@ export class HomeComponent implements OnInit {
             },
             name: 'line'
           }
+        },
+        {
+          name: 'more[Todo]',
+          icon: 'icon-more'
+        }
+      ]
+    },
+    {
+      group: '流程图',
+      children: [
+        {
+          name: 'rect',
+          icon: 'icon-rounded-rect',
+          data: {
+            text: '开始/结束',
+            textMaxLine: 1,
+            rect: {
+              width: 100,
+              height: 50
+            },
+            borderRadius: 0.5,
+            name: 'rect'
+          }
+        },
+        {
+          name: 'rect',
+          icon: 'icon-rect',
+          data: {
+            text: '矩形',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'rect',
+            icon: '\uec46',
+            iconFamily: 'iconfont',
+            iconSize: 40,
+            iconColor: '#2f54eb'
+          }
+        },
+        {
+          name: 'circle',
+          icon: 'icon-circle',
+          data: {
+            text: '圆',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'circle',
+            textMaxLine: 1
+          }
+        },
+        {
+          name: 'diamond',
+          icon: 'icon-diamond',
+          data: {
+            text: '菱形',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'diamond'
+          }
+        },
+        {
+          name: 'more[Todo]',
+          icon: 'icon-more'
+        }
+      ]
+    },
+    {
+      group: '活动图',
+      children: [
+        {
+          name: 'rect',
+          icon: 'icon-round-rect',
+          data: {
+            text: '圆角矩形',
+            textMaxLine: 1,
+            rect: {
+              width: 100,
+              height: 50
+            },
+            borderRadius: 0.2,
+            name: 'rect'
+          }
+        },
+        {
+          name: 'rect',
+          icon: 'icon-rect',
+          data: {
+            text: '矩形',
+            rect: {
+              width: 100,
+              height: 50
+            },
+            name: 'rect'
+          }
+        },
+        {
+          name: 'circle',
+          icon: 'icon-circle',
+          data: {
+            text: '圆',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'circle',
+            textMaxLine: 1
+          }
+        },
+        {
+          name: 'more[Todo]',
+          icon: 'icon-more'
+        }
+      ]
+    },
+    {
+      group: 'UML类图',
+      children: [
+        {
+          name: 'rect',
+          icon: 'icon-round-rect',
+          data: {
+            text: '圆角矩形',
+            textMaxLine: 1,
+            rect: {
+              width: 200,
+              height: 50
+            },
+            borderRadius: 0.1,
+            name: 'rect'
+          }
+        },
+        {
+          name: 'more[Todo]',
+          icon: 'icon-more'
         }
       ]
     }
   ];
   canvas: Topology;
+  canvasOptions: Options = {};
+  filename = '空白图形';
+  selectedNodes: Node[];
+  selectedLine: Line;
   constructor() {}
 
   ngOnInit() {
-    this.canvas = new Topology(this.workspace.nativeElement);
-    window.canvas = this.canvas;
+    this.canvasOptions.on = this.onMessage;
+    this.canvas = new Topology(this.workspace.nativeElement, this.canvasOptions);
+    // window.canvas = this.canvas;
   }
 
   onDrag(event: DragEvent, node: any) {
@@ -225,6 +368,7 @@ export class HomeComponent implements OnInit {
     input.onchange = event => {
       const elem: any = event.srcElement || event.target;
       if (elem.files && elem.files[0]) {
+        this.filename = elem.files[0].name.replace('.json', '');
         const reader = new FileReader();
         reader.onload = (e: any) => {
           const text = e.target.result + '';
@@ -261,4 +405,26 @@ export class HomeComponent implements OnInit {
   onParse() {
     this.canvas.parse();
   }
+
+  onMessage = (event: string, data: any) => {
+    switch (event) {
+      case 'node':
+        this.selectedNodes = [data];
+        this.selectedLine = null;
+        break;
+      case 'nodes':
+        this.selectedNodes = data;
+        this.selectedLine = null;
+        break;
+      case 'line':
+        this.selectedNodes = null;
+        this.selectedLine = data;
+        break;
+      case 'space':
+        this.selectedNodes = null;
+        this.selectedLine = null;
+        break;
+    }
+    console.log('onMessage:', event, data, this.selectedNodes, this.selectedLine);
+  };
 }
