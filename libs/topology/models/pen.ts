@@ -61,6 +61,8 @@ export abstract class Pen {
 
     if (this.strokeStyle) {
       ctx.strokeStyle = this.strokeStyle;
+    } else {
+      ctx.strokeStyle = '#333';
     }
 
     if (this.fillStyle) {

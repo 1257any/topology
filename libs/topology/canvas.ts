@@ -7,10 +7,9 @@ import { Options } from './options';
 export class Canvas {
   name = '';
   canvas = document.createElement('canvas');
-  nodes: Node[] = [];
-  lines: Line[] = [];
+  private readonly nodes: Node[] = Store.get('nodes');
+  private readonly lines: Line[] = Store.get('lines');
   rendering = false;
-  rotate = 0;
   constructor(public options: Options = {}, name = '') {
     this.name = name;
   }
@@ -39,18 +38,6 @@ export class Canvas {
     }
 
     return false;
-  }
-
-  hasNode(node: Node) {
-    let found = false;
-    for (const item of this.nodes) {
-      if (item.id === node.id) {
-        found = true;
-        break;
-      }
-    }
-
-    return found;
   }
 
   render(update = true) {
@@ -90,7 +77,6 @@ export class Canvas {
       return;
     }
 
-    const activeLine = Store.get('activeLine');
     const ctx = this.canvas.getContext('2d');
     let i = 0;
     for (const item of this.lines) {
@@ -99,14 +85,6 @@ export class Canvas {
         continue;
       }
       item.render(ctx);
-
-      if (activeLine === item && item.controlPoints.length && drawLineFns[item.name]) {
-        ctx.save();
-        ctx.strokeStyle = this.options.hoverColor;
-        ctx.fillStyle = this.options.hoverColor;
-        drawLineFns[item.name].drawControlPointsFn(ctx, item);
-        ctx.restore();
-      }
       ++i;
     }
   }

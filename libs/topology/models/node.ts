@@ -88,14 +88,22 @@ export class Node extends Pen {
 
     // Draw text.
     if (this.name !== 'text' && this.text) {
+      ctx.save();
+      ctx.shadowColor = '';
+      ctx.shadowBlur = 0;
       text(ctx, this);
+      ctx.restore();
     }
 
     // Draw image.
     if (this.image) {
       // There is the cache of image.
       if (this.img) {
+        ctx.save();
+        ctx.shadowColor = '';
+        ctx.shadowBlur = 0;
         ctx.drawImage(this.img, this.iconRect.x, this.iconRect.y, this.iconRect.width, this.iconRect.height);
+        ctx.restore();
         return;
       } else {
         // Load image and draw it.
@@ -103,7 +111,11 @@ export class Node extends Pen {
         this.img.crossOrigin = 'anonymous';
         this.img.src = this.image;
         this.img.onload = () => {
+          ctx.save();
+          ctx.shadowColor = '';
+          ctx.shadowBlur = 0;
           ctx.drawImage(this.img, this.iconRect.x, this.iconRect.y, this.iconRect.width, this.iconRect.height);
+          ctx.restore();
           this.emitRender();
         };
       }
@@ -113,7 +125,11 @@ export class Node extends Pen {
 
     // Draw icon
     if (this.icon) {
+      ctx.save();
+      ctx.shadowColor = '';
+      ctx.shadowBlur = 0;
       iconfont(ctx, this);
+      ctx.restore();
     }
   }
 

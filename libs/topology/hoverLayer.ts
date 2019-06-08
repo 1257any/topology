@@ -1,18 +1,23 @@
 import { Rect } from './models/rect';
 import { Point } from './models/point';
 import { Line } from './models/line';
-import { Canvas } from './canvas';
+import { Node } from './models/node';
 import { Store } from './store/store';
+import { drawLineFns } from './middles';
 
-export class HoverLayer extends Canvas {
+export class HoverLayer {
+  canvas = document.createElement('canvas');
+
+  anchorRadius = 4;
+
   line: Line;
+  node: Node;
+  hoverLineCP: Point;
   // The dock of to point of line.
   dockAnchor: Point;
+
   dragRect: Rect;
-  lineControlPoint: Point;
-  anchorRadius = 4;
-  constructor(parent: HTMLElement, options: any) {
-    super(options, 'HoverLayer');
+  constructor(parent: HTMLElement, public options: any) {
     if (!this.options.hoverColor) {
       this.options.hoverColor = '#389e0d';
     }
@@ -31,7 +36,6 @@ export class HoverLayer extends Canvas {
   setLine(from: Point, fromArrow?: string) {
     this.line = new Line();
     this.line.setFrom(from, fromArrow);
-    this.lines = [this.line];
     Store.get('lines').push(this.line);
   }
 
@@ -40,45 +44,43 @@ export class HoverLayer extends Canvas {
     this.line.calcControlPoints();
   }
 
-  clearLines() {
-    this.line = null;
-    this.lines = [];
-  }
-
   render() {
     // clear
     this.canvas.height = this.canvas.height;
 
-    this.renderLines();
-
     const ctx = this.canvas.getContext('2d');
-    ctx.strokeStyle = this.options.hoverColor + '80';
-    ctx.fillStyle = this.options.hoverColor + '80';
     ctx.translate(0, 0);
-    if (this.dockAnchor) {
-      ctx.beginPath();
-      ctx.arc(this.dockAnchor.x, this.dockAnchor.y, 10, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.fill();
-    }
-
-    // anchors
     ctx.strokeStyle = this.options.hoverColor;
     ctx.fillStyle = '#fff';
-    ctx.lineWidth = 2;
-    for (const item of this.nodes) {
-      for (const pt of item.rotatedAnchors) {
+    // anchors
+    if (this.node) {
+      for (const pt of this.node.rotatedAnchors) {
         ctx.beginPath();
         ctx.arc(pt.x, pt.y, this.anchorRadius, 0, Math.PI * 2);
-        ctx.stroke();
         ctx.fill();
+        ctx.stroke();
       }
     }
 
-    if (this.lineControlPoint) {
-      ctx.fillStyle = this.options.hoverColor;
+    const activeLine = Store.get('activeLine');
+    if (activeLine) {
+      drawLineFns[activeLine.name].drawControlPointsFn(ctx, activeLine);
+    }
+
+    ctx.fillStyle = this.options.hoverColor;
+    if (this.dockAnchor) {
+      ctx.save();
+      ctx.globalAlpha = 0.7;
       ctx.beginPath();
-      ctx.arc(this.lineControlPoint.x, this.lineControlPoint.y, 5, 0, Math.PI * 2);
+      ctx.arc(this.dockAnchor.x, this.dockAnchor.y, 10, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    if (this.hoverLineCP) {
+      ctx.beginPath();
+      ctx.arc(this.hoverLineCP.x, this.hoverLineCP.y, 5, 0, Math.PI * 2);
       ctx.fill();
     }
 
@@ -92,5 +94,10 @@ export class HoverLayer extends Canvas {
       ctx.strokeRect(this.dragRect.x, this.dragRect.y, this.dragRect.width, this.dragRect.height);
       ctx.fillRect(this.dragRect.x, this.dragRect.y, this.dragRect.width, this.dragRect.height);
     }
+  }
+
+  resize(width: number, height: number) {
+    this.canvas.width = width;
+    this.canvas.height = height;
   }
 }

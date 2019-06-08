@@ -1,21 +1,26 @@
 import { Node } from './models/node';
-import { Canvas } from './canvas';
+import { Line } from './models/line';
 import { Rect } from './models/rect';
 import { Point } from './models/point';
 import { Store } from './store/store';
 
-export class ActiveLayer extends Canvas {
+export class ActiveLayer {
+  canvas = document.createElement('canvas');
+
   rotateCPs: Point[] = [];
   sizeCPs: Point[] = [];
   center: Point = new Point(0, 0);
 
   initialSizeCPs: Point[] = [];
 
+  nodes: Node[] = [];
+  lines: Line[] = [];
+
   // 备份初始位置，方便移动事件处理
   nodeRects: Rect[] = [];
 
-  constructor(parent: HTMLElement, options: any) {
-    super(options, 'ActiveLayer');
+  rotate = 0;
+  constructor(parent: HTMLElement, public options: any) {
     if (!this.options.activeColor) {
       this.options.activeColor = '#2f54eb';
     }
@@ -27,9 +32,7 @@ export class ActiveLayer extends Canvas {
   }
 
   calcControlPoints() {
-    if (!this.nodes.length) {
-      return;
-    } else if (this.nodes.length === 1) {
+    if (this.nodes.length === 1 && !this.lines.length) {
       this.center.x = this.nodes[0].rect.center.x;
       this.center.y = this.nodes[0].rect.center.y;
       this.sizeCPs = this.nodes[0].rect.toPoints();
@@ -64,7 +67,7 @@ export class ActiveLayer extends Canvas {
     let y1 = 99999;
     let x2 = -99999;
     let y2 = -99999;
-    const pts = this.getPoints(this.nodes);
+    const pts = this.getPoints();
     for (const item of pts) {
       if (x1 > item.x) {
         x1 = item.x;
@@ -85,9 +88,9 @@ export class ActiveLayer extends Canvas {
     this.rotateCPs = [new Point(x1 + (x2 - x1) / 2, y1 - 35), new Point(x1 + (x2 - x1) / 2, y1)];
   }
 
-  getPoints(nodes: Node[]) {
+  getPoints() {
     const points: Point[] = [];
-    for (const item of nodes) {
+    for (const item of this.nodes) {
       const pts = item.rect.toPoints();
       if (item.rotate) {
         for (const pt of pts) {
@@ -97,21 +100,30 @@ export class ActiveLayer extends Canvas {
       points.push.apply(points, pts);
     }
 
+    for (const item of this.lines) {
+      points.push(item.from);
+      points.push(item.to);
+    }
+
     return points;
   }
 
   render() {
-    super.render(false);
+    // clear
+    this.canvas.height = this.canvas.height;
 
-    if (!this.nodes.length) {
+    if (!this.nodes.length && !this.lines.length) {
       return;
     }
 
-    const ctx = this.canvas.getContext('2d');
+    this.calcControlPoints();
 
-    ctx.save();
+    const ctx = this.canvas.getContext('2d');
     ctx.strokeStyle = this.options.activeColor;
+    ctx.fillStyle = '#fff';
     ctx.lineWidth = 1;
+
+    this.renderShadow();
 
     // This is diffence between single node and more.
     if (this.rotate && this.nodes.length > 1) {
@@ -157,7 +169,6 @@ export class ActiveLayer extends Canvas {
       ctx.strokeRect(item.x - 5.5, item.y - 5.5, 10, 10);
       ctx.restore();
     }
-    ctx.restore();
   }
 
   // 即将缩放选中的nodes，备份nodes最初大小，方便缩放比例计算
@@ -229,7 +240,7 @@ export class ActiveLayer extends Canvas {
       item.init();
       ++i;
     }
-    this.calcControlPoints();
+
     this.updateLines();
     this.render();
   }
@@ -263,7 +274,6 @@ export class ActiveLayer extends Canvas {
     }
     this.updateLines();
 
-    this.calcControlPoints();
     this.render();
   }
 
@@ -300,9 +310,6 @@ export class ActiveLayer extends Canvas {
       ++i;
     }
     this.rotate = angle;
-    if (this.nodes.length === 1) {
-      this.calcControlPoints();
-    }
   }
 
   updateRotate() {
@@ -311,23 +318,47 @@ export class ActiveLayer extends Canvas {
       item.offsetRotate = 0;
     }
     this.rotate = 0;
-    if (this.nodes.length > 1) {
-      this.calcControlPoints();
-    }
   }
 
-  addNode(node: Node): boolean {
-    const b = super.addNode(node);
-
-    if (b) {
-      this.calcControlPoints();
-    }
-
-    return b;
+  addNode(node: Node) {
+    this.nodes.push(node);
   }
 
   setNodes(nodes: Node[]) {
     this.nodes = nodes;
-    this.calcControlPoints();
+    this.lines = [];
+  }
+
+  hasNode(node: Node) {
+    let found = false;
+    for (const item of this.nodes) {
+      if (item.id === node.id) {
+        found = true;
+        break;
+      }
+    }
+
+    return found;
+  }
+
+  renderShadow() {
+    const ctx = this.canvas.getContext('2d');
+    ctx.save();
+    ctx.shadowColor = this.options.activeColor + 'e0';
+    for (const item of this.nodes) {
+      item.render(ctx);
+    }
+    for (const item of this.lines) {
+      if (!item.to) {
+        continue;
+      }
+      item.render(ctx);
+    }
+    ctx.restore();
+  }
+
+  resize(width: number, height: number) {
+    this.canvas.width = width;
+    this.canvas.height = height;
   }
 }
