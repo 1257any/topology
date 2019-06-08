@@ -11,7 +11,6 @@ export class Canvas {
   lines: Line[] = [];
   rendering = false;
   rotate = 0;
-  color = '';
   constructor(public options: Options = {}, name = '') {
     this.name = name;
   }
@@ -63,7 +62,9 @@ export class Canvas {
     // Clear the canvas.
     this.canvas.height = this.canvas.height;
 
-    this.canvas.getContext('2d').strokeStyle = this.options.color;
+    const ctx = this.canvas.getContext('2d');
+    ctx.strokeStyle = this.options.color;
+    ctx.fillStyle = '#fff';
 
     this.renderLines();
     this.renderNodes();
@@ -80,7 +81,7 @@ export class Canvas {
 
     const ctx = this.canvas.getContext('2d');
     for (const item of this.nodes) {
-      item.render(ctx, this.color);
+      item.render(ctx);
     }
   }
 
@@ -97,7 +98,7 @@ export class Canvas {
         this.lines.splice(i++, 1);
         continue;
       }
-      item.render(ctx, this.color);
+      item.render(ctx);
 
       if (activeLine === item && item.controlPoints.length && drawLineFns[item.name]) {
         ctx.save();

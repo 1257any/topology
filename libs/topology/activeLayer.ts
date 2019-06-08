@@ -19,7 +19,6 @@ export class ActiveLayer extends Canvas {
     if (!this.options.activeColor) {
       this.options.activeColor = '#2f54eb';
     }
-    this.color = this.options.activeColor;
 
     this.canvas.style.position = 'absolute';
     this.canvas.style.left = '0';
@@ -110,6 +109,10 @@ export class ActiveLayer extends Canvas {
 
     const ctx = this.canvas.getContext('2d');
 
+    ctx.save();
+    ctx.strokeStyle = this.options.activeColor;
+    ctx.lineWidth = 1;
+
     // This is diffence between single node and more.
     if (this.rotate && this.nodes.length > 1) {
       ctx.translate(this.center.x, this.center.y);
@@ -118,31 +121,29 @@ export class ActiveLayer extends Canvas {
     }
 
     // Occupied territory.
-    ctx.strokeStyle = this.options.activeColor + '30';
-    ctx.lineWidth = 1;
+    ctx.save();
+    ctx.globalAlpha = 0.3;
     ctx.beginPath();
-    ctx.moveTo(this.sizeCPs[0].x, this.sizeCPs[0].y);
-    ctx.lineTo(this.sizeCPs[1].x, this.sizeCPs[1].y);
-    ctx.lineTo(this.sizeCPs[2].x, this.sizeCPs[2].y);
-    ctx.lineTo(this.sizeCPs[3].x, this.sizeCPs[3].y);
+    ctx.moveTo(this.sizeCPs[0].x - 0.5, this.sizeCPs[0].y - 0.5);
+    ctx.lineTo(this.sizeCPs[1].x + 0.5, this.sizeCPs[1].y - 0.5);
+    ctx.lineTo(this.sizeCPs[2].x + 0.5, this.sizeCPs[2].y + 0.5);
+    ctx.lineTo(this.sizeCPs[3].x - 0.5, this.sizeCPs[3].y - 0.5);
     ctx.closePath();
     ctx.stroke();
+    ctx.restore();
 
     // Draw rotate control point.
+    ctx.beginPath();
     ctx.moveTo(this.rotateCPs[0].x, this.rotateCPs[0].y);
     ctx.lineTo(this.rotateCPs[1].x, this.rotateCPs[1].y);
     ctx.stroke();
 
-    ctx.strokeStyle = this.options.activeColor;
-    ctx.fillStyle = '#fff';
-    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(this.rotateCPs[0].x, this.rotateCPs[0].y, 5, 0, Math.PI * 2);
-    ctx.stroke();
     ctx.fill();
+    ctx.stroke();
 
     // Draw size control points.
-    ctx.strokeStyle = this.options.activeColor + '80';
     ctx.lineWidth = 1;
     for (const item of this.sizeCPs) {
       ctx.save();
@@ -152,10 +153,11 @@ export class ActiveLayer extends Canvas {
         ctx.rotate(((this.nodes[0].rotate + this.rotate) * Math.PI) / 180);
         ctx.translate(-item.x, -item.y);
       }
-      ctx.strokeRect(item.x - 5, item.y - 5, 10, 10);
-      ctx.fillRect(item.x - 4, item.y - 4, 8, 8);
+      ctx.fillRect(item.x - 4.5, item.y - 4.5, 8, 8);
+      ctx.strokeRect(item.x - 5.5, item.y - 5.5, 10, 10);
       ctx.restore();
     }
+    ctx.restore();
   }
 
   // 即将缩放选中的nodes，备份nodes最初大小，方便缩放比例计算

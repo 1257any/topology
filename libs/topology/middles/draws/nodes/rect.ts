@@ -30,6 +30,7 @@ export function rect(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.arcTo(node.rect.x, node.rect.y + node.rect.height, node.rect.x, node.rect.y, r);
   ctx.arcTo(node.rect.x, node.rect.y, node.rect.x + node.rect.width, node.rect.y, r);
   ctx.closePath();
+  ctx.fill();
   ctx.stroke();
 }
 

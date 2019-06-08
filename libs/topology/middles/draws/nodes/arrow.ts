@@ -17,5 +17,6 @@ export function arrow(ctx: CanvasRenderingContext2D, node: Node) {
   );
   ctx.lineTo(node.rect.x, (node.rect.y + ((node.rect.height * 2) / 3 + 0.5)) << 0);
   ctx.closePath();
+  ctx.fill();
   ctx.stroke();
 }

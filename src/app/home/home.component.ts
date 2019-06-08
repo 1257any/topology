@@ -171,7 +171,7 @@ export class HomeComponent implements OnInit {
             name: 'rect',
             icon: '\uec46',
             iconFamily: 'iconfont',
-            iconSize: 40,
+            iconSize: 32,
             iconColor: '#2f54eb'
           }
         },
@@ -242,6 +242,10 @@ export class HomeComponent implements OnInit {
   }
 
   onkeyDocument(key: KeyboardEvent) {
+    if (key.target !== this.canvas.hoverLayer.canvas) {
+      return;
+    }
+
     switch (key.keyCode) {
       case 68:
         if (key.ctrlKey) {

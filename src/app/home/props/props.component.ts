@@ -21,7 +21,7 @@ export class PropsComponent implements OnInit, OnChanges {
       this.props.data = {
         dash: 0,
         lineWidth: 1,
-        strokeStyle: '#555',
+        strokeStyle: '',
         fillStyle: '',
         globalAlpha: 1,
         rotate: 0,

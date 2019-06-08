@@ -16,7 +16,6 @@ export class HoverLayer extends Canvas {
     if (!this.options.hoverColor) {
       this.options.hoverColor = '#389e0d';
     }
-    this.color = this.options.hoverColor;
 
     // The backgournd color of selecting nodes by draging.
     if (!this.options.dragColor) {

@@ -46,7 +46,7 @@ export abstract class Pen {
       this.id = s8();
     }
   }
-  render(ctx: CanvasRenderingContext2D, color = '') {
+  render(ctx: CanvasRenderingContext2D) {
     ctx.save();
 
     if (this.rotate || this.offsetRotate) {
@@ -59,9 +59,7 @@ export abstract class Pen {
       ctx.lineWidth = this.lineWidth;
     }
 
-    if (color) {
-      ctx.strokeStyle = color;
-    } else if (this.strokeStyle) {
+    if (this.strokeStyle) {
       ctx.strokeStyle = this.strokeStyle;
     }
 
