@@ -79,6 +79,8 @@ export function text(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.font = `${node.font.fontSize}px/${node.font.lineHeight} ${node.font.fontFamily}`;
   if (node.font.color) {
     ctx.fillStyle = node.font.color;
+  } else {
+    ctx.fillStyle = ctx.strokeStyle;
   }
   if (node.font.textAlign) {
     ctx.textAlign = node.font.textAlign;

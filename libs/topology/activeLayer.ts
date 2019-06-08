@@ -2,6 +2,7 @@ import { Node } from './models/node';
 import { Canvas } from './canvas';
 import { Rect } from './models/rect';
 import { Point } from './models/point';
+import { Store } from './store/store';
 
 export class ActiveLayer extends Canvas {
   rotateCPs: Point[] = [];
@@ -12,11 +13,14 @@ export class ActiveLayer extends Canvas {
 
   // 备份初始位置，方便移动事件处理
   nodeRects: Rect[] = [];
+
   constructor(parent: HTMLElement, options: any) {
-    super(options);
+    super(options, 'ActiveLayer');
     if (!this.options.activeColor) {
       this.options.activeColor = '#2f54eb';
     }
+    this.color = this.options.activeColor;
+
     this.canvas.style.position = 'absolute';
     this.canvas.style.left = '0';
     this.canvas.style.top = '0';
@@ -262,8 +266,9 @@ export class ActiveLayer extends Canvas {
   }
 
   updateLines() {
+    const lines = Store.get('lines');
     for (const item of this.nodes) {
-      for (const line of this.lines) {
+      for (const line of lines) {
         if (line.from.id === item.id) {
           line.from.x = item.rotatedAnchors[line.from.anchorIndex].x;
           line.from.y = item.rotatedAnchors[line.from.anchorIndex].y;

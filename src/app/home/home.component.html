@@ -228,7 +228,7 @@
   </div>
   <div class="body">
     <div class="tools">
-      <div *ngFor="let item of tools">
+      <div *ngFor="let item of tools" class="mb20">
         <div class="title">{{ item.group }}</div>
         <div class="buttons">
           <a
@@ -244,17 +244,15 @@
     </div>
     <div class="full" #workspace></div>
     <div class="props">
-      <div class="title">
+      <div class="popup-title">
         <span class="nowrap line one">{{ filename }}</span>
-        <span class="mh5" *ngIf="selectedNodes || selectedLine">/</span>
-        <span class="line one">
-          <span *ngFor="let item of selectedNodes; let i = index"
-            >欢迎使用le5le-topology！{{ item.text + (i < selectedNodes.length - 1 ? ', ' : '') }}</span
-          >
+        <span class="mh5" *ngIf="selected">/</span>
+        <span class="line one" *ngIf="selected">
+          {{ selected.type === 'multi' ? '多个对象' : selected.data.text || selected.data.name }}
         </span>
       </div>
       <div class="pv5">
-        <div *ngIf="!selectedNodes && !selectedLine">
+        <div *ngIf="!selected">
           <div class="ph15">
             欢迎使用le5le-topology！<br />
             le5le-topology愿景是以便捷、开放、可扩展、云存储、社区互动等方式帮助我们快速的创建微服务拓扑图、微服务流量图、软件项目设计图、流程图、活动图、时序图、类图、甚至UML各种图。
@@ -267,7 +265,8 @@
             <a>联系我们</a>
           </div>
           <div class="title mt20">[Todo] 未来规划</div>
-          <ul class="ml30 mb20">
+          <ul class="ml30 mb20 mt10">
+            <li>线的移动等功能</li>
             <li>动画</li>
             <li>编辑/只读模式</li>
             <li>流程图</li>
@@ -280,8 +279,9 @@
             <li>社区与分享</li>
           </ul>
         </div>
-        <div *ngIf="selectedNodes"></div>
-        <div *ngIf="selectedLine"></div>
+        <div *ngIf="selected">
+          <app-props [props]="selected" (ok)="onChangeProps($event)"></app-props>
+        </div>
       </div>
     </div>
   </div>

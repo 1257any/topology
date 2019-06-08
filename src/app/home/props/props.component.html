@@ -1,0 +1,593 @@
+<form #propForm="ngForm" *ngIf="props.data" (click)="drowdown = 0" (ngSubmit)="onSubmitProps(propForm.invalid)">
+  <div class="group" *ngIf="props.type === 'node'">
+    <div class="title">位置和大小</div>
+    <div class="flex grid">
+      <div>X（px）</div>
+      <div>Y（px）</div>
+    </div>
+    <div class="flex grid mt5">
+      <div class="mr5">
+        <input
+          type="number"
+          name="x"
+          class="input"
+          [(ngModel)]="props.data.rect.x"
+          [uiMin]="0"
+          [uiMax]="5000"
+          required
+        />
+      </div>
+      <div>
+        <input
+          type="number"
+          name="y"
+          class="input"
+          [(ngModel)]="props.data.rect.y"
+          [uiMin]="0"
+          [uiMax]="5000"
+          required
+        />
+      </div>
+    </div>
+    <div class="flex grid mt5">
+      <div>宽（px）</div>
+      <div>高（px）</div>
+    </div>
+    <div class="flex grid">
+      <div class="mr5">
+        <input
+          type="number"
+          name="width"
+          class="input"
+          [(ngModel)]="props.data.rect.width"
+          [uiMin]="0"
+          [uiMax]="5000"
+          required
+        />
+      </div>
+      <div>
+        <input
+          type="number"
+          name="height"
+          class="input"
+          [(ngModel)]="props.data.rect.height"
+          [uiMin]="0"
+          [uiMax]="5000"
+          required
+        />
+      </div>
+    </div>
+    <div class="flex grid mt5">
+      <div title="百分比%对应的小数值">圆角（0 - 1）</div>
+      <div>旋转（°）</div>
+    </div>
+    <div class="flex grid">
+      <div class="mr5">
+        <input type="number" name="borderRadius" class="input" [(ngModel)]="props.data.borderRadius" [uiMin]="0" [uiMax]="1" />
+      </div>
+      <div>
+        <input type="number" name="rotate" class="input" [(ngModel)]="props.data.rotate" [uiMin]="0" [uiMax]="360" />
+      </div>
+    </div>
+    <div class="flex mt5">
+      <div>图标</div>
+      <div class="gray ml10">图片或Unicode图标，图片优先</div>
+    </div>
+    <div class="flex input-line">
+      <label>图片URL</label>
+      <div>
+        <input name="image" class="input" [(ngModel)]="props.data.image" />
+      </div>
+    </div>
+    <div class="flex input-line">
+      <label>字体内容</label>
+      <div>
+        <input name="icon" class="input" [(ngModel)]="iconStr" />
+      </div>
+    </div>
+    <div class="flex input-line">
+      <label>字体名称</label>
+      <div>
+        <input name="iconFamily" class="input" [(ngModel)]="props.data.iconFamily" />
+      </div>
+    </div>
+    <div class="flex input-line">
+      <label>字体大小</label>
+      <div>
+        <input type="number" name="iconSize" class="input" [(ngModel)]="props.data.iconSize" [uiMin]="0" [uiMax]="500" />
+      </div>
+    </div>
+    <div class="flex input-line">
+      <label>字体颜色</label>
+      <div>
+        <div class="input color ">
+          <i [ngStyle]="getBackground(props.data.iconColor)"></i>
+          <input name="iconColor" [(ngModel)]="props.data.iconColor" />
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="group" *ngIf="props.type === 'line'">
+    <div class="title">位置</div>
+    <div>
+      起点
+    </div>
+    <div class="flex grid mt5">
+      <div class="mr5">
+        <input
+          type="number"
+          name="x"
+          class="input"
+          [(ngModel)]="props.data.from.x"
+          placeholder="X（px）"
+          [uiMin]="0"
+          [uiMax]="5000"
+          required
+        />
+      </div>
+      <div>
+        <input
+          type="number"
+          name="y"
+          class="input"
+          [(ngModel)]="props.data.from.y"
+          placeholder="Y（px）"
+          [uiMin]="0"
+          [uiMax]="5000"
+          required
+        />
+      </div>
+    </div>
+    <div class="mt5">
+      终点
+    </div>
+    <div class="flex grid">
+      <div class="mr5">
+        <input
+          type="number"
+          name="ex"
+          class="input"
+          [(ngModel)]="props.data.to.x"
+          placeholder="X（px）"
+          [uiMin]="0"
+          [uiMax]="5000"
+          required
+        />
+      </div>
+      <div>
+        <input
+          type="number"
+          name="ey"
+          class="input"
+          [(ngModel)]="props.data.to.y"
+          placeholder="Y（px）"
+          [uiMin]="0"
+          [uiMax]="5000"
+          required
+        />
+      </div>
+    </div>
+    <div class="flex grid mt5">
+      <div class="mr5">起点箭头</div>
+      <div>终点箭头</div>
+    </div>
+    <div class="flex grid">
+      <div class="mr5">
+        <div class="rel">
+          <div class="input" (click)="$event.stopPropagation(); drowdown = 2">
+            <div class="icon-item pv5" [class.hidden]="props.data.fromArrow !== ''">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.fromArrow !== 'triangleSolid'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="0 9,15 4,15 14" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.fromArrow !== 'triangle'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="0 9,15 4,15 14" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.fromArrow !== 'diamondSolid'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="0 9,10 6,20 9,10 12" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.fromArrow !== 'diamond'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="0 9,10 6,20 9,10 12" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.fromArrow !== 'circleSolid'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M1 9 l85 0" />
+                  <circle cx="6" cy="9" r="5" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.fromArrow !== 'circle'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M1 9 l85 0" />
+                  <circle cx="6" cy="9" r="5" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.fromArrow !== 'lineUp'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <path d="M0 9 l12 -6" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.fromArrow !== 'lineDown'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <path d="M0 9 l12 6" />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div class="dropdown" [class.block]="drowdown === 2">
+            <div class="icon-item ph10 pv5" (click)="onClickFromArrow('')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l100 0" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickFromArrow('triangleSolid')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="0 9,15 4,15 14" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickFromArrow('triangle')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="0 9,15 4,15 14" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickFromArrow('diamondSolid')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="0 9,10 6,20 9,10 12" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickFromArrow('diamond')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="0 9,10 6,20 9,10 12" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickFromArrow('circleSolid')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M1 9 l85 0" />
+                  <circle cx="6" cy="9" r="5" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickFromArrow('circle')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M1 9 l85 0" />
+                  <circle cx="6" cy="9" r="5" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickFromArrow('lineUp')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <path d="M0 9 l12 -6" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickFromArrow('lineDown')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <path d="M0 9 l12 6" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="rel">
+          <div class="input" (click)="$event.stopPropagation(); drowdown = 3">
+            <div class="icon-item pv5" [class.hidden]="props.data.toArrow !== ''">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l80 0" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.toArrow !== 'triangleSolid'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l79 0" />
+                  <polygon points="79 9,65 4,65 14" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.toArrow !== 'triangle'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l79 0" />
+                  <polygon points="79 9,65 4,65 14" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.toArrow !== 'diamondSolid'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l79 0" />
+                  <polygon points="79 9,70 6,60 9,70 12" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.toArrow !== 'diamond'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="79 9,70 6,60 9,70 12" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.toArrow !== 'circleSolid'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M1 9 l78 0" />
+                  <circle cx="74" cy="9" r="5" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.toArrow !== 'circle'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M1 9 l78 0" />
+                  <circle cx="74" cy="9" r="5" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.toArrow !== 'lineUp'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l78 0" />
+                  <path d="M78 9 l-12 -6" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item pv5" [class.hidden]="props.data.toArrow !== 'lineDown'">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l78 0" />
+                  <path d="M78 9 l-12 6" />
+                </g>
+              </svg>
+            </div>
+          </div>
+          <div class="dropdown" [class.block]="drowdown === 3">
+            <div class="icon-item ph10 pv5" (click)="onClickFromArrow('')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l100 0" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickToArrow('triangleSolid')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="79 9,65 4,65 14" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickToArrow('triangle')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="79 9,65 4,65 14" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickToArrow('diamondSolid')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="79 9,70 6,60 9,70 12" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickToArrow('diamond')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l85 0" />
+                  <polygon points="79 9,70 6,60 9,70 12" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickToArrow('circleSolid')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M1 9 l78 0" />
+                  <circle cx="74" cy="9" r="5" fill="#000000" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickToArrow('circle')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M1 9 l78 0" />
+                  <circle cx="74" cy="9" r="5" fill="#ffffff" stroke="#000000" stroke-width="1" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickToArrow('lineUp')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l78 0" />
+                  <path d="M78 9 l-12 -6" />
+                </g>
+              </svg>
+            </div>
+            <div class="icon-item ph10 pv5" (click)="onClickToArrow('lineDown')">
+              <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+                <g fill="none" stroke="black" stroke-width="1">
+                  <path d="M0 9 l78 0" />
+                  <path d="M78 9 l-12 6" />
+                </g>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="group">
+    <div class="title">外观</div>
+    <div class="flex grid">
+      <div>线型</div>
+      <div>线宽（px）</div>
+    </div>
+    <div class="flex grid mt5">
+      <div class="mr5 rel">
+        <div class="input" (click)="$event.stopPropagation(); drowdown = 1">
+          <div class="icon-item pv5" [class.hidden]="props.data.dash">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+              <g fill="none" stroke="black" stroke-width="1">
+                <path d="M0 9 l85 0" />
+              </g>
+            </svg>
+          </div>
+          <div class="icon-item pv5" [class.hidden]="props.data.dash !== 1">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+              <g fill="none" stroke="black" stroke-width="1">
+                <path stroke-dasharray="5,5" d="M0 9 l85 0" />
+              </g>
+            </svg>
+          </div>
+          <div class="icon-item pv5" [class.hidden]="props.data.dash !== 2">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+              <g fill="none" stroke="black" stroke-width="1">
+                <path stroke-dasharray="10,10" d="M0 9 l85 0" />
+              </g>
+            </svg>
+          </div>
+          <div class="icon-item pv5" [class.hidden]="props.data.dash !== 3">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+              <g fill="none" stroke="black" stroke-width="1">
+                <path stroke-dasharray="10,10,2,10" d="M0 9 l85 0" />
+              </g>
+            </svg>
+          </div>
+        </div>
+        <div class="dropdown" [class.block]="drowdown === 1">
+          <div class="icon-item ph10 pv5" (click)="onClickDash(0)">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+              <g fill="none" stroke="black" stroke-width="1">
+                <path d="M0 9 l100 0" />
+              </g>
+            </svg>
+          </div>
+          <div class="icon-item ph10 pv5" (click)="onClickDash(1)">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+              <g fill="none" stroke="black" stroke-width="1">
+                <path stroke-dasharray="5,5" d="M0 9 l100 0" />
+              </g>
+            </svg>
+          </div>
+          <div class="icon-item ph10 pv5" (click)="onClickDash(2)">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+              <g fill="none" stroke="black" stroke-width="1">
+                <path stroke-dasharray="10,10" d="M0 9 l100 0" />
+              </g>
+            </svg>
+          </div>
+          <div class="icon-item ph10 pv5" (click)="onClickDash(3)">
+            <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
+              <g fill="none" stroke="black" stroke-width="1">
+                <path stroke-dasharray="10,10,2,10" d="M0 9 l100 0" />
+              </g>
+            </svg>
+          </div>
+        </div>
+      </div>
+      <div>
+        <input
+          type="number"
+          name="lineWidth"
+          class="input"
+          [(ngModel)]="props.data.lineWidth"
+          [uiMin]="1"
+          [uiMax]="100"
+          required
+        />
+      </div>
+    </div>
+    <div class="flex grid mt5">
+      <div>线条颜色</div>
+      <div></div>
+    </div>
+    <div class="flex grid">
+      <div class="input color mr5">
+        <i [ngStyle]="getBackground(props.data.strokeStyle)"></i>
+        <input name="strokeStyle" [(ngModel)]="props.data.strokeStyle" />
+      </div>
+      <div class="ph10"></div>
+    </div>
+    <div class="flex grid mt5">
+      <div>背景颜色</div>
+      <div>透明度（0 - 1）</div>
+    </div>
+    <div class="flex grid">
+      <div class="mr5">
+        <div class="input color ">
+          <i [ngStyle]="getBackground(props.data.fillStyle)"></i>
+          <input name="fillStyle" [(ngModel)]="props.data.fillStyle" />
+        </div>
+      </div>
+      <div>
+        <input
+          type="number"
+          name="globalAlpha"
+          class="input"
+          [(ngModel)]="props.data.globalAlpha"
+          [uiMin]="0"
+          [uiMax]="1"
+        />
+      </div>
+    </div>
+  </div>
+  <button hidden></button>
+</form>

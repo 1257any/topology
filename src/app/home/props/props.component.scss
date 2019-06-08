@@ -1,0 +1,60 @@
+@import 'src/variables';
+@import '~le5le-ui/variables';
+
+.group {
+  padding: 0.05rem 0.15rem 0.15rem 0.15rem;
+  border-bottom: 1px solid #ccc;
+
+  .grid > div {
+    .input {
+      width: 100%;
+    }
+  }
+
+  .icon-item {
+    line-height: 1;
+  }
+
+  svg {
+    width: 0.8rem;
+    height: 0.18rem;
+  }
+
+  .dropdown {
+    .icon-item:hover {
+      background: $color-primary;
+    }
+  }
+
+  .input.color {
+    display: flex;
+    i {
+      display: inline-block;
+      width: 0.1rem;
+      height: 0.1rem;
+      border: 1px solid #555;
+      margin-top: 0.09rem;
+    }
+
+    input {
+      width: 100%;
+      border: none;
+    }
+  }
+
+  .input-line {
+    margin-bottom: 0.05rem;
+    > label {
+      width: 0.6rem;
+      margin: 0;
+    }
+    .input {
+      width: 100%;
+      font-family: Arial;
+    }
+  }
+}
+
+app-props form {
+  min-height: calc(100vh - 1rem);
+}

@@ -6,11 +6,11 @@ export abstract class Pen {
   id = '';
   name = '';
   rect: Rect = new Rect(0, 0, 0, 0);
+  dash = 0;
   lineWidth = 1;
   strokeStyle = '';
-  activeStrokeStyle = '';
   fillStyle = '';
-  activeFillStyle = '';
+  globalAlpha = 1;
   rotate = 0;
   offsetRotate = 0;
   font = {
@@ -30,9 +30,11 @@ export abstract class Pen {
       if (json.rect) {
         this.rect = new Rect(json.rect.x, json.rect.y, json.rect.width, json.rect.height);
       }
+      this.dash = json.dash || 0;
       this.lineWidth = json.lineWidth || 1;
       this.strokeStyle = json.strokeStyle || '';
       this.fillStyle = json.fillStyle || '';
+      this.globalAlpha = json.globalAlpha || 1;
       this.rotate = json.rotate || 0;
       this.offsetRotate = json.offsetRotate || 0;
       if (json.font) {
@@ -44,7 +46,7 @@ export abstract class Pen {
       this.id = s8();
     }
   }
-  render(ctx: CanvasRenderingContext2D) {
+  render(ctx: CanvasRenderingContext2D, color = '') {
     ctx.save();
 
     if (this.rotate || this.offsetRotate) {
@@ -57,16 +59,30 @@ export abstract class Pen {
       ctx.lineWidth = this.lineWidth;
     }
 
-    if (this.activeStrokeStyle) {
-      ctx.strokeStyle = this.activeStrokeStyle;
+    if (color) {
+      ctx.strokeStyle = color;
     } else if (this.strokeStyle) {
       ctx.strokeStyle = this.strokeStyle;
     }
 
-    if (this.activeFillStyle) {
-      ctx.fillStyle = this.activeFillStyle;
-    } else if (this.fillStyle) {
+    if (this.fillStyle) {
       ctx.fillStyle = this.fillStyle;
+    }
+
+    if (this.globalAlpha < 1) {
+      ctx.globalAlpha = this.globalAlpha;
+    }
+
+    switch (this.dash) {
+      case 1:
+        ctx.setLineDash([5, 5]);
+        break;
+      case 2:
+        ctx.setLineDash([10, 10]);
+        break;
+      case 3:
+        ctx.setLineDash([10, 10, 2, 10]);
+        break;
     }
 
     this.draw(ctx);

@@ -12,10 +12,11 @@ export class HoverLayer extends Canvas {
   lineControlPoint: Point;
   anchorRadius = 4;
   constructor(parent: HTMLElement, options: any) {
-    super(options);
+    super(options, 'HoverLayer');
     if (!this.options.hoverColor) {
       this.options.hoverColor = '#389e0d';
     }
+    this.color = this.options.hoverColor;
 
     // The backgournd color of selecting nodes by draging.
     if (!this.options.dragColor) {
@@ -31,7 +32,6 @@ export class HoverLayer extends Canvas {
   setLine(from: Point, fromArrow?: string) {
     this.line = new Line();
     this.line.setFrom(from, fromArrow);
-    this.line.activeStrokeStyle = this.options.hoverColor;
     this.lines = [this.line];
     Store.get('lines').push(this.line);
   }

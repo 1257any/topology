@@ -63,9 +63,7 @@ export class Line extends Pen {
     if (this.fromArrow && drawArrowFns[this.fromArrow]) {
       ctx.save();
       ctx.beginPath();
-      if (this.activeStrokeStyle) {
-        ctx.fillStyle = this.activeStrokeStyle;
-      } else if (this.strokeStyle) {
+      if (this.strokeStyle) {
         ctx.fillStyle = this.strokeStyle;
       } else {
         ctx.fillStyle = ctx.strokeStyle;
@@ -80,9 +78,7 @@ export class Line extends Pen {
     if (this.toArrow && drawArrowFns[this.toArrow]) {
       ctx.save();
       ctx.beginPath();
-      if (this.activeStrokeStyle) {
-        ctx.fillStyle = this.activeStrokeStyle;
-      } else if (this.strokeStyle) {
+      if (this.strokeStyle) {
         ctx.fillStyle = this.strokeStyle;
       } else {
         ctx.fillStyle = ctx.strokeStyle;

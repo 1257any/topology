@@ -2,6 +2,7 @@
 @import '~le5le-ui/variables';
 
 $head-height: 0.4rem;
+$color-border: #ddd;
 
 .page {
   height: 100vh;
@@ -74,19 +75,21 @@ $head-height: 0.4rem;
   .body {
     display: flex;
     height: calc(100vh - 0.4rem);
-    border-top: 1px solid #ddd;
+    border-top: 1px solid $color-border;
 
     .tools {
       flex-shrink: 0;
       width: 1.65rem;
       background-color: #f8f8f8;
-      border-right: 1px solid #ddd;
-
+      border-right: 1px solid $color-border;
       .title {
         padding: 0.05rem 0.1rem;
-        border-top: 1px solid #bbb;
-        border-bottom: 1px solid #bbb;
-        margin-top: 0.2rem;
+        border-top: 1px solid #ccc;
+        border-bottom: 1px solid #ccc;
+
+        &:first-child {
+          border-top: none;
+        }
       }
 
       .buttons {
@@ -117,12 +120,13 @@ $head-height: 0.4rem;
       flex-shrink: 0;
       width: 2.4rem;
       background-color: #f8f8f8;
-      border-left: 1px solid #ddd;
-      overflow: auto;
+      border-left: 1px solid $color-border;
+      overflow-y: auto;
 
-      .title {
+      .title,
+      .popup-title {
         padding: 0.05rem 0.15rem;
-        border-bottom: 1px solid #ddd;
+        border-bottom: 1px solid #ccc;
         display: flex;
       }
     }

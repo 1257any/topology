@@ -20,7 +20,7 @@ export class Node extends Pen {
   iconRect: Rect;
 
   image: string;
-  img: HTMLImageElement;
+  private img: HTMLImageElement;
 
   text: string;
   textMaxLine: number;

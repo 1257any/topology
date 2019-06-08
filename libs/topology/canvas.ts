@@ -5,12 +5,16 @@ import { Store } from './store/store';
 import { Options } from './options';
 
 export class Canvas {
+  name = '';
   canvas = document.createElement('canvas');
   nodes: Node[] = [];
   lines: Line[] = [];
   rendering = false;
   rotate = 0;
-  constructor(public options: Options = {}) {}
+  color = '';
+  constructor(public options: Options = {}, name = '') {
+    this.name = name;
+  }
 
   resize(width: number, height: number) {
     this.canvas.width = width;
@@ -31,21 +35,11 @@ export class Canvas {
     }
 
     if (!found) {
-      node.activeStrokeStyle = this.options.activeColor;
       this.nodes.push(node);
       return true;
     }
 
     return false;
-  }
-
-  removeNode(node: Node) {
-    for (let i = 0; i < this.nodes.length; ++i) {
-      if (this.nodes[i].id === node.id) {
-        this.nodes.splice(i, 1);
-        break;
-      }
-    }
   }
 
   hasNode(node: Node) {
@@ -68,6 +62,9 @@ export class Canvas {
     this.rendering = true;
     // Clear the canvas.
     this.canvas.height = this.canvas.height;
+
+    this.canvas.getContext('2d').strokeStyle = this.options.color;
+
     this.renderLines();
     this.renderNodes();
     if (update) {
@@ -83,7 +80,7 @@ export class Canvas {
 
     const ctx = this.canvas.getContext('2d');
     for (const item of this.nodes) {
-      item.render(ctx);
+      item.render(ctx, this.color);
     }
   }
 
@@ -100,7 +97,7 @@ export class Canvas {
         this.lines.splice(i++, 1);
         continue;
       }
-      item.render(ctx);
+      item.render(ctx, this.color);
 
       if (activeLine === item && item.controlPoints.length && drawLineFns[item.name]) {
         ctx.save();

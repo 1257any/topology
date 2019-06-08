@@ -1,10 +1,10 @@
 import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { Topology } from 'libs/topology';
-import { Node } from 'libs/topology/models/node';
-import { Line } from 'libs/topology/models/line';
 import { Options } from 'libs/topology/options';
 
 import * as FileSaver from 'file-saver';
+
+import { Props } from './props/props.model';
 
 @Component({
   selector: 'app-home',
@@ -210,45 +210,6 @@ export class HomeComponent implements OnInit {
       group: '活动图',
       children: [
         {
-          name: 'rect',
-          icon: 'icon-round-rect',
-          data: {
-            text: '圆角矩形',
-            textMaxLine: 1,
-            rect: {
-              width: 100,
-              height: 50
-            },
-            borderRadius: 0.2,
-            name: 'rect'
-          }
-        },
-        {
-          name: 'rect',
-          icon: 'icon-rect',
-          data: {
-            text: '矩形',
-            rect: {
-              width: 100,
-              height: 50
-            },
-            name: 'rect'
-          }
-        },
-        {
-          name: 'circle',
-          icon: 'icon-circle',
-          data: {
-            text: '圆',
-            rect: {
-              width: 100,
-              height: 100
-            },
-            name: 'circle',
-            textMaxLine: 1
-          }
-        },
-        {
           name: 'more[Todo]',
           icon: 'icon-more'
         }
@@ -257,20 +218,6 @@ export class HomeComponent implements OnInit {
     {
       group: 'UML类图',
       children: [
-        {
-          name: 'rect',
-          icon: 'icon-round-rect',
-          data: {
-            text: '圆角矩形',
-            textMaxLine: 1,
-            rect: {
-              width: 200,
-              height: 50
-            },
-            borderRadius: 0.1,
-            name: 'rect'
-          }
-        },
         {
           name: 'more[Todo]',
           icon: 'icon-more'
@@ -281,8 +228,7 @@ export class HomeComponent implements OnInit {
   canvas: Topology;
   canvasOptions: Options = {};
   filename = '空白图形';
-  selectedNodes: Node[];
-  selectedLine: Line;
+  selected: Props;
   constructor() {}
 
   ngOnInit() {
@@ -354,8 +300,6 @@ export class HomeComponent implements OnInit {
         }
         break;
     }
-
-    return false;
   }
 
   onNew() {
@@ -409,22 +353,21 @@ export class HomeComponent implements OnInit {
   onMessage = (event: string, data: any) => {
     switch (event) {
       case 'node':
-        this.selectedNodes = [data];
-        this.selectedLine = null;
-        break;
-      case 'nodes':
-        this.selectedNodes = data;
-        this.selectedLine = null;
-        break;
       case 'line':
-        this.selectedNodes = null;
-        this.selectedLine = data;
+      case 'multi':
+        this.selected = {
+          type: event,
+          data
+        };
         break;
       case 'space':
-        this.selectedNodes = null;
-        this.selectedLine = null;
+        this.selected = null;
         break;
     }
-    console.log('onMessage:', event, data, this.selectedNodes, this.selectedLine);
+    // console.log('onMessage:', event, data, this.selected);
   };
+
+  onChangeProps(data: any) {
+    this.canvas.update();
+  }
 }
