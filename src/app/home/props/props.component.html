@@ -589,5 +589,62 @@
       </div>
     </div>
   </div>
+  <div class="group" *ngIf="props.type === 'node'">
+    <div class="title">文字</div>   
+    <div class="mt5">
+      字体
+    </div>
+    <div >
+      <input name="fontFamily" class="input full" [(ngModel)]="props.data.font.fontFamily" />
+    </div>
+    <div class="flex grid mt5">
+      <div>颜色</div>
+      <div>大小</div>
+    </div>
+    <div class="flex grid">
+      <div class="mr5">
+        <div class="input color ">
+          <i [ngStyle]="getBackground(props.data.font.color)"></i>
+          <input name="fontColor" [(ngModel)]="props.data.font.color" />
+        </div>
+      </div>
+      <div>
+        <input type="number" name="fontSize" class="input" [(ngModel)]="props.data.font.fontSize" [uiMin]="0" [uiMax]="500" />
+      </div>
+    </div>
+    <div class="flex grid mt5">
+      <div>水平对齐</div>
+      <div>垂直对齐</div>
+    </div>
+    <div class="flex grid">
+      <div class="mr5">
+        <ui-select name="textAlign" [(ngModel)]="props.data.font.textAlign" [options]="textAlignOptions" [multi]="false"
+          (change)="onSubmitProps(propForm.invalid)"></ui-select>
+      </div>
+      <div>
+        <ui-select name="textBaseline" [(ngModel)]="props.data.font.textBaseline" [options]="textBaselineOptions" [multi]="false"
+        (change)="onSubmitProps(propForm.invalid)"></ui-select>
+      </div>
+    </div>
+
+    <div class="flex grid mt5">
+      <div>行高</div>
+      <div></div>
+    </div>
+    <div class="flex grid">
+      <div class="mr5">
+        <input type="number" name="lineHeight" class="input" [(ngModel)]="props.data.font.lineHeight" [uiMin]="1" [uiMax]="5" />
+      </div>
+      <div>      
+      </div>
+    </div>
+    <div class="mt5">
+      内容
+    </div>
+    <div >
+      <textarea name="text" class="input full" [(ngModel)]="props.data.text" rows="2" (keydown)="onKeyText($event, propForm.invalid)"
+       placeholder="Ctrl + Enter换行"></textarea>
+    </div>
+  </div>
   <button hidden></button>
 </form>

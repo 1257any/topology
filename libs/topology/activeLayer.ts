@@ -344,7 +344,8 @@ export class ActiveLayer {
   renderShadow() {
     const ctx = this.canvas.getContext('2d');
     ctx.save();
-    ctx.shadowColor = this.options.activeColor + 'e0';
+    // ctx.shadowColor = this.options.activeColor + 'e0';
+    ctx.shadowColor = '#cccccc70';
     for (const item of this.nodes) {
       item.render(ctx);
     }

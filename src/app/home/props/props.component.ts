@@ -12,8 +12,48 @@ export class PropsComponent implements OnInit, OnChanges {
   @Input() readonly = false;
 
   iconStr = '';
-
   drowdown = 0;
+
+  textAlignOptions = {
+    id: 'id',
+    name: 'name',
+    list: [
+      {
+        id: 'left',
+        name: '左对齐'
+      },
+      {
+        id: 'center',
+        name: '居中'
+      },
+      {
+        id: 'right',
+        name: '右对齐'
+      }
+    ],
+    noDefaultOption: true
+  };
+
+  textBaselineOptions = {
+    id: 'id',
+    name: 'name',
+    list: [
+      {
+        id: 'top',
+        name: '顶部对齐'
+      },
+      {
+        id: 'middle',
+        name: '居中'
+      },
+      {
+        id: 'bottom',
+        name: '底部对齐'
+      }
+    ],
+    noDefaultOption: true
+  };
+
   constructor() {}
 
   ngOnInit() {
@@ -92,5 +132,18 @@ export class PropsComponent implements OnInit, OnChanges {
 
   StrToUnicode(str: string) {
     return unescape(str.replace(/\\/g, '%'));
+  }
+
+  onKeyText(key: KeyboardEvent, invalid: boolean) {
+    switch (key.keyCode) {
+      case 13:
+        if (key.ctrlKey) {
+          this.props.data.text += '\n';
+        } else {
+          key.preventDefault();
+          this.onSubmitProps(invalid);
+        }
+        break;
+    }
   }
 }
