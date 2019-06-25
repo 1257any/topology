@@ -626,17 +626,21 @@ export class Topology {
         this.lines.splice(index - 1, 1);
         continue;
       }
-      let i = 0;
-      for (const pt of item.controlPoints) {
-        if (pt.hit(e)) {
-          pt.id = i;
-          this.moveIn.type = MoveInType.LineControlPoint;
-          this.moveIn.lineControlPoint = pt;
-          this.moveIn.hoverLine = item;
-          this.hoverLayer.canvas.style.cursor = 'pointer';
-          return;
+
+      // In LineControlPoint
+      if (this.activeLayer.lines.length) {
+        let i = 0;
+        for (const pt of item.controlPoints) {
+          if (pt.hit(e)) {
+            pt.id = i;
+            this.moveIn.type = MoveInType.LineControlPoint;
+            this.moveIn.lineControlPoint = pt;
+            this.moveIn.hoverLine = item;
+            this.hoverLayer.canvas.style.cursor = 'pointer';
+            return;
+          }
+          ++i;
         }
-        ++i;
       }
       if (item.pointIn(e)) {
         this.moveIn.type = MoveInType.Line;

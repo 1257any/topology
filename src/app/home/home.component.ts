@@ -16,7 +16,7 @@ import { Props } from './props/props.model';
   }
 })
 export class HomeComponent implements OnInit {
-  @ViewChild('workspace') workspace: ElementRef;
+  @ViewChild('workspace', { static: true }) workspace: ElementRef;
   tools: any[] = [
     {
       group: '基本形状',

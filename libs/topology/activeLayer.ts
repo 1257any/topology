@@ -32,7 +32,7 @@ export class ActiveLayer {
   }
 
   calcControlPoints() {
-    if (this.nodes.length === 1 && !this.lines.length) {
+    if (this.nodes.length === 1) {
       this.center.x = this.nodes[0].rect.center.x;
       this.center.y = this.nodes[0].rect.center.y;
       this.sizeCPs = this.nodes[0].rect.toPoints();
@@ -100,11 +100,6 @@ export class ActiveLayer {
       points.push.apply(points, pts);
     }
 
-    for (const item of this.lines) {
-      points.push(item.from);
-      points.push(item.to);
-    }
-
     return points;
   }
 
@@ -123,7 +118,7 @@ export class ActiveLayer {
     ctx.fillStyle = '#fff';
     ctx.lineWidth = 1;
 
-    this.renderShadow();
+    this.renderNodesLines();
 
     // This is diffence between single node and more.
     if (this.rotate && this.nodes.length > 1) {
@@ -341,19 +336,28 @@ export class ActiveLayer {
     return found;
   }
 
-  renderShadow() {
+  renderNodesLines() {
     const ctx = this.canvas.getContext('2d');
     ctx.save();
-    // ctx.shadowColor = this.options.activeColor + 'e0';
-    ctx.shadowColor = '#cccccc70';
     for (const item of this.nodes) {
-      item.render(ctx);
+      const tmp = new Node(item);
+      tmp.strokeStyle = '#ffffff';
+      tmp.render(ctx);
+
+      tmp.strokeStyle = this.options.activeColor;
+      tmp.render(ctx);
     }
     for (const item of this.lines) {
       if (!item.to) {
         continue;
       }
-      item.render(ctx);
+
+      const tmp = new Line(item);
+      tmp.strokeStyle = '#ffffff';
+      tmp.render(ctx);
+
+      tmp.strokeStyle = this.options.activeColor;
+      tmp.render(ctx);
     }
     ctx.restore();
   }
