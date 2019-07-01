@@ -7,6 +7,7 @@ import { AppHttpInterceptor } from './http/http.interceptor';
 
 import { Le5leStoreModule } from 'le5le-store';
 
+import { CoreModule } from './core/core.module';
 import { SharedModule } from './shared/shared.module';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -23,6 +24,7 @@ import { PropsComponent } from './home/props/props.component';
     HttpClientModule,
     SharedModule,
     Le5leStoreModule.forRoot(),
+    CoreModule.forRoot(),
     AppRoutingModule
   ],
   providers: [

@@ -5,7 +5,9 @@
 export const environment = {
   production: false,
   token: 'token_dev',
-  urls: {}
+  urls: {
+    account: 'http://account.le5le.com'
+  }
 };
 
 /*

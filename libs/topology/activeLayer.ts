@@ -22,7 +22,7 @@ export class ActiveLayer {
   rotate = 0;
   constructor(parent: HTMLElement, public options: any) {
     if (!this.options.activeColor) {
-      this.options.activeColor = '#2f54eb';
+      this.options.activeColor = '#d4380d';
     }
 
     this.canvas.style.position = 'absolute';
@@ -342,9 +342,11 @@ export class ActiveLayer {
     for (const item of this.nodes) {
       const tmp = new Node(item);
       tmp.strokeStyle = '#ffffff';
+      tmp.lineWidth += 2;
       tmp.render(ctx);
 
-      tmp.strokeStyle = this.options.activeColor;
+      tmp.strokeStyle = '#d4380d';
+      tmp.lineWidth -= 2;
       tmp.render(ctx);
     }
     for (const item of this.lines) {
@@ -354,9 +356,11 @@ export class ActiveLayer {
 
       const tmp = new Line(item);
       tmp.strokeStyle = '#ffffff';
+      tmp.lineWidth += 2;
       tmp.render(ctx);
 
-      tmp.strokeStyle = this.options.activeColor;
+      tmp.strokeStyle = '#d4380d';
+      tmp.lineWidth -= 2;
       tmp.render(ctx);
     }
     ctx.restore();

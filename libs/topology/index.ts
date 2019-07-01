@@ -11,6 +11,7 @@ import { ActiveLayer } from './activeLayer';
 import { Rect } from './models/rect';
 import { pointInRect } from './middles/draws/nodes/rect';
 import { s8 } from './uuid/uuid';
+import { getBezierPoint } from './middles/draws/lines/curve';
 
 const resizeCursors = ['nw-resize', 'ne-resize', 'se-resize', 'sw-resize'];
 enum MoveInType {
@@ -454,6 +455,7 @@ export class Topology {
 
     if (this.hoverLayer.dragRect) {
       this.getRectNodes(this.nodes, this.hoverLayer.dragRect);
+      this.getRectLines(this.lines, this.hoverLayer.dragRect);
       this.activeLayer.render();
 
       if (this.options.on && this.activeLayer.nodes && this.activeLayer.nodes.length) {
@@ -704,6 +706,28 @@ export class Topology {
     }
   }
 
+  private getRectLines(lines: Line[], rect: Rect) {
+    if (rect.width < 0) {
+      rect.width = -rect.width;
+      rect.x = rect.ex;
+      rect.ex = rect.x + rect.width;
+    }
+    if (rect.height < 0) {
+      rect.height = -rect.height;
+      rect.y = rect.ey;
+      rect.ey = rect.y + rect.height;
+    }
+    this.activeLayer.lines = [];
+    for (const item of lines) {
+      if (
+        rect.hit({ offsetX: item.from.x, offsetY: item.from.y }) &&
+        rect.hit({ offsetX: item.to.x, offsetY: item.to.y })
+      ) {
+        this.activeLayer.lines.push(item);
+      }
+    }
+  }
+
   private getAngle(e: MouseEvent) {
     if (e.offsetX === this.activeLayer.center.x) {
       return e.offsetY <= this.activeLayer.center.y ? 0 : 180;
@@ -737,6 +761,51 @@ export class Topology {
     this.input.style.width = pos.width + 'px';
     this.input.style.height = pos.height + 'px';
     this.input.style.zIndex = '1000';
+  }
+
+  getRect() {
+    let x1 = 99999;
+    let y1 = 99999;
+    let x2 = -99999;
+    let y2 = -99999;
+
+    const points: Point[] = [];
+    for (const item of this.nodes) {
+      const pts = item.rect.toPoints();
+      if (item.rotate) {
+        for (const pt of pts) {
+          pt.rotate(item.rotate, item.rect.center);
+        }
+      }
+      points.push.apply(points, pts);
+    }
+
+    for (const l of this.lines) {
+      points.push(l.from);
+      points.push(l.to);
+      if (l.name === 'curve') {
+        for (let i = 0.01; i < 1; i += 0.02) {
+          points.push(getBezierPoint(i, l.from, l.controlPoints[0], l.controlPoints[1], l.to));
+        }
+      }
+    }
+
+    for (const item of points) {
+      if (x1 > item.x) {
+        x1 = item.x;
+      }
+      if (y1 > item.y) {
+        y1 = item.y;
+      }
+      if (x2 < item.x) {
+        x2 = item.x;
+      }
+      if (y2 < item.y) {
+        y2 = item.y;
+      }
+    }
+
+    return new Rect(x1, y1, x2 - x1, y2 - y1);
   }
 
   private cache() {
@@ -782,10 +851,37 @@ export class Topology {
     });
   }
 
+  toImage(callback?: BlobCallback): string {
+    const rect = this.getRect();
+    const canvas = document.createElement('canvas');
+    canvas.width = rect.width + 20;
+    canvas.height = rect.height + 20;
+    canvas
+      .getContext('2d')
+      .drawImage(
+        this.offscreen.canvas,
+        rect.x - 10,
+        rect.y - 10,
+        rect.width + 20,
+        rect.height + 20,
+        0,
+        0,
+        rect.width + 20,
+        rect.height + 20
+      );
+
+    if (callback) {
+      canvas.toBlob(callback);
+      return '';
+    }
+
+    return canvas.toDataURL();
+  }
+
   saveAsPng(name?: string) {
     const a = document.createElement('a');
     a.setAttribute('download', name || 'le5le.topology.png');
-    a.setAttribute('href', this.canvas.toDataURL());
+    a.setAttribute('href', this.toImage());
     a.click();
   }
 

@@ -1,0 +1,69 @@
+@import 'src/variables';
+@import '~le5le-ui/variables';
+
+$head-height: 0.4rem;
+$color-border: #ddd;
+
+.page {
+  height: 100vh;
+  overflow: hidden;
+
+  .menus {
+    height: $head-height;
+    line-height: $head-height;
+    background: #f8f8f8;
+    display: flex;
+    font-size: 0.13rem;
+
+    img {
+      height: 0.24rem;
+      margin: 0.08rem 0.1rem;
+    }
+
+    a {
+      color: $color;
+      padding: 0 0.1rem;
+    }
+
+    .item {
+      position: relative;
+
+      &:hover {
+        .dropdown {
+          display: block;
+          padding: 0.08rem 0;
+
+          .item {
+            padding: 0 0.1rem;
+
+            a {
+              display: flex;
+              justify-content: space-between;
+              padding: 0 0.15rem;
+              font-size: 0.13rem !important;
+              min-width: 2rem;
+            }
+
+            &.line {
+              background-color: transparent !important;
+              padding: 0;
+              margin: 0.05rem 0.1rem;
+              border-top: 1px solid $color-gray;
+            }
+          }
+        }
+      }
+    }
+
+    .full {
+      flex-grow: 1;
+      width: inherit !important;
+    }
+
+    .tools {
+      position: relative;
+      top: 0.01rem;
+      justify-content: space-between;
+    }
+  }
+}

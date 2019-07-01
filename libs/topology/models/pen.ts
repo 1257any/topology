@@ -67,6 +67,8 @@ export abstract class Pen {
 
     if (this.fillStyle) {
       ctx.fillStyle = this.fillStyle;
+    } else {
+      ctx.fillStyle = 'transparent';
     }
 
     if (this.globalAlpha < 1) {

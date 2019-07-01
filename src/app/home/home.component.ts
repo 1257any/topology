@@ -1,21 +1,26 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Topology } from 'libs/topology';
 import { Options } from 'libs/topology/options';
 
 import * as FileSaver from 'file-saver';
+import { StoreService } from 'le5le-store';
+import { NoticeService } from 'le5le-components/notice';
 
+import { HomeService } from './home.service';
 import { Props } from './props/props.model';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-home',
   templateUrl: 'home.component.html',
   styleUrls: ['./home.component.scss'],
+  providers: [HomeService],
   // tslint:disable-next-line:use-host-property-decorator
   host: {
     '(document:keydown)': 'onkeyDocument($event)'
   }
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   @ViewChild('workspace', { static: true }) workspace: ElementRef;
   tools: any[] = [
     {
@@ -229,12 +234,58 @@ export class HomeComponent implements OnInit {
   canvasOptions: Options = {};
   filename = '空白图形';
   selected: Props;
-  constructor() {}
+  subMenu: any;
+
+  data = {
+    _id: '',
+    data: { nodes: [], lines: [] },
+    desc: '',
+    image: ''
+  };
+  constructor(private service: HomeService, private storeService: StoreService) {}
 
   ngOnInit() {
     this.canvasOptions.on = this.onMessage;
     this.canvas = new Topology(this.workspace.nativeElement, this.canvasOptions);
-    // window.canvas = this.canvas;
+
+    this.subMenu = this.storeService.get$('clickMenu').subscribe((menu: string) => {
+      switch (menu) {
+        case 'new':
+          this.onNew();
+          break;
+        case 'open':
+          this.onOpen();
+          break;
+        case 'save':
+          this.save();
+          break;
+        case 'saveAs':
+          this.data._id = '';
+          this.save();
+          break;
+        case 'down':
+          this.onSaveLocal();
+          break;
+        case 'downPng':
+          this.onSavePng();
+          break;
+        case 'undo':
+          this.canvas.undo();
+          break;
+        case 'redo':
+          this.canvas.redo();
+          break;
+        case 'cut':
+          this.canvas.cut();
+          break;
+        case 'copy':
+          this.canvas.copy();
+          break;
+        case 'parse':
+          this.canvas.parse();
+          break;
+      }
+    });
   }
 
   onDrag(event: DragEvent, node: any) {
@@ -307,7 +358,13 @@ export class HomeComponent implements OnInit {
   }
 
   onNew() {
-    this.canvas.render({ nodes: [], lines: [] });
+    this.data = {
+      _id: '',
+      data: { nodes: [], lines: [] },
+      desc: '',
+      image: ''
+    };
+    this.canvas.render(this.data.data);
   }
 
   onOpen() {
@@ -323,6 +380,12 @@ export class HomeComponent implements OnInit {
           try {
             const data = JSON.parse(text);
             if (data && Array.isArray(data.nodes) && Array.isArray(data.lines)) {
+              this.data = {
+                _id: '',
+                data,
+                desc: '',
+                image: ''
+              };
               this.canvas.render(data, true);
             }
           } catch (e) {
@@ -333,6 +396,22 @@ export class HomeComponent implements OnInit {
       }
     };
     input.click();
+  }
+
+  save() {
+    this.canvas.toImage(async blob => {
+      const file = await this.service.Upload(blob);
+      this.data.image = file.url;
+      const ret = await this.service.Save(this.data);
+      if (ret) {
+        this.data._id = ret;
+        const _noticeService: NoticeService = new NoticeService();
+        _noticeService.notice({
+          body: '保存成功！',
+          theme: 'success'
+        });
+      }
+    });
   }
 
   onSaveLocal() {
@@ -373,5 +452,19 @@ export class HomeComponent implements OnInit {
 
   onChangeProps(data: any) {
     this.canvas.update();
+  }
+
+  onSignup() {
+    location.href = `${environment.urls.account}?signup=true`;
+  }
+
+  onLogin() {
+    location.href = environment.urls.account;
+  }
+
+  ngOnDestroy() {
+    if (this.subMenu) {
+      this.subMenu.unsubscribe();
+    }
   }
 }

@@ -1,1 +1,245 @@
-<router-outlet></router-outlet>
+<div class="page">
+  <div class="menus">
+    <div class="item">
+      <img src="/assets/img/favicon.ico" />
+    </div>
+    <div class="item">
+      <a>
+        文件
+      </a>
+      <div class="dropdown">
+        <div class="item">
+          <a class="flex" (click)="onMenu('new')">
+            新建文件
+            <span class="ml50">Ctrl + Alt + N</span>
+          </a>
+        </div>
+        <div class="item">
+          <a (click)="onMenu('open')">
+            打开文件...
+            <span class="ml50">Ctrl + O</span>
+          </a>
+        </div>
+        <div class="item line"></div>
+        <div class="item">
+          <a (click)="onMenu('save')">
+            保存到云端
+            <span class="ml50">Ctrl + S</span>
+          </a>
+        </div>
+        <div class="item">
+          <a (click)="onMenu('saveAs')">
+            另存为...（在云端）
+            <span class="ml50">Ctrl + Shift + S</span>
+          </a>
+        </div>
+        <div class="item">
+          <a (click)="onMenu('down')">
+            保存到本地
+            <span class="ml50">Alt + Shift + S</span>
+          </a>
+        </div>
+        <div class="item line"></div>
+        <div class="item">
+          <a (click)="onMenu('downPng')">
+            下载PNG
+            <span class="ml50">Ctrl + D</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="item">
+      <a>编辑</a>
+      <div class="dropdown">
+        <div class="item">
+          <a (click)="onMenu('undo')">
+            撤消
+            <span class="ml50">Ctrl + Z</span>
+          </a>
+        </div>
+        <div class="item">
+          <a (click)="onMenu('redo')">
+            恢复
+            <span class="ml50">Ctrl + Shift+ Z</span>
+          </a>
+        </div>
+        <div class="item line"></div>
+        <div class="item">
+          <a (click)="onMenu('cut')">
+            剪切
+            <span class="ml50">Ctrl + X</span>
+          </a>
+        </div>
+        <div class="item">
+          <a (click)="onMenu('copy')">
+            复制
+            <span class="ml50">Ctrl + C</span>
+          </a>
+        </div>
+        <div class="item">
+          <a (click)="onMenu('parse')">
+            粘贴
+            <span class="ml50">Ctrl + V</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="item">
+      <a>查看</a>
+      <div class="dropdown">
+        <div class="item">
+          <a class="flex ">
+            基本形状
+          </a>
+        </div>
+        <div class="item">
+          <a class="flex ">
+            流程图
+          </a>
+        </div>
+        <div class="item">
+          <a class="flex ">
+            活动图
+          </a>
+        </div>
+        <div class="item">
+          <a class="flex ">
+            UML类图
+          </a>
+        </div>
+        <div class="item line"></div>
+        <div class="item">
+          <a>
+            更多...
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="item">
+      <a>社区</a>
+      <div class="dropdown">
+        <div class="item">
+          <a class="flex ">
+            推荐图文
+          </a>
+        </div>
+        <div class="item line"></div>
+        <div class="item">
+          <a class="flex ">
+            咨询与建议
+          </a>
+        </div>
+        <div class="item">
+          <a class="flex ">
+            开源（GitHub）
+          </a>
+        </div>
+        <div class="item line"></div>
+        <div class="item">
+          <a>
+            分享
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="item">
+      <a>帮助</a>
+      <div class="dropdown">
+        <div class="item">
+          <a class="flex ">
+            欢迎使用
+          </a>
+        </div>
+        <div class="item">
+          <a class="flex ">
+            API开发教程
+          </a>
+        </div>
+        <div class="item line"></div>
+        <div class="item">
+          <a class="flex ">
+            许可与声明
+          </a>
+        </div>
+        <div class="item line"></div>
+        <div class="item">
+          <a class="flex ">
+            捐助与加入
+          </a>
+        </div>
+        <div class="item">
+          <a class="flex ">
+            联系
+          </a>
+        </div>
+        <div class="item line"></div>
+        <div class="item">
+          <a>
+            关于
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="full flex tools">
+      <div class="flex ml50"></div>
+      <div class="flex">
+        <div class="item" (click)="onMenu('save')">
+          <a title="保存到云端">
+            <i class="iconfont icon-upload"></i>
+          </a>
+        </div>
+        <div class="item">
+          <a title="保存到本地" (click)="onMenu('down')">
+            <i class="iconfont icon-download"></i>
+          </a>
+        </div>
+        <div class="item">
+          <a title="另存为图片" (click)="onMenu('downPng')">
+            <i class="iconfont icon-pic"></i>
+          </a>
+        </div>
+        <div class="item">
+          <a title="分享">
+            <i class="iconfont icon-share"></i>
+          </a>
+        </div>
+        <div class="item ml20">
+          <a title="推荐图文">
+            <i class="iconfont icon-fly"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="flex ph20" *ngIf="!user">
+      <div class="item">
+        <a (click)="onSignup()">注册</a>
+      </div>
+      <div class="gray">/</div>
+      <div class="item">
+        <a (click)="onLogin()">登录</a>
+      </div>
+    </div>
+    <div class="flex ph20" *ngIf="user">
+      <div class="item">
+        <a [href]="urls.account" class="flex middle">
+          <ui-avatar
+            class="mr5"
+            [letters]="user.usernamePinyin"
+            [img]="user.avatarUrl"
+            [colors]="['#ff4d4f']"
+          ></ui-avatar>
+          {{ user.username }}
+          <i class="iconfont icon-angle-down"></i>
+        </a>
+        <div class="dropdown right">
+          <div class="item"><a [href]="urls.account">个人中心</a></div>
+          <div class="item line"></div>
+          <div class="item"><a (click)="onSignout()">退出</a></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <router-outlet></router-outlet>
+</div>
+
+<img src="/assets/img/logo.png" hidden="hidden" />

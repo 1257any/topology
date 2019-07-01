@@ -19,12 +19,12 @@ export class HoverLayer {
   dragRect: Rect;
   constructor(parent: HTMLElement, public options: any) {
     if (!this.options.hoverColor) {
-      this.options.hoverColor = '#389e0d';
+      this.options.hoverColor = '#d4380d';
     }
 
     // The backgournd color of selecting nodes by draging.
     if (!this.options.dragColor) {
-      this.options.dragColor = '#1890ff';
+      this.options.dragColor = '#d4380d';
     }
 
     this.canvas.style.position = 'absolute';

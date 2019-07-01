@@ -53,8 +53,8 @@ export class Canvas {
     ctx.strokeStyle = this.options.color;
     ctx.fillStyle = '#fff';
 
-    this.renderLines();
     this.renderNodes();
+    this.renderLines();
     if (update) {
       this.emitRender();
     }
