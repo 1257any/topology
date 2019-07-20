@@ -1,4 +1,4 @@
-<div class="body">
+<div class="flex">
   <div class="tools">
     <div *ngFor="let item of tools" class="mb20">
       <div class="title">{{ item.group }}</div>
@@ -16,17 +16,10 @@
   </div>
   <div class="full" #workspace></div>
   <div class="props">
-    <div class="popup-title">
-      <span class="nowrap line one">{{ filename }}</span>
-      <span class="mh5" *ngIf="selected">/</span>
-      <span class="line one" *ngIf="selected">
-        {{ selected.type === 'multi' ? '多个对象' : selected.data.text || selected.data.name }}
-      </span>
-    </div>
     <div class="pv5">
       <div *ngIf="!selected">
-        <div class="ph15">
-          欢迎使用le5le-topology！<br />
+        <div class="title">欢迎使用le5le-topology！</div>
+        <div class="ph15 mt10">
           便捷、开放、可扩展、云存储、社区等方式快速的创建微服务拓扑图、微服务流量图、软件项目设计图、流程图、活动图、时序图、类图、甚至UML各种图。
           <br /><br />
           更多绘图，自由定义，我们定义了框架和实现主流程。推荐以npm中间件的方式分享，让我们大家人人都可以成为设计师！
@@ -44,7 +37,6 @@
           <li>流程图</li>
           <li>活动图</li>
           <li>类图</li>
-          <li>账户与云存储</li>
           <li>官网</li>
           <li>使用文档</li>
           <li>API开发文档</li>

@@ -70,16 +70,6 @@ export class HttpService {
     }
   }
 
-  async Form(url: string, body: FormData, options?: any) {
-    url += this.queryParams;
-    this.queryParams = '';
-    try {
-      return await this.http.post(url, body, options).toPromise();
-    } catch (error) {
-      return error;
-    }
-  }
-
   async Put(url: string, body: any, options?: any) {
     url += this.queryParams;
     this.queryParams = '';
@@ -88,6 +78,29 @@ export class HttpService {
     }
     try {
       return await this.http.put(url, body, options).toPromise();
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async Patch(url: string, body: any, options?: any) {
+    url += this.queryParams;
+    this.queryParams = '';
+    if (!options) {
+      options = this.httpOptions;
+    }
+    try {
+      return await this.http.patch(url, body, options).toPromise();
+    } catch (error) {
+      return error;
+    }
+  }
+
+  async PostForm(url: string, body: FormData, options?: any) {
+    url += this.queryParams;
+    this.queryParams = '';
+    try {
+      return await this.http.post(url, body, options).toPromise();
     } catch (error) {
       return error;
     }

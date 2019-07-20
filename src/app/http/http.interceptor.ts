@@ -13,18 +13,9 @@ import { CoreService } from '../core/core.service';
 export class AppHttpInterceptor implements HttpInterceptor {
   constructor(protected store: StoreService, protected coreService: CoreService) {}
 
-  private getToken(): string {
-    const remember: any = localStorage.getItem('rememberMe');
-    if (remember) {
-      return localStorage.getItem(environment.token) || '';
-    } else {
-      return CookieService.get(environment.token) || '';
-    }
-  }
-
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const authReq = req.clone({
-      headers: req.headers.set('Authorization', this.getToken())
+      headers: req.headers.set('Authorization', CookieService.get(environment.token))
     });
     return next.handle(authReq).pipe(
       tap(

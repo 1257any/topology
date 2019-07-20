@@ -21,6 +21,10 @@ export abstract class Pen {
     textAlign: 'center' as CanvasTextAlign,
     textBaseline: 'middle' as CanvasTextBaseline
   };
+  animateColor = '';
+  animateSpeed = 1;
+  animatePlay = false;
+  animatePos = 0;
   // For users.
   data: any;
   constructor(json?: any) {
@@ -40,7 +44,7 @@ export abstract class Pen {
       if (json.font) {
         this.font = json.font;
       }
-
+      this.animateColor = json.animateColor;
       this.data = json.data || '';
     } else {
       this.id = s8();

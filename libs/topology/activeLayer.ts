@@ -237,7 +237,6 @@ export class ActiveLayer {
     }
 
     this.updateLines();
-    this.render();
   }
 
   // 当initialOccupy缩放为occupy后，计算node在occupy中的新位置
@@ -268,24 +267,33 @@ export class ActiveLayer {
       ++i;
     }
     this.updateLines();
-
-    this.render();
   }
 
   updateLines() {
     const lines = Store.get('lines');
-    for (const item of this.nodes) {
-      for (const line of lines) {
+    for (const line of lines) {
+      let found = false;
+      for (const item of this.nodes) {
         if (line.from.id === item.id) {
           line.from.x = item.rotatedAnchors[line.from.anchorIndex].x;
           line.from.y = item.rotatedAnchors[line.from.anchorIndex].y;
+          found = true;
         }
         if (line.to.id === item.id) {
           line.to.x = item.rotatedAnchors[line.to.anchorIndex].x;
           line.to.y = item.rotatedAnchors[line.to.anchorIndex].y;
+          found = true;
         }
+      }
+      if (found) {
         line.calcControlPoints();
       }
+    }
+  }
+
+  changeLineType() {
+    for (const item of this.lines) {
+      item.calcControlPoints();
     }
   }
 
@@ -341,6 +349,7 @@ export class ActiveLayer {
     ctx.save();
     for (const item of this.nodes) {
       const tmp = new Node(item);
+      tmp.text = '';
       tmp.strokeStyle = '#ffffff';
       tmp.lineWidth += 2;
       tmp.render(ctx);
@@ -353,7 +362,6 @@ export class ActiveLayer {
       if (!item.to) {
         continue;
       }
-
       const tmp = new Line(item);
       tmp.strokeStyle = '#ffffff';
       tmp.lineWidth += 2;

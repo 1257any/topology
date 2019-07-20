@@ -1,6 +1,6 @@
 {
   "/ws": {
-    "target": "ws://127.0.0.1:8200",
+    "target": "ws://127.0.0.1:8210",
     "ws": true,
     "changeOrigin": true,
     "secure": false
@@ -10,11 +10,7 @@
     "changeOrigin": true,
     "secure": false
   },
-  "/api/file": {
-    "target": "http://127.0.0.1:8201",
-    "changeOrigin": true,
-    "secure": false
-  },
+
   "/image": {
     "target": "http://127.0.0.1:8201",
     "changeOrigin": true,
@@ -25,6 +21,17 @@
     "changeOrigin": true,
     "secure": false
   },
+  "/api/image": {
+    "target": "http://127.0.0.1:8201",
+    "changeOrigin": true,
+    "secure": false
+  },
+  "/api/file": {
+    "target": "http://127.0.0.1:8201",
+    "changeOrigin": true,
+    "secure": false
+  },
+
   "/api": {
     "target": "http://127.0.0.1:8210",
     "changeOrigin": true,

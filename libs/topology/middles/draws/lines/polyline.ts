@@ -90,7 +90,7 @@ export function dockPolylineControlPoint(point: Point, l: Line) {
 }
 
 function getDirectionPoint(p: Point) {
-  const point = Object.assign({}, p);
+  const point = p.clone();
   switch (p.direction) {
     case Direction.Up:
       point.y -= minDistance;

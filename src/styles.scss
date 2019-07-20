@@ -35,6 +35,70 @@
   top: 0.02rem;
 }
 
+.page .menus {
+  .ui-avatar {
+    width: 0.24rem;
+    line-height: 0.22rem;
+    height: 0.24rem;
+  }
+}
+
+app-hot .topo .ui-avatar,
+app-user-favorite .topo .ui-avatar {
+  width: 0.2rem;
+  line-height: 0.2rem;
+  height: 0.2rem;
+  position: relative;
+  top: 0.06rem;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+.nav a {
+  &:hover {
+    text-decoration: none;
+    color: #096dd9 !important;
+  }
+}
+
+.page .pagination .buttons > a.active {
+  background-color: $color-primary !important;
+  border-color: $color-primary !important;
+}
+
+.pagination {
+  .buttons > a {
+    &:first-child {
+      border-top-left-radius: 0.02rem !important;
+      border-bottom-left-radius: 0.02rem !important;
+    }
+    &:last-child {
+      border-top-right-radius: 0.02rem !important;
+      border-bottom-right-radius: 0.02rem !important;
+    }
+  }
+
+  .input {
+    min-height: 0.26rem;
+  }
+
+  .flex.middle.full {
+    height: 0.28rem;
+  }
+}
+
+.ui-slider {
+  .max,
+  .min {
+    border-color: $color-primary !important;
+  }
+  .bk {
+    background: $color-primary !important;
+  }
+}
+
 /*定义滚动条轨道 内阴影+圆角*/
 ::-webkit-scrollbar {
   width: 0.1rem;

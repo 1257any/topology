@@ -4,7 +4,10 @@ import { Props } from './props.model';
 @Component({
   selector: 'app-props',
   templateUrl: './props.component.html',
-  styleUrls: ['./props.component.scss']
+  styleUrls: ['./props.component.scss'],
+  host: {
+    '(document:click)': 'onclickDocument()'
+  }
 })
 export class PropsComponent implements OnInit, OnChanges {
   @Input() props: Props = { type: '' };
@@ -59,6 +62,7 @@ export class PropsComponent implements OnInit, OnChanges {
   ngOnInit() {
     if (!this.props.data) {
       this.props.data = {
+        name: 'curve',
         dash: 0,
         lineWidth: 1,
         strokeStyle: '',
@@ -104,6 +108,12 @@ export class PropsComponent implements OnInit, OnChanges {
     this.ok.emit(this.props);
   }
 
+  onClickName(name: string) {
+    this.props.data.name = name;
+    this.drowdown = 0;
+    this.onSubmitProps();
+  }
+
   onClickDash(dash: number) {
     this.props.data.dash = dash;
     this.drowdown = 0;
@@ -145,5 +155,9 @@ export class PropsComponent implements OnInit, OnChanges {
         }
         break;
     }
+  }
+
+  onclickDocument() {
+    this.drowdown = 0;
   }
 }

@@ -40,7 +40,7 @@ export class Canvas {
     return false;
   }
 
-  render(update = true) {
+  render(update = false) {
     if (this.rendering) {
       return;
     }

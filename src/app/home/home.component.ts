@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { Topology } from 'libs/topology';
 import { Options } from 'libs/topology/options';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import * as FileSaver from 'file-saver';
 import { StoreService } from 'le5le-store';
@@ -9,6 +10,7 @@ import { NoticeService } from 'le5le-components/notice';
 import { HomeService } from './home.service';
 import { Props } from './props/props.model';
 import { environment } from 'src/environments/environment';
+import { CoreService } from '../core/core.service';
 
 @Component({
   selector: 'app-home',
@@ -232,35 +234,57 @@ export class HomeComponent implements OnInit, OnDestroy {
   ];
   canvas: Topology;
   canvasOptions: Options = {};
-  filename = '空白图形';
   selected: Props;
   subMenu: any;
 
   data = {
-    _id: '',
+    id: '',
+    fileId: '',
     data: { nodes: [], lines: [] },
+    name: '',
     desc: '',
-    image: ''
+    image: '',
+    userId: '',
+    shared: false
   };
-  constructor(private service: HomeService, private storeService: StoreService) {}
+
+  user: any;
+  subUser: any;
+
+  subRoute: any;
+  constructor(
+    private service: HomeService,
+    private storeService: StoreService,
+    private coreService: CoreService,
+    private router: Router,
+    private activateRoute: ActivatedRoute
+  ) {}
 
   ngOnInit() {
-    this.canvasOptions.on = this.onMessage;
-    this.canvas = new Topology(this.workspace.nativeElement, this.canvasOptions);
+    this.user = this.storeService.get('user');
+    this.subUser = this.storeService.get$('user').subscribe((user: any) => {
+      this.user = user;
+      if (this.data && this.data.userId !== this.user.id) {
+        this.data.shared = false;
+        this.data.id = '';
+      }
+    });
 
-    this.subMenu = this.storeService.get$('clickMenu').subscribe((menu: string) => {
-      switch (menu) {
+    this.canvasOptions.on = this.onMessage;
+    this.subMenu = this.storeService.get$('clickMenu').subscribe((menu: { event: string; data: any }) => {
+      switch (menu.event) {
         case 'new':
           this.onNew();
           break;
         case 'open':
-          this.onOpen();
+          this.selected = null;
+          this.onOpenLocal();
           break;
         case 'save':
           this.save();
           break;
         case 'saveAs':
-          this.data._id = '';
+          this.data.id = '';
           this.save();
           break;
         case 'down':
@@ -284,7 +308,33 @@ export class HomeComponent implements OnInit, OnDestroy {
         case 'parse':
           this.canvas.parse();
           break;
+        case 'filename':
+          this.onSaveFilename(menu.data);
+          break;
+        case 'share':
+          this.onShare();
+          break;
       }
+    });
+
+    setTimeout(() => {
+      this.canvas = new Topology(this.workspace.nativeElement, this.canvasOptions);
+      this.subRoute = this.activateRoute.queryParamMap.subscribe(params => {
+        if (params.get('id')) {
+          this.onOpen({ id: params.get('id'), fileId: params.get('fileId') });
+        } else {
+          this.data = {
+            id: '',
+            fileId: '',
+            data: { nodes: [], lines: [] },
+            name: '',
+            desc: '',
+            image: '',
+            userId: '',
+            shared: false
+          };
+        }
+      });
     });
   }
 
@@ -298,33 +348,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     }
 
     switch (key.keyCode) {
-      case 68:
-        if (key.ctrlKey) {
-          this.onSavePng();
-        }
-        break;
-      case 78:
-        if (key.ctrlKey) {
-          this.onNew();
-        }
-        break;
-      case 79:
-        if (key.ctrlKey) {
-          this.onOpen();
-        }
-        break;
-      case 83:
-        if (key.ctrlKey) {
-          if (key.shiftKey) {
-            // Save as
-          } else {
-            // Save
-          }
-        }
-        if (key.altKey && key.shiftKey) {
-          this.onSaveLocal();
-        }
-        break;
       case 88:
         if (key.ctrlKey) {
           this.onCut();
@@ -359,21 +382,52 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   onNew() {
     this.data = {
-      _id: '',
+      id: '',
+      fileId: '',
       data: { nodes: [], lines: [] },
+      name: '',
       desc: '',
-      image: ''
+      image: '',
+      userId: '',
+      shared: false
     };
-    this.canvas.render(this.data.data);
+    this.storeService.set('file', this.data);
+    this.canvas.render(this.data.data, true);
   }
 
-  onOpen() {
+  async onOpen(data: { id: string; fileId?: string }) {
+    const ret = await this.service.Get(data);
+    if (!ret) {
+      this.router.navigateByUrl('/');
+      return;
+    }
+
+    this.storeService.set('recently', {
+      id: ret.id,
+      fileId: ret.fileId || '',
+      image: ret.image,
+      name: ret.name,
+      desc: ret.desc
+    });
+
+    if (this.user && ret.userId !== this.user.id) {
+      ret.shared = false;
+      ret.id = '';
+    }
+    this.data = ret;
+    this.canvas.render(ret.data, true);
+
+    this.storeService.set('file', this.data);
+  }
+
+  onOpenLocal() {
     const input = document.createElement('input');
     input.type = 'file';
     input.onchange = event => {
       const elem: any = event.srcElement || event.target;
       if (elem.files && elem.files[0]) {
-        this.filename = elem.files[0].name.replace('.json', '');
+        this.data.name = elem.files[0].name.replace('.json', '');
+        this.storeService.set('file', this.data);
         const reader = new FileReader();
         reader.onload = (e: any) => {
           const text = e.target.result + '';
@@ -381,10 +435,14 @@ export class HomeComponent implements OnInit, OnDestroy {
             const data = JSON.parse(text);
             if (data && Array.isArray(data.nodes) && Array.isArray(data.lines)) {
               this.data = {
-                _id: '',
+                id: '',
+                fileId: '',
                 data,
+                name: '',
                 desc: '',
-                image: ''
+                image: '',
+                userId: '',
+                shared: false
               };
               this.canvas.render(data, true);
             }
@@ -399,28 +457,83 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   save() {
+    this.data.data = this.canvas.save();
     this.canvas.toImage(async blob => {
-      const file = await this.service.Upload(blob);
+      if (this.data.id && !this.coreService.isVip(this.user)) {
+        await this.service.DelImage(this.data.image);
+      }
+      const file = await this.service.Upload(blob, this.data.shared);
       this.data.image = file.url;
       const ret = await this.service.Save(this.data);
       if (ret) {
-        this.data._id = ret;
+        this.data.id = ret.id;
+        this.storeService.set('file', this.data);
         const _noticeService: NoticeService = new NoticeService();
         _noticeService.notice({
           body: '保存成功！',
           theme: 'success'
         });
+
+        this.storeService.set('recently', {
+          id: this.data.id,
+          fileId: this.data.fileId || '',
+          image: this.data.image,
+          name: this.data.name,
+          desc: this.data.desc
+        });
       }
     });
   }
 
+  async onSaveFilename(filename: string) {
+    if (this.data.id) {
+      if (
+        !(await this.service.Patch({
+          id: this.data.id,
+          name: filename
+        }))
+      ) {
+        return;
+      }
+
+      this.storeService.set('recently', {
+        id: this.data.id,
+        fileId: this.data.fileId || '',
+        image: this.data.image,
+        name: filename
+      });
+    }
+
+    this.data.name = filename;
+    this.storeService.set('file', this.data);
+  }
+
   onSaveLocal() {
     const data = this.canvas.save();
-    FileSaver.saveAs(new Blob([data], { type: 'text/plain;charset=utf-8' }), 'le5le.topology.json');
+    FileSaver.saveAs(new Blob([JSON.stringify(data)], { type: 'text/plain;charset=utf-8' }), 'le5le.topology.json');
   }
 
   onSavePng() {
     this.canvas.saveAsPng();
+  }
+
+  async onShare() {
+    if (!this.data.id) {
+      return;
+    }
+
+    if (
+      !(await this.service.Patch({
+        id: this.data.id,
+        image: this.data.image,
+        shared: !this.data.shared
+      }))
+    ) {
+      return;
+    }
+
+    this.data.shared = !this.data.shared;
+    this.storeService.set('file', this.data);
   }
 
   onCut() {
@@ -450,7 +563,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     // console.log('onMessage:', event, data, this.selected);
   };
 
-  onChangeProps(data: any) {
+  onChangeProps(props: any) {
+    if (props.type === 'line') {
+      this.canvas.lineName = props.data.name;
+      this.canvas.activeLayer.changeLineType();
+    }
+
     this.canvas.update();
   }
 
@@ -463,8 +581,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    if (this.subMenu) {
-      this.subMenu.unsubscribe();
-    }
+    this.subMenu.unsubscribe();
+    this.subUser.unsubscribe();
+    this.subRoute.unsubscribe();
   }
 }

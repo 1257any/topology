@@ -16,41 +16,73 @@ $color-border: #ddd;
     font-size: 0.13rem;
 
     img {
-      height: 0.24rem;
-      margin: 0.08rem 0.1rem;
+      height: 0.22rem;
+      margin: 0.1rem 0 0.1rem 0.1rem;
     }
 
     a {
       color: $color;
       padding: 0 0.1rem;
+
+      .iconfont {
+        font-size: 0.16rem;
+        line-height: 0.28rem;
+        padding: 0;
+      }
+
+      .icon-angle-right {
+        position: relative;
+        left: 0.2rem;
+      }
+
+      &:hover {
+        text-decoration: none;
+      }
+    }
+
+    .disabled {
+      a {
+        cursor: default;
+        background: transparent !important;
+        color: $color-gray !important;
+      }
+
+      &:hover,
+      .item:hover {
+        background: transparent !important;
+      }
     }
 
     .item {
       position: relative;
 
-      &:hover {
-        .dropdown {
-          display: block;
-          padding: 0.08rem 0;
+      & > .dropdown {
+        padding: 0.08rem 0;
 
-          .item {
-            padding: 0 0.1rem;
+        .item {
+          padding: 0 0.1rem;
 
-            a {
-              display: flex;
-              justify-content: space-between;
-              padding: 0 0.15rem;
-              font-size: 0.13rem !important;
-              min-width: 2rem;
-            }
-
-            &.line {
-              background-color: transparent !important;
-              padding: 0;
-              margin: 0.05rem 0.1rem;
-              border-top: 1px solid $color-gray;
-            }
+          a {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 0.15rem;
+            font-size: 0.13rem !important;
+            min-width: 2rem;
           }
+
+          &.line {
+            background-color: transparent !important;
+            padding: 0;
+            margin: 0.05rem 0.1rem;
+            border-top: 1px solid $color-gray;
+          }
+        }
+      }
+
+      &:hover {
+        & > .dropdown {
+          display: block;
+          background: #fff !important;
         }
       }
     }
@@ -60,10 +92,51 @@ $color-border: #ddd;
       width: inherit !important;
     }
 
-    .tools {
-      position: relative;
-      top: 0.01rem;
-      justify-content: space-between;
+    input {
+      display: inline-block;
+      width: 3rem;
+    }
+  }
+
+  .body {
+    display: flex;
+    height: calc(100vh - 0.4rem);
+    border-top: 1px solid $color-border;
+  }
+}
+
+.clicked {
+  .dropdown {
+    display: none !important;
+  }
+}
+
+figure {
+  padding: 0 0.25rem;
+  width: 7rem;
+
+  .topo {
+    margin: 0.1rem 0.1rem 0 0;
+    border: 1px solid $color-border !important;
+    cursor: pointer;
+    min-width: 1.2rem !important;
+    width: 1.2rem !important;
+    height: 1.2rem !important;
+    padding: 0.1rem !important;
+
+    &:nth-child(5n + 0) {
+      margin-right: 0;
+    }
+
+    &:hover {
+      border-color: $color-primary !important;
+    }
+
+    img {
+      margin: 0 !important;
+      width: 1rem !important;
+      height: 1rem !important;
+      pointer-events: none;
     }
   }
 }

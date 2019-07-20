@@ -1,8 +1,10 @@
 import { Direction } from './direction';
 
 export class Point {
+  // The id is nodeId while the point is from or to of a line.
   id: number | string;
   direction: Direction;
+  // The index of docker anchor on node.
   anchorIndex: number;
   constructor(public x: number, public y: number, direction?: Direction, anchorIndex?: number, id?: number | string) {
     this.x = (this.x + 0.5) << 0;

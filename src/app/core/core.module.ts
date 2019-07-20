@@ -2,11 +2,12 @@ import { ModuleWithProviders, NgModule, Optional, SkipSelf } from '@angular/core
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 
-import { StoreService } from 'le5le-store';
-
+import { StoreService, CookieService } from 'le5le-store';
 import { NoticeService } from 'le5le-components/notice';
+
 import { HttpService } from '../http/http.service';
 import { CoreService } from './core.service';
+import { environment } from 'src/environments/environment';
 
 @NgModule({
   imports: [CommonModule],
@@ -75,7 +76,9 @@ export class CoreModule {
       }
     };
 
-    // this.socket.onopen = (event: any) => {};
+    this.socket.onopen = (event: any) => {
+      this.socket.send(JSON.stringify({ event: 'token', data: CookieService.get(environment.token) }));
+    };
 
     this.socket.onclose = (event: any) => {
       console.log('websocket close and reconneting...');

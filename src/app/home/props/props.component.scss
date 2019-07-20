@@ -37,12 +37,13 @@
       width: 0.1rem;
       height: 0.1rem;
       border: 1px solid #555;
-      margin-top: 0.09rem;
+      margin-top: 0.04rem;
     }
 
     input {
       width: 100%;
       border: none;
+      padding: 0 0 0 0.05rem;
     }
   }
 
@@ -59,6 +60,15 @@
   }
 }
 
-app-props form {
-  min-height: calc(100vh - 1rem);
+:host {
+  form {
+    min-height: calc(100vh - 1rem);
+  }
+
+  ui-slider {
+    overflow: hidden;
+    position: relative;
+    top: 0.05rem;
+    padding: 0 0.1rem 0 0.07rem;
+  }
 }

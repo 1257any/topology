@@ -11,6 +11,8 @@ export class HoverLayer {
   anchorRadius = 4;
 
   line: Line;
+  // for move line.
+  initLine: Line;
   node: Node;
   hoverLineCP: Point;
   // The dock of to point of line.
@@ -33,14 +35,28 @@ export class HoverLayer {
     parent.appendChild(this.canvas);
   }
 
-  setLine(from: Point, fromArrow?: string) {
+  setLine(from: Point, fromArrow = '', lineName = 'curve') {
     this.line = new Line();
+    this.line.name = lineName;
     this.line.setFrom(from, fromArrow);
     Store.get('lines').push(this.line);
   }
 
   lineTo(to: Point, toArrow: string = 'triangleSolid') {
     this.line.setTo(to, toArrow);
+    this.line.calcControlPoints();
+  }
+
+  lineFrom(from: Point) {
+    this.line.setFrom(from, this.line.fromArrow);
+    this.line.calcControlPoints();
+  }
+
+  lineMove(e: MouseEvent, initPos: MouseEvent) {
+    const x = e.offsetX - initPos.offsetX;
+    const y = e.offsetY - initPos.offsetY;
+    this.line.setTo(new Point(this.initLine.to.x + x, this.initLine.to.y + y), this.line.toArrow);
+    this.line.setFrom(new Point(this.initLine.from.x + x, this.initLine.from.y + y), this.line.fromArrow);
     this.line.calcControlPoints();
   }
 
@@ -99,5 +115,16 @@ export class HoverLayer {
   resize(width: number, height: number) {
     this.canvas.width = width;
     this.canvas.height = height;
+  }
+
+  getLen(line: Line) {
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute(
+      'd',
+      `M${line.from.x} ${line.from.y} C${line.controlPoints[0].x} ${line.controlPoints[0].y} ${
+        line.controlPoints[1].x
+      } ${line.controlPoints[1].y} ${line.to.x} ${line.to.y}`
+    );
+    return path.getTotalLength();
   }
 }

@@ -20,6 +20,9 @@ export interface Props {
       textAlign: CanvasTextAlign;
       textBaseline: CanvasTextBaseline;
     };
+    animateColor: string;
+    animateSpeed: number;
+    animatePlay?: boolean;
     data?: any;
 
     // Node

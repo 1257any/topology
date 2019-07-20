@@ -69,7 +69,9 @@ export class Line extends Pen {
         ctx.fillStyle = ctx.strokeStyle;
       }
       let f = this.to;
-      if (this.controlPoints.length) {
+      if (this.name === 'curve') {
+        f = getBezierPoint(0.9, this.to, this.controlPoints[1], this.controlPoints[0], this.from);
+      } else if (this.name !== 'line' && this.controlPoints.length) {
         f = this.controlPoints[0];
       }
       drawArrowFns[this.fromArrow](ctx, f, this.from);
@@ -83,10 +85,10 @@ export class Line extends Pen {
       } else {
         ctx.fillStyle = ctx.strokeStyle;
       }
-      let f = this.to;
+      let f = this.from;
       if (this.name === 'curve') {
         f = getBezierPoint(0.9, this.from, this.controlPoints[0], this.controlPoints[1], this.to);
-      } else if (this.controlPoints.length) {
+      } else if (this.name !== 'line' && this.controlPoints.length) {
         f = this.controlPoints[this.controlPoints.length - 1];
       }
       drawArrowFns[this.toArrow](ctx, f, this.to);

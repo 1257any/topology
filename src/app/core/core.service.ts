@@ -519,31 +519,38 @@ export class CoreService {
     return '';
   }
 
-  saveToken(user: { token: string }) {
+  saveToken(data: { token: string }) {
+    const options: any = {
+      domain: document.domain
+        .split('.')
+        .slice(-2)
+        .join('.')
+    };
     const remember: any = localStorage.getItem('rememberMe');
     if (remember) {
-      localStorage.setItem(environment.token, user.token);
-    } else {
-      CookieService.set(environment.token, user.token, {
-        domain: document.domain
-          .split('.')
-          .slice(-2)
-          .join('.')
-      });
+      // 1 year.
+      options.expires = 365;
     }
+
+    CookieService.set(environment.token, data.token, options);
   }
 
   removeToken() {
-    const remember: any = localStorage.getItem('rememberMe');
-    if (remember) {
-      localStorage.removeItem(environment.token);
-    } else {
-      CookieService.delete(environment.token, {
-        domain: document.domain
-          .split('.')
-          .slice(-2)
-          .join('.')
-      });
+    CookieService.delete(environment.token, {
+      domain: document.domain
+        .split('.')
+        .slice(-2)
+        .join('.')
+    });
+  }
+
+  isVip(user: any, day = 0) {
+    if (!user || !user.vip) {
+      return false;
     }
+
+    const now = new Date().getTime();
+    const date = new Date(user.vipExpiry).getTime();
+    return (date - now) / (1000 * 60 * 60 * 24) + day >= 0;
   }
 }
