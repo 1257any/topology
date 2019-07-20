@@ -76,7 +76,9 @@ export class PropsComponent implements OnInit, OnChanges {
           lineHeight: 1.5,
           textAlign: 'center',
           textBaseline: 'middle'
-        }
+        },
+        animateColor: '#52c41a',
+        animateSpeed: 1
       };
     }
 
