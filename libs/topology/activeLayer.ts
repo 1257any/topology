@@ -139,6 +139,10 @@ export class ActiveLayer {
     ctx.stroke();
     ctx.restore();
 
+    if (Store.get('locked')) {
+      return;
+    }
+
     // Draw rotate control point.
     ctx.beginPath();
     ctx.moveTo(this.rotateCPs[0].x, this.rotateCPs[0].y);
@@ -349,6 +353,8 @@ export class ActiveLayer {
     ctx.save();
     for (const item of this.nodes) {
       const tmp = new Node(item);
+      tmp.icon = '';
+      tmp.image = '';
       tmp.text = '';
       tmp.strokeStyle = '#ffffff';
       tmp.lineWidth += 2;

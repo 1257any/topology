@@ -1,5 +1,5 @@
 import { Point } from './point';
-import { pointInRect } from '../middles/draws/nodes/rect';
+import { pointInRect } from '../middles/utils';
 
 export class Rect {
   ex: number;

@@ -1,6 +1,6 @@
 import { s8 } from '../uuid/uuid';
 import { Rect } from './rect';
-import { pointInRect } from '../middles/draws/nodes/rect';
+import { pointInRect } from '../middles/utils';
 
 export abstract class Pen {
   id = '';
@@ -45,6 +45,7 @@ export abstract class Pen {
         this.font = json.font;
       }
       this.animateColor = json.animateColor;
+      this.animateSpeed = json.animateSpeed;
       this.data = json.data || '';
     } else {
       this.id = s8();

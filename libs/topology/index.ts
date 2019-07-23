@@ -10,9 +10,9 @@ import { HoverLayer } from './hoverLayer';
 import { ActiveLayer } from './activeLayer';
 import { AnimateLayer } from './animateLayer';
 import { Rect } from './models/rect';
-import { pointInRect } from './middles/draws/nodes/rect';
 import { s8 } from './uuid/uuid';
-import { getBezierPoint } from './middles/draws/lines/curve';
+import { getBezierPoint } from './middles/lines/curve';
+import { pointInRect } from './middles/utils';
 
 const resizeCursors = ['nw-resize', 'ne-resize', 'se-resize', 'sw-resize'];
 enum MoveInType {
@@ -51,10 +51,17 @@ export class Topology {
   private subcribe: Observer;
 
   lastHoverNode: Node;
-  input = document.createElement('input');
+  input = document.createElement('textarea');
   inputNode: Node;
   mouseDown: MouseEvent;
-  moveIn = {
+  moveIn: {
+    type: MoveInType;
+    activeAnchorIndex: number;
+    hoverAnchorIndex: number;
+    hoverNode: Node;
+    hoverLine: Line;
+    lineControlPoint: Point;
+  } = {
     type: MoveInType.None,
     activeAnchorIndex: 0,
     hoverAnchorIndex: 0,
@@ -69,6 +76,8 @@ export class Topology {
   lineName = 'curve';
 
   clipboard: ICanvasData;
+
+  locked = false;
 
   private scheduledAnimationFrame = false;
 
@@ -161,6 +170,7 @@ export class Topology {
     this.input.style.height = '0';
     this.input.style.outline = 'none';
     this.input.style.border = '1px solid #cdcdcd';
+    this.input.style.resize = 'none';
     this.parentElem.appendChild(this.input);
 
     this.cache();
@@ -386,6 +396,7 @@ export class Topology {
       this.input.style.width = '0';
       this.inputNode = null;
       this.cache();
+      this.offscreen.render(true);
     }
 
     switch (this.moveIn.type) {
@@ -548,10 +559,9 @@ export class Topology {
     switch (this.moveIn.type) {
       case MoveInType.Nodes:
         if (this.moveIn.hoverNode) {
-          if (
-            this.moveIn.hoverNode.textRect.hitRotate(e, this.moveIn.hoverNode.rotate, this.moveIn.hoverNode.rect.center)
-          ) {
-            this.showInput(this.moveIn.hoverNode.textRect);
+          const textRect = this.moveIn.hoverNode.getTextRect();
+          if (textRect.hitRotate(e, this.moveIn.hoverNode.rotate, this.moveIn.hoverNode.rect.center)) {
+            this.showInput(textRect);
           }
           if (this.options.on) {
             this.options.on('dblclick', this.moveIn.hoverNode);
@@ -604,9 +614,9 @@ export class Topology {
   };
 
   private getHoverNode(e: MouseEvent) {
-    for (const item of this.nodes) {
-      if (item.hit(e, 2)) {
-        this.moveIn.hoverNode = item;
+    for (let i = this.nodes.length - 1; i > -1; --i) {
+      if (this.nodes[i].hit(e, 2)) {
+        this.moveIn.hoverNode = this.nodes[i];
         this.moveIn.type = MoveInType.Nodes;
         break;
       }
@@ -639,12 +649,14 @@ export class Topology {
           this.hoverLayer.canvas.style.cursor = 'move';
         }
 
-        for (let i = 0; i < this.activeLayer.sizeCPs.length; ++i) {
-          if (this.activeLayer.sizeCPs[i].hit(e, 10)) {
-            this.moveIn.type = MoveInType.ResizeCP;
-            this.moveIn.activeAnchorIndex = i;
-            this.hoverLayer.canvas.style.cursor = resizeCursors[i];
-            break;
+        if (!this.locked) {
+          for (let i = 0; i < this.activeLayer.sizeCPs.length; ++i) {
+            if (this.activeLayer.sizeCPs[i].hit(e, 10)) {
+              this.moveIn.type = MoveInType.ResizeCP;
+              this.moveIn.activeAnchorIndex = i;
+              this.hoverLayer.canvas.style.cursor = resizeCursors[i];
+              break;
+            }
           }
         }
       }
@@ -655,7 +667,7 @@ export class Topology {
     }
 
     // In anchors of hoverNode
-    if (this.moveIn.hoverNode) {
+    if (this.moveIn.hoverNode && !this.locked) {
       for (let i = 0; i < this.moveIn.hoverNode.rotatedAnchors.length; ++i) {
         if (this.moveIn.hoverNode.rotatedAnchors[i].hit(e, 10)) {
           this.moveIn.type = MoveInType.HoverAnchors;
@@ -823,6 +835,9 @@ export class Topology {
   }
 
   private showInput(pos: Rect) {
+    if (this.locked) {
+      return;
+    }
     this.inputNode = this.moveIn.hoverNode;
     this.input.value = this.moveIn.hoverNode.text;
     this.input.style.left = pos.x + 'px';
@@ -831,6 +846,8 @@ export class Topology {
     this.input.style.height = pos.height + 'px';
     this.input.style.zIndex = '1000';
   }
+
+  onInput = (e: MouseEvent) => {};
 
   getRect() {
     let x1 = 99999;
@@ -898,7 +915,7 @@ export class Topology {
   }
 
   undo() {
-    if (this.caches.index < 1) {
+    if (this.locked || this.caches.index < 1) {
       return;
     }
 
@@ -906,7 +923,7 @@ export class Topology {
   }
 
   redo() {
-    if (this.caches.index > this.caches.list.length - 2) {
+    if (this.locked || this.caches.index > this.caches.list.length - 2) {
       return;
     }
 
@@ -955,6 +972,10 @@ export class Topology {
   }
 
   cut() {
+    if (this.locked) {
+      return;
+    }
+
     this.clipboard = {
       nodes: [],
       lines: []
@@ -1014,7 +1035,7 @@ export class Topology {
   }
 
   parse() {
-    if (!this.clipboard) {
+    if (!this.clipboard || this.locked) {
       return;
     }
 
@@ -1069,7 +1090,12 @@ export class Topology {
     this.activeLayer.render();
     this.animateLayer.render();
     this.hoverLayer.render();
-    this.render();
+    this.offscreen.render(true);
+  }
+
+  lock(lock: boolean) {
+    this.locked = lock;
+    Store.set('locked', lock);
   }
 
   destory() {

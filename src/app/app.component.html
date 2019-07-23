@@ -232,7 +232,9 @@
       </div>
     </div>
     <div class="full text-center" *ngIf="editMode">
-      <div class="inline" *ngIf="!editFilename" (dblclick)="editFilename = true">{{ filename || '空白文件' }}</div>
+      <div class="inline" *ngIf="!editFilename" (dblclick)="editFilename = true" title="双击修改">
+        {{ filename || '空白文件' }}
+      </div>
       <form
         class="inline"
         *ngIf="editFilename"
@@ -246,6 +248,16 @@
     </div>
     <div class="full text-center" *ngIf="!editMode"></div>
     <div class="flex" [class.disabled]="!editMode">
+      <div *ngIf="!locked" class="item" (click)="locked = !locked; onMenu('lock', true)" title="锁定">
+        <a>
+          <i class="iconfont icon-unlock"></i>
+        </a>
+      </div>
+      <div *ngIf="locked" class="item" (click)="locked = !locked; onMenu('lock', false)" title="解锁">
+        <a>
+          <i class="iconfont icon-lock"></i>
+        </a>
+      </div>
       <div class="item" (click)="onMenu('save')" title="保存到云端">
         <a>
           <i class="iconfont icon-upload"></i>

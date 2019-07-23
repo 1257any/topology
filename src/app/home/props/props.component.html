@@ -639,7 +639,7 @@
       </div>
     </div>    
   </div>
-  <div class="group">
+  <div class="group" *ngIf="props.type === 'line'">
     <div class="title">
       <label class="checkbox">
         <input name="remember" type="checkbox" [(ngModel)]="props.data.animatePlay" (change)="onSubmitProps()" />
@@ -658,7 +658,7 @@
         </div>
       </div>
       <div>
-        <ui-slider class="block" [(min)]="props.data.animateSpeed" [options]="{min: 1, max: 100}" (change)="onSubmitProps()"></ui-slider>
+        <ui-slider class="block" [(min)]="props.data.animateSpeed" [options]="{min: 1, max: 5}" (change)="onSubmitProps()"></ui-slider>
       </div>
     </div>
   </div>

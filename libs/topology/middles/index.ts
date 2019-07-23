@@ -1,34 +1,53 @@
 import { Rect } from '../models/rect';
 import { Point } from '../models/point';
 import { Line } from '../models/line';
-import { rect } from './draws/nodes/rect';
-import { circle } from './draws/nodes/circle';
-import { triangle } from './draws/nodes/triangle';
-import { diamond } from './draws/nodes/diamond';
-import { arrow } from './draws/nodes/arrow';
-import { text } from './draws/nodes/text';
-import { line as nodeLine } from './draws/nodes/line';
-import { triangleAnchors } from './anchors/triangle';
-import { arrowAnchors } from './anchors/arrow';
-import { lineAnchors } from './anchors/line';
-import { circleIconRect, circleTextRect } from './rects/circle';
-import { triangleIconRect, triangleTextRect } from './rects/triangle';
-import { diamondIconRect, diamondTextRect } from './rects/diamond';
-import { arrowIconRect, arrowTextRect } from './rects/arrow';
-import { lineIconRect, lineTextRect } from './rects/line';
-import { line, lineControlPoints, calcLineControlPoints } from './draws/lines/line';
+import { rectangle } from './nodes/rectangle';
+import { circle } from './nodes/circle';
+import { triangle } from './nodes/triangle';
+import { diamond } from './nodes/diamond';
+import { leftArrow, rightArrow, twowayArrow } from './nodes/arrow';
+import { text } from './nodes/text';
+import { line as nodeLine } from './nodes/line';
+import { triangleAnchors } from './nodes/triangle.anchor';
+import { arrowAnchors } from './nodes/arrow.anchor';
+import { lineAnchors } from './nodes/line.anchor';
+import { circleIconRect, circleTextRect } from './nodes/circle.rect';
+import { triangleIconRect, triangleTextRect } from './nodes/triangle.rect';
+import { diamondIconRect, diamondTextRect } from './nodes/diamond.rect';
+import {
+  twowayArrowIconRect,
+  twowayArrowTextRect,
+  leftArrowIconRect,
+  leftArrowTextRect,
+  rightArrowIconRect,
+  rightArrowTextRect
+} from './nodes/arrow.rect';
+import { lineIconRect, lineTextRect } from './nodes/line.rect';
+import { line, lineControlPoints, calcLineControlPoints } from './lines/line';
 import {
   polyline,
   polylineControlPoints,
   pointInPolyline,
   calcPolylineControlPoints,
   dockPolylineControlPoint
-} from './draws/lines/polyline';
-import { curve, curveControlPoints, pointInCurve, calcCurveControlPoints } from './draws/lines/curve';
-import { triangleSolid, triangle as arrowTriangle } from './draws/arrows/triangle';
-import { diamondSolid, diamond as arrowDiamond } from './draws/arrows/diamond';
-import { circleSolid, circle as arrowCircle } from './draws/arrows/circle';
-import { lineUp, lineDown, line as arrowLine } from './draws/arrows/line';
+} from './lines/polyline';
+import { curve, curveControlPoints, pointInCurve, calcCurveControlPoints } from './lines/curve';
+import { triangleSolid, triangle as arrowTriangle } from './arrows/triangle';
+import { diamondSolid, diamond as arrowDiamond } from './arrows/diamond';
+import { circleSolid, circle as arrowCircle } from './arrows/circle';
+import { lineUp, lineDown, line as arrowLine } from './arrows/line';
+import { pentagon } from './nodes/pentagon';
+import { pentagonIconRect, pentagonTextRect } from './nodes/pentagon.rect';
+import { pentagonAnchors } from './nodes/pentagon.anchor';
+import { hexagon } from './nodes/hexagon';
+import { hexagonAnchors } from './nodes/hexagon.anchor';
+import { hexagonIconRect, hexagonTextRect } from './nodes/hexagon.rect';
+import { pentagram } from './nodes/pentagram';
+import { pentagramAnchors } from './nodes/pentagram.anchor';
+import { pentagramIconRect, pentagramTextRect } from './nodes/pentagram.rect';
+import { cloud } from './nodes/cloud';
+import { cloudAnchors } from './nodes/cloud.anchor';
+import { cloudIconRect, cloudTextRect } from './nodes/cloud.rect';
 
 // Functions of drawing a node.
 export const drawNodeFns: any = {};
@@ -50,7 +69,7 @@ function init() {
 
   // ********Default nodes.*******
   // Rectangle
-  drawNodeFns.rect = rect;
+  drawNodeFns.rectangle = rectangle;
 
   // Ciricle
   drawNodeFns.circle = circle;
@@ -68,11 +87,47 @@ function init() {
   iconRectFns.diamond = diamondIconRect;
   textRectFns.diamond = diamondTextRect;
 
-  // Arrow
-  drawNodeFns.arrow = arrow;
-  anchorsFns.arrow = arrowAnchors;
-  iconRectFns.arrow = arrowIconRect;
-  textRectFns.arrow = arrowTextRect;
+  // Hexagon
+  drawNodeFns.hexagon = hexagon;
+  iconRectFns.hexagon = hexagonIconRect;
+  textRectFns.hexagon = hexagonTextRect;
+  anchorsFns.hexagon = hexagonAnchors;
+
+  // Pentagon
+  drawNodeFns.pentagon = pentagon;
+  iconRectFns.pentagon = pentagonIconRect;
+  textRectFns.pentagon = pentagonTextRect;
+  anchorsFns.pentagon = pentagonAnchors;
+
+  // Pentagram
+  drawNodeFns.pentagram = pentagram;
+  iconRectFns.pentagram = pentagramIconRect;
+  textRectFns.pentagram = pentagramTextRect;
+  anchorsFns.pentagram = pentagramAnchors;
+
+  // Left arrow
+  drawNodeFns.leftArrow = leftArrow;
+  anchorsFns.leftArrow = arrowAnchors;
+  iconRectFns.leftArrow = leftArrowIconRect;
+  textRectFns.leftArrow = leftArrowTextRect;
+
+  // Right arrow
+  drawNodeFns.rightArrow = rightArrow;
+  anchorsFns.rightArrow = arrowAnchors;
+  iconRectFns.rightArrow = rightArrowIconRect;
+  textRectFns.rightArrow = rightArrowTextRect;
+
+  // Two-way arrow
+  drawNodeFns.twowayArrow = twowayArrow;
+  anchorsFns.twowayArrow = arrowAnchors;
+  iconRectFns.twowayArrow = twowayArrowIconRect;
+  textRectFns.twowayArrow = twowayArrowTextRect;
+
+  // Cloud
+  drawNodeFns.cloud = cloud;
+  anchorsFns.cloud = cloudAnchors;
+  iconRectFns.cloud = cloudIconRect;
+  textRectFns.cloud = cloudTextRect;
 
   // Text
   drawNodeFns.text = text;

@@ -2,10 +2,10 @@ import { Pen } from './pen';
 import { Rect } from './rect';
 import { Point } from './point';
 import { anchorsFns, iconRectFns, textRectFns, drawNodeFns } from '../middles';
-import { defaultAnchors } from '../middles/anchors/default';
-import { defaultIconRect, defaultTextRect } from '../middles/rects/default';
-import { text } from '../middles/draws/nodes/text';
-import { iconfont } from '../middles/draws/nodes/iconfont';
+import { defaultAnchors } from '../middles/default.anchor';
+import { defaultIconRect, defaultTextRect } from '../middles/default.rect';
+import { text } from '../middles/nodes/text';
+import { iconfont } from '../middles/utils';
 import { Store } from '../store/store';
 
 export class Node extends Pen {
@@ -24,7 +24,8 @@ export class Node extends Pen {
 
   text: string;
   textMaxLine: number;
-  textRect: Rect;
+  iconTextRect: Rect;
+  fullTextRect: Rect;
 
   anchors: Point[] = [];
   rotatedAnchors: Point[] = [];
@@ -83,6 +84,10 @@ export class Node extends Pen {
   }
 
   draw(ctx: CanvasRenderingContext2D) {
+    if (!drawNodeFns[this.name]) {
+      return;
+    }
+
     // Draw shape.
     drawNodeFns[this.name](ctx, this);
 
@@ -146,5 +151,14 @@ export class Node extends Pen {
     for (const item of this.anchors) {
       this.rotatedAnchors.push(item.clone().rotate(angle, this.rect.center));
     }
+  }
+
+  getTextRect() {
+    let textRect = this.iconTextRect;
+    if (!this.icon && !this.image) {
+      textRect = this.fullTextRect;
+    }
+
+    return textRect;
   }
 }

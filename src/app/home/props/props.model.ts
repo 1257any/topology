@@ -43,5 +43,7 @@ export interface Props {
     fromArrow?: string;
     toArrow?: string;
     // End
+
+    dirty?: boolean;
   };
 }

@@ -36,6 +36,7 @@ export class AppComponent implements OnInit, OnDestroy {
   editFilename = false;
   blank = false;
   editMode = false;
+  locked = false;
 
   showLicense = false;
   showHelp = false;
@@ -53,6 +54,7 @@ export class AppComponent implements OnInit, OnDestroy {
     });
 
     this.storeService.get$('file').subscribe((file: any) => {
+      this.locked = false;
       this.file = file;
       this.filename = file.name;
       this.editFilename = false;

@@ -1,7 +1,7 @@
 import { Pen } from './pen';
 import { Point } from './point';
 import { drawLineFns, drawArrowFns } from '../middles';
-import { getBezierPoint } from '../middles/draws/lines/curve';
+import { getBezierPoint } from '../middles/lines/curve';
 
 export class Line extends Pen {
   from: Point;

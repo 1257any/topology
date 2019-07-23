@@ -29,8 +29,24 @@ export class HomeComponent implements OnInit, OnDestroy {
       group: '基本形状',
       children: [
         {
-          name: 'rect',
-          icon: 'icon-round-rect',
+          name: 'rectangle',
+          icon: 'icon-rect',
+          data: {
+            text: 'Topology',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'rectangle',
+            icon: '\uec46',
+            iconFamily: 'iconfont',
+            iconSize: 40,
+            iconColor: '#2f54eb'
+          }
+        },
+        {
+          name: 'rectangle',
+          icon: 'icon-rectangle',
           data: {
             text: '圆角矩形',
             textMaxLine: 1,
@@ -39,23 +55,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               height: 50
             },
             borderRadius: 0.1,
-            name: 'rect'
-          }
-        },
-        {
-          name: 'rect',
-          icon: 'icon-rect',
-          data: {
-            text: '矩形',
-            rect: {
-              width: 100,
-              height: 100
-            },
-            name: 'rect',
-            icon: '\uec46',
-            iconFamily: 'iconfont',
-            iconSize: 40,
-            iconColor: '#2f54eb'
+            name: 'rectangle'
           }
         },
         {
@@ -96,39 +96,75 @@ export class HomeComponent implements OnInit, OnDestroy {
           }
         },
         {
-          name: 'arrow',
-          icon: 'icon-arrow',
+          name: 'pentagon',
+          icon: 'icon-pentagon',
           data: {
-            text: '箭头',
+            text: '五边形',
             rect: {
               width: 100,
               height: 100
             },
-            name: 'arrow'
+            name: 'pentagon'
           }
         },
         {
-          name: 'text',
-          icon: 'icon-text',
+          name: 'hexagon',
+          icon: 'icon-hexagon',
           data: {
-            text: '这是一段测试文本，用来测试换行：This is a text.',
+            text: '六边形',
             rect: {
               width: 100,
               height: 100
             },
-            name: 'text'
+            name: 'hexagon'
           }
         },
         {
-          name: 'image',
-          icon: 'icon-image',
+          name: 'pentagram',
+          icon: 'icon-star-o',
           data: {
+            text: '五角星',
             rect: {
               width: 100,
               height: 100
             },
-            name: 'image',
-            image: '/assets/img/logo.png'
+            name: 'pentagram'
+          }
+        },
+        {
+          name: 'leftArrow',
+          icon: 'icon-arrow-left',
+          data: {
+            text: '左箭头',
+            rect: {
+              width: 200,
+              height: 100
+            },
+            name: 'leftArrow'
+          }
+        },
+        {
+          name: 'rightArrow',
+          icon: 'icon-arrow-right',
+          data: {
+            text: '右箭头',
+            rect: {
+              width: 200,
+              height: 100
+            },
+            name: 'rightArrow'
+          }
+        },
+        {
+          name: 'twowayArrow',
+          icon: 'icon-twoway-arrow',
+          data: {
+            text: '双向箭头',
+            rect: {
+              width: 200,
+              height: 100
+            },
+            name: 'twowayArrow'
           }
         },
         {
@@ -144,8 +180,66 @@ export class HomeComponent implements OnInit, OnDestroy {
           }
         },
         {
-          name: 'more[Todo]',
-          icon: 'icon-more'
+          name: 'text',
+          icon: 'icon-text',
+          data: {
+            text:
+              '便捷、开放、可扩展、云存储、社区等特点。快速创建微服务拓扑图、微服务流量动画演示、软件项目设计图、流程图、活动图、时序图、类图等UML各种图。',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'text'
+          }
+        },
+        {
+          name: 'cloud',
+          icon: 'icon-cloud',
+          data: {
+            text: '云',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'cloud'
+          }
+        },
+        {
+          name: 'message',
+          icon: 'icon-msg',
+          data: {
+            text: '消息框',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'message'
+          }
+        },
+        {
+          name: 'file',
+          icon: 'icon-file',
+          data: {
+            text: '文档',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'file'
+          }
+        },
+        {
+          name: 'image',
+          icon: 'icon-image',
+          data: {
+            text: '图片',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'image',
+            image: '/assets/img/logo.png'
+          }
         }
       ]
     },
@@ -153,7 +247,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       group: '流程图',
       children: [
         {
-          name: 'rect',
+          name: 'rectangle',
           icon: 'icon-rounded-rect',
           data: {
             text: '开始/结束',
@@ -163,11 +257,11 @@ export class HomeComponent implements OnInit, OnDestroy {
               height: 50
             },
             borderRadius: 0.5,
-            name: 'rect'
+            name: 'rectangle'
           }
         },
         {
-          name: 'rect',
+          name: 'rectangle',
           icon: 'icon-rect',
           data: {
             text: '矩形',
@@ -175,7 +269,7 @@ export class HomeComponent implements OnInit, OnDestroy {
               width: 100,
               height: 100
             },
-            name: 'rect',
+            name: 'rectangle',
             icon: '\uec46',
             iconFamily: 'iconfont',
             iconSize: 32,
@@ -313,6 +407,9 @@ export class HomeComponent implements OnInit, OnDestroy {
           break;
         case 'share':
           this.onShare();
+          break;
+        case 'lock':
+          this.canvas.lock(menu.data);
           break;
       }
     });
@@ -564,6 +661,10 @@ export class HomeComponent implements OnInit, OnDestroy {
   };
 
   onChangeProps(props: any) {
+    if (this.canvas.locked) {
+      return;
+    }
+
     if (props.type === 'line') {
       this.canvas.lineName = props.data.name;
       this.canvas.activeLayer.changeLineType();

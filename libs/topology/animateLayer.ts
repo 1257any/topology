@@ -1,6 +1,6 @@
 import { Line } from './models/line';
 import { Store } from './store/store';
-import { lineLen, curveLen } from './middles/draws/lines/utils';
+import { lineLen, curveLen } from './middles/utils';
 
 export class AnimateLayer {
   canvas = document.createElement('canvas');
