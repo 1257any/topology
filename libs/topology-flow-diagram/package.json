@@ -1,0 +1,27 @@
+{
+  "name": "togology-flow-diagram",
+  "version": "0.0.1",
+  "description": "A flow diagram tool using le5le-topology.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "topology",
+    "flow diagram",
+    "canvas"
+  ],
+  "author": "alsmile123@qq.com",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alsmile/topology.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Alsmile/topology/issues"
+  },
+  "homepage": "https://github.com/Alsmile/topology#readme",
+  "devDependencies": {
+    "typescript": "~3.4.3"
+  }
+}

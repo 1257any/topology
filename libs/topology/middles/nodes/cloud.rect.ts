@@ -10,7 +10,7 @@ export function cloudTextRect(node: Node) {
     node.rect.x + node.rect.width / 4,
     node.rect.y + node.rect.height / 4,
     node.rect.width / 2,
-    node.rect.height / 2
+    (node.rect.height * 6) / 11
   );
   node.fullTextRect = node.iconTextRect;
 }

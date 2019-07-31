@@ -1,11 +1,11 @@
 import { Node } from '../../models/node';
 
 // getWords: Get the word array from text. A single Chinese character is a word.
-function getWords(txt) {
+function getWords(txt: string) {
   const words = [];
   let word = '';
   for (let i = 0; i < txt.length; ++i) {
-    const ch = txt[i].charCodeAt();
+    const ch = txt.charCodeAt(i);
     if (ch < 33 || ch > 126) {
       if (word) {
         words.push(word);
@@ -96,8 +96,12 @@ export function text(ctx: CanvasRenderingContext2D, node: Node) {
   const textRect = node.getTextRect();
 
   const lines = getLines(ctx, getWords(node.text), textRect.width);
-  const maxLineLen = node.textMaxLine || lines.length || 1;
-  const lineHeight = (node.font.fontSize * node.font.lineHeight) << 0;
+  const lineHeight = node.font.fontSize * node.font.lineHeight;
+  let maxLineLen = node.textMaxLine;
+  const rectLines = (textRect.height / lineHeight) << 0;
+  if (!maxLineLen) {
+    maxLineLen = lines.length > rectLines ? rectLines : lines.length;
+  }
 
   // By default, the text is center aligned.
   let x = (textRect.x + textRect.width / 2) << 0;
@@ -118,6 +122,30 @@ export function text(ctx: CanvasRenderingContext2D, node: Node) {
       y = textRect.ey - lineHeight * lines.length + lineHeight;
       break;
   }
-  fillText(ctx, lines, x, y, textRect.width, textRect.height, lineHeight, node.textMaxLine);
+  fillText(ctx, lines, x, y, textRect.width, textRect.height, lineHeight, maxLineLen);
+  ctx.restore();
+}
+
+export function iconfont(ctx: CanvasRenderingContext2D, node: Node) {
+  ctx.save();
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  if (node.iconSize > 0) {
+    ctx.font = `${node.iconSize}px ${node.iconFamily}`;
+  } else if (node.iconRect.width > node.iconRect.height) {
+    ctx.font = `${node.iconRect.height}px ${node.iconFamily}`;
+  } else {
+    ctx.font = `${node.iconRect.width}px ${node.iconFamily}`;
+  }
+  if (!node.iconColor) {
+    node.iconColor = '#2f54eb';
+  }
+  ctx.fillStyle = node.iconColor;
+  ctx.beginPath();
+  ctx.fillText(
+    node.icon,
+    (node.iconRect.x + node.iconRect.width / 2) << 0,
+    (node.iconRect.y + node.iconRect.height / 2) << 0
+  );
   ctx.restore();
 }

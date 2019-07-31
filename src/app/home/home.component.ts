@@ -1,7 +1,35 @@
 import { Component, OnInit, OnDestroy, ViewChild, ElementRef } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
+
 import { Topology } from 'libs/topology';
 import { Options } from 'libs/topology/options';
-import { ActivatedRoute, Router } from '@angular/router';
+import { registerNode } from 'libs/topology/middles';
+import {
+  flowData,
+  flowDataAnchors,
+  flowDataIconRect,
+  flowDataTextRect,
+  flowSubprocess,
+  flowSubprocessIconRect,
+  flowSubprocessTextRect,
+  flowDb,
+  flowDbIconRect,
+  flowDbTextRect,
+  flowDocument,
+  flowDocumentAnchors,
+  flowDocumentIconRect,
+  flowDocumentTextRect,
+  flowInternalStorage,
+  flowInternalStorageIconRect,
+  flowInternalStorageTextRect,
+  flowExternStorage,
+  flowExternStorageAnchors,
+  flowExternStorageIconRect,
+  flowExternStorageTextRect,
+  flowQueue,
+  flowQueueIconRect,
+  flowQueueTextRect
+} from 'libs/topology-flow-diagram';
 
 import * as FileSaver from 'file-saver';
 import { StoreService } from 'le5le-store';
@@ -40,7 +68,6 @@ export class HomeComponent implements OnInit, OnDestroy {
             name: 'rectangle',
             icon: '\uec46',
             iconFamily: 'iconfont',
-            iconSize: 40,
             iconColor: '#2f54eb'
           }
         },
@@ -121,7 +148,7 @@ export class HomeComponent implements OnInit, OnDestroy {
         },
         {
           name: 'pentagram',
-          icon: 'icon-star-o',
+          icon: 'icon-pentagram',
           data: {
             text: '五角星',
             rect: {
@@ -180,19 +207,6 @@ export class HomeComponent implements OnInit, OnDestroy {
           }
         },
         {
-          name: 'text',
-          icon: 'icon-text',
-          data: {
-            text:
-              '便捷、开放、可扩展、云存储、社区等特点。快速创建微服务拓扑图、微服务流量动画演示、软件项目设计图、流程图、活动图、时序图、类图等UML各种图。',
-            rect: {
-              width: 100,
-              height: 100
-            },
-            name: 'text'
-          }
-        },
-        {
           name: 'cloud',
           icon: 'icon-cloud',
           data: {
@@ -222,10 +236,23 @@ export class HomeComponent implements OnInit, OnDestroy {
           data: {
             text: '文档',
             rect: {
-              width: 100,
+              width: 80,
               height: 100
             },
             name: 'file'
+          }
+        },
+        {
+          name: 'text',
+          icon: 'icon-text',
+          data: {
+            text:
+              '便捷、开放、可扩展、云存储、社区等特点。快速创建微服务拓扑图、微服务流量动画演示、软件项目设计图、流程图、活动图、时序图、类图等UML各种图。',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'text'
           }
         },
         {
@@ -237,6 +264,14 @@ export class HomeComponent implements OnInit, OnDestroy {
               width: 100,
               height: 100
             },
+            font: {
+              color: '#333',
+              fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
+              fontSize: 12,
+              lineHeight: 1.5,
+              textAlign: 'center',
+              textBaseline: 'top'
+            },
             name: 'image',
             image: '/assets/img/logo.png'
           }
@@ -247,63 +282,186 @@ export class HomeComponent implements OnInit, OnDestroy {
       group: '流程图',
       children: [
         {
-          name: 'rectangle',
-          icon: 'icon-rounded-rect',
+          name: '开始/结束',
+          icon: 'icon-flow-start',
           data: {
-            text: '开始/结束',
+            text: '开始',
             textMaxLine: 1,
             rect: {
-              width: 100,
-              height: 50
+              width: 120,
+              height: 40
             },
             borderRadius: 0.5,
             name: 'rectangle'
           }
         },
         {
-          name: 'rectangle',
-          icon: 'icon-rect',
+          name: '流程',
+          icon: 'icon-rectangle',
           data: {
-            text: '矩形',
+            text: '流程',
             rect: {
-              width: 100,
-              height: 100
+              width: 120,
+              height: 40
             },
-            name: 'rectangle',
-            icon: '\uec46',
-            iconFamily: 'iconfont',
-            iconSize: 32,
-            iconColor: '#2f54eb'
+            name: 'rectangle'
           }
         },
         {
-          name: 'circle',
-          icon: 'icon-circle',
-          data: {
-            text: '圆',
-            rect: {
-              width: 100,
-              height: 100
-            },
-            name: 'circle',
-            textMaxLine: 1
-          }
-        },
-        {
-          name: 'diamond',
+          name: '判定',
           icon: 'icon-diamond',
           data: {
-            text: '菱形',
+            text: '判定',
             rect: {
-              width: 100,
-              height: 100
+              width: 120,
+              height: 60
             },
             name: 'diamond'
           }
         },
         {
-          name: 'more[Todo]',
-          icon: 'icon-more'
+          name: '数据',
+          icon: 'icon-flow-data',
+          data: {
+            text: '数据',
+            rect: {
+              width: 120,
+              height: 50
+            },
+            name: 'flowData'
+          }
+        },
+        {
+          name: '准备',
+          icon: 'icon-flow-ready',
+          data: {
+            text: '准备',
+            rect: {
+              width: 120,
+              height: 50
+            },
+            name: 'hexagon'
+          }
+        },
+        {
+          name: '子流程',
+          icon: 'icon-flow-subprocess',
+          data: {
+            text: '子流程',
+            rect: {
+              width: 120,
+              height: 50
+            },
+            name: 'flowSubprocess'
+          }
+        },
+        {
+          name: '数据库',
+          icon: 'icon-db',
+          data: {
+            text: '数据库',
+            rect: {
+              width: 80,
+              height: 120
+            },
+            name: 'flowDb'
+          }
+        },
+        {
+          name: '文档',
+          icon: 'icon-flow-document',
+          data: {
+            text: '文档',
+            rect: {
+              width: 120,
+              height: 100
+            },
+            name: 'flowDocument'
+          }
+        },
+        {
+          name: '内部存储',
+          icon: 'icon-internal-storage',
+          data: {
+            text: '内部存储',
+            rect: {
+              width: 120,
+              height: 80
+            },
+            name: 'flowInternalStorage'
+          }
+        },
+        {
+          name: '外部存储',
+          icon: 'icon-extern-storage',
+          data: {
+            text: '外部存储',
+            rect: {
+              width: 120,
+              height: 80
+            },
+            name: 'flowExternStorage'
+          }
+        },
+        {
+          name: '队列',
+          icon: 'icon-flow-queue',
+          data: {
+            text: '队列',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'flowQueue'
+          }
+        },
+        {
+          name: '手动输入',
+          icon: 'icon-flow-manually',
+          data: {
+            text: '手动输入',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'flowManually'
+          }
+        },
+        {
+          name: '展示',
+          icon: 'icon-flow-display',
+          data: {
+            text: '展示',
+            rect: {
+              width: 100,
+              height: 100
+            },
+            name: 'flowDisplay'
+          }
+        },
+        {
+          name: '并行模式',
+          icon: 'icon-flow-parallel',
+          data: {
+            text: '并行模式',
+            rect: {
+              width: 120,
+              height: 50
+            },
+            name: 'flowParallel'
+          }
+        },
+        {
+          name: '注释',
+          icon: 'icon-flow-comment',
+          data: {
+            text: '注释',
+            rect: {
+              width: 50,
+              height: 120
+            },
+            name: 'flowComment'
+          }
         }
       ]
     },
@@ -385,7 +543,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.onSaveLocal();
           break;
         case 'downPng':
-          this.onSavePng();
+          this.onSavePng(menu.data);
           break;
         case 'undo':
           this.canvas.undo();
@@ -414,6 +572,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       }
     });
 
+    // Wait for parent dom render.
     setTimeout(() => {
       this.canvas = new Topology(this.workspace.nativeElement, this.canvasOptions);
       this.subRoute = this.activateRoute.queryParamMap.subscribe(params => {
@@ -433,6 +592,30 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
       });
     });
+
+    this.canvasRegister();
+  }
+
+  canvasRegister() {
+    registerNode('flowData', flowData, flowDataAnchors, flowDataIconRect, flowDataTextRect);
+    registerNode('flowSubprocess', flowSubprocess, null, flowSubprocessIconRect, flowSubprocessTextRect);
+    registerNode('flowDb', flowDb, null, flowDbIconRect, flowDbTextRect);
+    registerNode('flowDocument', flowDocument, flowDocumentAnchors, flowDocumentIconRect, flowDocumentTextRect);
+    registerNode(
+      'flowInternalStorage',
+      flowInternalStorage,
+      null,
+      flowInternalStorageIconRect,
+      flowInternalStorageTextRect
+    );
+    registerNode(
+      'flowExternStorage',
+      flowExternStorage,
+      flowExternStorageAnchors,
+      flowExternStorageIconRect,
+      flowExternStorageTextRect
+    );
+    registerNode('flowQueue', flowQueue, null, flowQueueIconRect, flowQueueTextRect);
   }
 
   onDrag(event: DragEvent, node: any) {
@@ -555,7 +738,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   save() {
     this.data.data = this.canvas.save();
-    this.canvas.toImage(async blob => {
+    this.canvas.toImage(null, null, async blob => {
       if (this.data.id && !this.coreService.isVip(this.user)) {
         await this.service.DelImage(this.data.image);
       }
@@ -610,8 +793,12 @@ export class HomeComponent implements OnInit, OnDestroy {
     FileSaver.saveAs(new Blob([JSON.stringify(data)], { type: 'text/plain;charset=utf-8' }), 'le5le.topology.json');
   }
 
-  onSavePng() {
-    this.canvas.saveAsPng();
+  onSavePng(options?: { type?: string; quality?: any; ext?: string }) {
+    if (!options) {
+      options = {};
+    }
+    const name = this.data.name + (options.ext || '.png');
+    this.canvas.saveAsImage(name, options.type, options.quality);
   }
 
   async onShare() {

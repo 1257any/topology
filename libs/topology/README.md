@@ -1,7 +1,27 @@
-# topology
+# topology-core
 
-由节点、连线等组成的拓扑图组件库源码。
+Topology-core is the core of the framework.
 
-## store
+# store
 
-数据共享和组件通信
+Store provides a way to pass data through snapshot/subcribe/unsubcribe .
+
+# Development
+
+```
+[libs/topology#] yarn or npm install
+
+# build
+[libs/topology#] npm run build
+
+```
+
+# How to Contribute
+
+If you have any comment or advice, please report your issue, or make any change as you wish and submit an PR.
+
+alsmile123@qq.com
+
+# License
+
+MIT © le5le.com

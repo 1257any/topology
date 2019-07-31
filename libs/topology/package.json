@@ -1,0 +1,27 @@
+{
+  "name": "topology-core",
+  "version": "0.0.2",
+  "description": "A diagram/topology tool by js.",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "keywords": [
+    "topology",
+    "diagram",
+    "canvas"
+  ],
+  "author": "alsmile123@qq.com",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alsmile/topology.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Alsmile/topology/issues"
+  },
+  "homepage": "https://github.com/Alsmile/topology#readme",
+  "devDependencies": {
+    "typescript": "~3.4.3"
+  }
+}

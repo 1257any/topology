@@ -1,5 +1,6 @@
 import { Rect } from '../models/rect';
 import { Point } from '../models/point';
+import { Node } from '../models/node';
 import { Line } from '../models/line';
 import { rectangle } from './nodes/rectangle';
 import { circle } from './nodes/circle';
@@ -48,6 +49,11 @@ import { pentagramIconRect, pentagramTextRect } from './nodes/pentagram.rect';
 import { cloud } from './nodes/cloud';
 import { cloudAnchors } from './nodes/cloud.anchor';
 import { cloudIconRect, cloudTextRect } from './nodes/cloud.rect';
+import { message } from './nodes/message';
+import { messageIconRect, messageTextRect } from './nodes/message.rect';
+import { messageAnchors } from './nodes/message.anchor';
+import { file } from './nodes/file';
+import { imageIconRect, imageTextRect } from './nodes/image.rect';
 
 // Functions of drawing a node.
 export const drawNodeFns: any = {};
@@ -129,8 +135,18 @@ function init() {
   iconRectFns.cloud = cloudIconRect;
   textRectFns.cloud = cloudTextRect;
 
+  // Message
+  drawNodeFns.message = message;
+  anchorsFns.message = messageAnchors;
+  iconRectFns.message = messageIconRect;
+  textRectFns.message = messageTextRect;
+
+  // File
+  drawNodeFns.file = file;
+
   // Text
   drawNodeFns.text = text;
+  iconRectFns.text = lineIconRect;
   anchorsFns.text = (node: Rect) => {};
 
   // Line
@@ -141,6 +157,8 @@ function init() {
 
   // Image
   drawNodeFns.image = (ctx: CanvasRenderingContext2D, node: Rect) => {};
+  iconRectFns.image = imageIconRect;
+  textRectFns.image = imageTextRect;
   // ********end********
 
   // ********Default lines.*******
@@ -186,11 +204,15 @@ init();
 // name - The name of node.
 // drawFn - How to draw.
 // anchorsFn - How to get the anchors.
+// iconRectFn - How to get the icon rect.
+// textRectFn - How to get the text rect.
 // force - Overwirte the node if exists.
 export function registerNode(
   name: string,
-  drawFn: (ctx: CanvasRenderingContext2D, data: Rect) => void,
-  anchorsFn?: (data: Rect) => void,
+  drawFn: (ctx: CanvasRenderingContext2D, node: Node) => void,
+  anchorsFn?: (node: Node) => void,
+  iconRectFn?: (node: Node) => void,
+  textRectFn?: (node: Node) => void,
   force?: boolean
 ) {
   // Exist
@@ -200,6 +222,9 @@ export function registerNode(
 
   drawNodeFns[name] = drawFn;
   anchorsFns[name] = anchorsFn;
+  iconRectFns[name] = iconRectFn;
+  textRectFns[name] = textRectFn;
+
   return true;
 }
 

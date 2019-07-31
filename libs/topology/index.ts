@@ -278,7 +278,7 @@ export class Topology {
 
           // Send a move event.
           if (!this.lastHoverNode && this.options.on) {
-            this.options.on('moveInNode', new Node(this.moveIn.hoverNode));
+            // this.options.on('moveInNode', new Node(this.moveIn.hoverNode));
           }
         } else if (this.lastHoverNode) {
           // Clear hover anchors.
@@ -528,6 +528,8 @@ export class Topology {
             this.activeLayer.lines = [this.hoverLayer.line];
             Store.set('activeLine', this.hoverLayer.line);
             this.activeLayer.render();
+
+            this.options.on('line', this.hoverLayer.line);
           }
 
           this.offscreen.render(true);
@@ -560,7 +562,10 @@ export class Topology {
       case MoveInType.Nodes:
         if (this.moveIn.hoverNode) {
           const textRect = this.moveIn.hoverNode.getTextRect();
-          if (textRect.hitRotate(e, this.moveIn.hoverNode.rotate, this.moveIn.hoverNode.rect.center)) {
+          if (
+            textRect.hitRotate(e, this.moveIn.hoverNode.rotate, this.moveIn.hoverNode.rect.center) ||
+            this.moveIn.hoverNode.name === 'image'
+          ) {
             this.showInput(textRect);
           }
           if (this.options.on) {
@@ -937,37 +942,41 @@ export class Topology {
     };
   }
 
-  toImage(callback?: BlobCallback): string {
+  toImage(type?: string, quality?: any, callback?: BlobCallback): string {
     const rect = this.getRect();
     const canvas = document.createElement('canvas');
     canvas.width = rect.width + 20;
     canvas.height = rect.height + 20;
-    canvas
-      .getContext('2d')
-      .drawImage(
-        this.offscreen.canvas,
-        rect.x - 10,
-        rect.y - 10,
-        rect.width + 20,
-        rect.height + 20,
-        0,
-        0,
-        rect.width + 20,
-        rect.height + 20
-      );
+
+    const ctx = canvas.getContext('2d');
+    if (type && type !== 'image/png') {
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.drawImage(
+      this.offscreen.canvas,
+      rect.x - 10,
+      rect.y - 10,
+      rect.width + 20,
+      rect.height + 20,
+      0,
+      0,
+      rect.width + 20,
+      rect.height + 20
+    );
 
     if (callback) {
       canvas.toBlob(callback);
       return '';
     }
 
-    return canvas.toDataURL();
+    return canvas.toDataURL(type, quality);
   }
 
-  saveAsPng(name?: string) {
+  saveAsImage(name?: string, type?: string, quality?: any) {
     const a = document.createElement('a');
     a.setAttribute('download', name || 'le5le.topology.png');
-    a.setAttribute('href', this.toImage());
+    a.setAttribute('href', this.toImage(type, quality));
     a.click();
   }
 

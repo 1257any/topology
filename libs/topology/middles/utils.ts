@@ -42,21 +42,3 @@ export function curveLen(from: Point, cp1: Point, cp2: Point, to: Point): number
   path.setAttribute('d', `M${from.x} ${from.y} C${cp1.x} ${cp1.y} ${cp2.x} ${cp2.y} ${to.x} ${to.y}`);
   return path.getTotalLength() | 0;
 }
-
-export function iconfont(ctx: CanvasRenderingContext2D, node: Node) {
-  ctx.save();
-  ctx.textAlign = 'center';
-  ctx.textBaseline = 'middle';
-  ctx.font = `${node.iconSize}px ${node.iconFamily}`;
-  if (!node.iconColor) {
-    node.iconColor = '#2f54eb';
-  }
-  ctx.fillStyle = node.iconColor;
-  ctx.beginPath();
-  ctx.fillText(
-    node.icon,
-    (node.iconRect.x + node.iconSize / 2 + (node.iconRect.width - node.iconSize) / 2) << 0,
-    (node.iconRect.y + (node.iconSize * 4) / 7 + (node.iconRect.height - node.iconSize) / 2) << 0
-  );
-  ctx.restore();
-}

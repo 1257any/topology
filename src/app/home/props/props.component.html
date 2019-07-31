@@ -1,108 +1,114 @@
 <form #propForm="ngForm" *ngIf="props.data" (click)="drowdown = 0" (ngSubmit)="onSubmitProps(propForm.invalid)">
-  <div class="group" *ngIf="props.type === 'node'">
-    <div class="title">位置和大小</div>
-    <div class="flex grid">
-      <div>X（px）</div>
-      <div>Y（px）</div>
-    </div>
-    <div class="flex grid mt5">
-      <div class="mr5">
-        <input
-          type="number"
-          name="x"
-          class="input"
-          [(ngModel)]="props.data.rect.x"
-          [uiMin]="0"
-          [uiMax]="5000"
-          required
-        />
+  <div *ngIf="props.type === 'node'">
+    <div class="group" >
+      <div class="title">位置和大小</div>
+      <div class="flex grid">
+        <div>X（px）</div>
+        <div>Y（px）</div>
       </div>
-      <div>
-        <input
-          type="number"
-          name="y"
-          class="input"
-          [(ngModel)]="props.data.rect.y"
-          [uiMin]="0"
-          [uiMax]="5000"
-          required
-        />
+      <div class="flex grid mt5">
+        <div class="mr5">
+          <input
+            type="number"
+            name="x"
+            class="input"
+            [(ngModel)]="props.data.rect.x"
+            [uiMin]="0"
+            [uiMax]="5000"
+            required
+          />
+        </div>
+        <div>
+          <input
+            type="number"
+            name="y"
+            class="input"
+            [(ngModel)]="props.data.rect.y"
+            [uiMin]="0"
+            [uiMax]="5000"
+            required
+          />
+        </div>
       </div>
-    </div>
-    <div class="flex grid mt5">
-      <div>宽（px）</div>
-      <div>高（px）</div>
-    </div>
-    <div class="flex grid">
-      <div class="mr5">
-        <input
-          type="number"
-          name="width"
-          class="input"
-          [(ngModel)]="props.data.rect.width"
-          [uiMin]="0"
-          [uiMax]="5000"
-          required
-        />
+      <div class="flex grid mt5">
+        <div>宽（px）</div>
+        <div>高（px）</div>
       </div>
-      <div>
-        <input
-          type="number"
-          name="height"
-          class="input"
-          [(ngModel)]="props.data.rect.height"
-          [uiMin]="0"
-          [uiMax]="5000"
-          required
-        />
+      <div class="flex grid">
+        <div class="mr5">
+          <input
+            type="number"
+            name="width"
+            class="input"
+            [(ngModel)]="props.data.rect.width"
+            [uiMin]="0"
+            [uiMax]="5000"
+            required
+          />
+        </div>
+        <div>
+          <input
+            type="number"
+            name="height"
+            class="input"
+            [(ngModel)]="props.data.rect.height"
+            [uiMin]="0"
+            [uiMax]="5000"
+            required
+          />
+        </div>
       </div>
-    </div>
-    <div class="flex grid mt5">
-      <div title="百分比%对应的小数值">圆角（0 - 1）</div>
-      <div>旋转（°）</div>
-    </div>
-    <div class="flex grid">
-      <div class="mr5">
-        <input type="number" name="borderRadius" class="input" [(ngModel)]="props.data.borderRadius" [uiMin]="0" [uiMax]="1" />
+      <div class="flex grid mt5">
+        <div title="百分比%对应的小数值">圆角（0 - 1）</div>
+        <div>旋转（°）</div>
       </div>
-      <div>
-        <input type="number" name="rotate" class="input" [(ngModel)]="props.data.rotate" [uiMin]="0" [uiMax]="360" />
+      <div class="flex grid">
+        <div class="mr5">
+          <input type="number" name="borderRadius" class="input" [(ngModel)]="props.data.borderRadius" [uiMin]="0" [uiMax]="1" />
+        </div>
+        <div>
+          <input type="number" name="rotate" class="input" [(ngModel)]="props.data.rotate" [uiMin]="0" [uiMax]="360" />
+        </div>
+      </div>     
+    </div>
+    <div class="group" >
+      <div class="title">图片</div>    
+      <div class="flex input-line">
+        <label>图片URL</label>
+        <div>
+          <input name="image" class="input" [(ngModel)]="props.data.image" />
+        </div>        
       </div>
+      <div class="gray" style="word-break: keep-all;line-height: 1.5;">图片、Unicode字体图标同时存在时，图片优先</div>
     </div>
-    <div class="flex mt5">
-      <div>图标</div>
-      <div class="gray ml10">图片或Unicode图标，图片优先</div>
-    </div>
-    <div class="flex input-line">
-      <label>图片URL</label>
-      <div>
-        <input name="image" class="input" [(ngModel)]="props.data.image" />
+    <div class="group">      
+      <div class="title mb5">Unicode字体图标</div>     
+      <div class="flex input-line">
+        <label>字体内容</label>
+        <div>
+          <input name="icon" class="input" [(ngModel)]="iconStr" />
+        </div>
       </div>
-    </div>
-    <div class="flex input-line">
-      <label>字体内容</label>
-      <div>
-        <input name="icon" class="input" [(ngModel)]="iconStr" />
+      <div class="flex input-line">
+        <label>字体名称</label>
+        <div>
+          <input name="iconFamily" class="input" [(ngModel)]="props.data.iconFamily" />
+        </div>
       </div>
-    </div>
-    <div class="flex input-line">
-      <label>字体名称</label>
-      <div>
-        <input name="iconFamily" class="input" [(ngModel)]="props.data.iconFamily" />
+      <div class="flex input-line">
+        <label>字体大小</label>
+        <div>
+          <input type="number" name="iconSize" class="input" [(ngModel)]="props.data.iconSize" [uiMin]="0" [uiMax]="500"
+            placeholder="<=0表示自适应" />
+        </div>
       </div>
-    </div>
-    <div class="flex input-line">
-      <label>字体大小</label>
-      <div>
-        <input type="number" name="iconSize" class="input" [(ngModel)]="props.data.iconSize" [uiMin]="0" [uiMax]="500" />
-      </div>
-    </div>
-    <div class="flex input-line">
-      <label>字体颜色</label>
-      <div>
-        <div class="input color ">
-          <i [ngStyle]="getBackground(props.data.iconColor)"></i>
-          <input name="iconColor" [(ngModel)]="props.data.iconColor" />
+      <div class="flex input-line">
+        <label>字体颜色</label>
+        <div>
+          <div class="input color ">
+            <i [ngStyle]="getBackground(props.data.iconColor)"></i>
+            <input name="iconColor" [(ngModel)]="props.data.iconColor" />
+          </div>
         </div>
       </div>
     </div>
@@ -682,7 +688,7 @@
         </div>
       </div>
       <div>
-        <input type="number" name="fontSize" class="input" [(ngModel)]="props.data.font.fontSize" [uiMin]="0" [uiMax]="500" />
+        <input type="number" name="fontSize" class="input" [(ngModel)]="props.data.font.fontSize" uiMin="0" uiMax="500" />
       </div>
     </div>
     <div class="flex grid mt5">
@@ -702,13 +708,15 @@
 
     <div class="flex grid mt5">
       <div>行高</div>
-      <div></div>
+      <div>最大行数</div>
     </div>
     <div class="flex grid">
       <div class="mr5">
-        <input type="number" name="lineHeight" class="input" [(ngModel)]="props.data.font.lineHeight" [uiMin]="1" [uiMax]="5" />
+        <input type="number" name="lineHeight" class="input" [(ngModel)]="props.data.font.lineHeight" uiMin="1" uiMax="5" />
       </div>
       <div>      
+          <input type="number" name="textMaxLine" class="input" [(ngModel)]="props.data.textMaxLine" uiMin="0" uiMax="500"
+            placeholder="0：自动匹配高度" />
       </div>
     </div>
     <div class="mt5">

@@ -25,6 +25,5 @@ export function hexagonTextRect(node: Node) {
   );
 
   const w = (node.rect.width * 3) / 5;
-  const h = (node.rect.height * 3) / 5;
-  node.fullTextRect = new Rect(node.rect.x + (node.rect.width - w) / 2, node.rect.y + node.rect.height / 4, w, h);
+  node.fullTextRect = new Rect(node.rect.x + (node.rect.width - w) / 2, node.rect.y, w, node.rect.height);
 }

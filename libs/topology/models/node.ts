@@ -4,8 +4,7 @@ import { Point } from './point';
 import { anchorsFns, iconRectFns, textRectFns, drawNodeFns } from '../middles';
 import { defaultAnchors } from '../middles/default.anchor';
 import { defaultIconRect, defaultTextRect } from '../middles/default.rect';
-import { text } from '../middles/nodes/text';
-import { iconfont } from '../middles/utils';
+import { text, iconfont } from '../middles/nodes/text';
 import { Store } from '../store/store';
 
 export class Node extends Pen {
@@ -46,7 +45,9 @@ export class Node extends Pen {
 
     this.image = json.image;
     this.text = json.text;
-    this.textMaxLine = +json.textMaxLine || 1;
+    if (json.textMaxLine) {
+      this.textMaxLine = +json.textMaxLine || 0;
+    }
 
     if (json.children) {
       this.children = [];
