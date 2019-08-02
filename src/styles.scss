@@ -99,6 +99,110 @@ a:hover {
   }
 }
 
+.page .color-picker {
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.3);
+  border: none;
+  overflow: hidden;
+
+  .cursor {
+    width: 12px;
+    height: 12px;
+    border: 1px solid #fff;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.3), 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+
+  .hue-alpha {
+    flex-direction: initial;
+    width: 100%;
+    padding: 0 0.05rem;
+
+    .cursor {
+      background: #fff;
+    }
+  }
+
+  .box {
+    flex-direction: initial;
+    border: none !important;
+  }
+
+  .left {
+    padding: 8px;
+  }
+
+  .selected-color-background,
+  .selected-color {
+    width: 32px;
+    height: 32px;
+    top: 8px;
+  }
+
+  .hue {
+    height: 12px;
+    margin-bottom: 10px;
+  }
+
+  .alpha {
+    height: 12px;
+  }
+
+  .hex-text,
+  .rgba-text,
+  .hsla-text {
+    .box {
+      width: initial;
+      padding: 0 24px 0 8px;
+
+      input {
+        width: initial;
+        outline: none;
+        border: 1px solid $color-input-border;
+        box-sizing: border-box;
+        background-color: #fff;
+        border-radius: $input-border-radius;
+      }
+    }
+  }
+
+  .type-policy {
+    top: 210px;
+  }
+
+  .preset-area {
+    padding: 0;
+
+    hr {
+      border-top: 1px;
+    }
+
+    .preset-label {
+      display: none;
+    }
+
+    & > div {
+      display: flex;
+      flex-wrap: wrap;
+      padding: 10px;
+
+      .preset-color {
+        width: 14px;
+        height: 14px;
+        border-radius: 3px;
+        border: 1px solid #eee;
+        margin: 5px;
+      }
+    }
+  }
+
+  .arrow.arrow-left,
+  .arrow.arrow-left-bottom,
+  .arrow.arrow-bottom-left {
+    top: 0;
+    right: -20px;
+    border-color: rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) rgba(0, 0, 0, 0) #ccc;
+  }
+}
+
 /*定义滚动条轨道 内阴影+圆角*/
 ::-webkit-scrollbar {
   width: 0.1rem;

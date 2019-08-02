@@ -36,14 +36,6 @@ export class AppHttpInterceptor implements HttpInterceptor {
                 timeout: 10000
               });
               // tslint:disable-next-line:triple-equals
-            } else if (event.body.code && event.body.code != 0) {
-              event.body.error = event.body.message;
-              const _noticeService: NoticeService = new NoticeService();
-              _noticeService.notice({
-                body: event.body.message,
-                theme: 'error',
-                timeout: 10000
-              });
             }
 
             if (event.status === 401) {

@@ -28,7 +28,19 @@ import {
   flowExternStorageTextRect,
   flowQueue,
   flowQueueIconRect,
-  flowQueueTextRect
+  flowQueueTextRect,
+  flowManually,
+  flowManuallyAnchors,
+  flowManuallyIconRect,
+  flowManuallyTextRect,
+  flowDisplay,
+  flowDisplayAnchors,
+  flowDisplayIconRect,
+  flowDisplayTextRect,
+  flowParallel,
+  flowParallelAnchors,
+  flowComment,
+  flowCommentAnchors
 } from 'libs/topology-flow-diagram';
 
 import * as FileSaver from 'file-saver';
@@ -66,8 +78,8 @@ export class HomeComponent implements OnInit, OnDestroy {
               height: 100
             },
             name: 'rectangle',
-            icon: '\uec46',
-            iconFamily: 'iconfont',
+            icon: '\ue64d',
+            iconFamily: 'topology',
             iconColor: '#2f54eb'
           }
         },
@@ -421,8 +433,8 @@ export class HomeComponent implements OnInit, OnDestroy {
           data: {
             text: '手动输入',
             rect: {
-              width: 100,
-              height: 100
+              width: 120,
+              height: 80
             },
             name: 'flowManually'
           }
@@ -433,8 +445,8 @@ export class HomeComponent implements OnInit, OnDestroy {
           data: {
             text: '展示',
             rect: {
-              width: 100,
-              height: 100
+              width: 120,
+              height: 80
             },
             name: 'flowDisplay'
           }
@@ -457,8 +469,8 @@ export class HomeComponent implements OnInit, OnDestroy {
           data: {
             text: '注释',
             rect: {
-              width: 50,
-              height: 120
+              width: 100,
+              height: 100
             },
             name: 'flowComment'
           }
@@ -466,22 +478,12 @@ export class HomeComponent implements OnInit, OnDestroy {
       ]
     },
     {
-      group: '活动图',
-      children: [
-        {
-          name: 'more[Todo]',
-          icon: 'icon-more'
-        }
-      ]
+      group: '活动图 [Todo]',
+      children: []
     },
     {
-      group: 'UML类图',
-      children: [
-        {
-          name: 'more[Todo]',
-          icon: 'icon-more'
-        }
-      ]
+      group: 'UML类图 [Todo]',
+      children: []
     }
   ];
   canvas: Topology;
@@ -499,6 +501,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     userId: '',
     shared: false
   };
+  icons: { icon: string; iconFamily: string }[] = [];
+  readonly = false;
 
   user: any;
   subUser: any;
@@ -567,6 +571,7 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.onShare();
           break;
         case 'lock':
+          this.readonly = menu.data;
           this.canvas.lock(menu.data);
           break;
       }
@@ -616,6 +621,10 @@ export class HomeComponent implements OnInit, OnDestroy {
       flowExternStorageTextRect
     );
     registerNode('flowQueue', flowQueue, null, flowQueueIconRect, flowQueueTextRect);
+    registerNode('flowManually', flowManually, flowManuallyAnchors, flowManuallyIconRect, flowManuallyTextRect);
+    registerNode('flowDisplay', flowDisplay, flowDisplayAnchors, flowDisplayIconRect, flowDisplayTextRect);
+    registerNode('flowParallel', flowParallel, flowParallelAnchors, null, null);
+    registerNode('flowComment', flowComment, flowCommentAnchors, null, null);
   }
 
   onDrag(event: DragEvent, node: any) {
@@ -737,7 +746,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   save() {
-    this.data.data = this.canvas.save();
+    this.data.data = this.canvas.data();
     this.canvas.toImage(null, null, async blob => {
       if (this.data.id && !this.coreService.isVip(this.user)) {
         await this.service.DelImage(this.data.image);
@@ -789,7 +798,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   onSaveLocal() {
-    const data = this.canvas.save();
+    const data = this.canvas.data();
     FileSaver.saveAs(new Blob([JSON.stringify(data)], { type: 'text/plain;charset=utf-8' }), 'le5le.topology.json');
   }
 

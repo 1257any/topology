@@ -4318,9 +4318,9 @@ lcid@^2.0.0:
     invert-kv "^2.0.0"
 
 le5le-components@^0.8.0:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/le5le-components/-/le5le-components-0.7.3.tgz#8a568ef43ebe4c476f22250a8a85cbde3d631a93"
-  integrity sha512-lSQ90yvSe/vQ7Y8Itm+rz/oJxxP6IjpJEoRTFS7B993N+vF1IyX4UvpcwSpHPMOWaYOS7n+IJ8AM8LTWnj1BHg==
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/le5le-components/-/le5le-components-0.8.0.tgz#6489a8d57b1b09f7aacdb5065bc6f5f0c1159057"
+  integrity sha512-Ap5iMB7yG6G1gEBELN3e9p3igvQfP8xqM+GHXEO11fxhF4cDgACF+9oh/Yd/1K7q4UefvxQd6qHwsQSUr16rLg==
   dependencies:
     tslib "^1.9.0"
 
@@ -4916,6 +4916,11 @@ ngresizable@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/ngresizable/-/ngresizable-1.0.1.tgz#d7c309ce9f762289d4d8950fd7b46f3e3108be82"
   integrity sha512-S8K2mp2+fOH9fc6A2gw5/0j8snFaBI3umdZUGsLik4qIjbVPx6Tnn5AKI8RHyLTDooxPHzJdQZqK061UbzWogA==
+
+ngx-color-picker@^8.1.0:
+  version "8.1.0"
+  resolved "https://registry.yarnpkg.com/ngx-color-picker/-/ngx-color-picker-8.1.0.tgz#eb99f530626169e9eea15c4c9c72c0a252094696"
+  integrity sha512-I8L3s5QYVDzk0ncYoxSM/wkX2aruMAcE9VEL0tc0pU6svoGYwDEDOu3tBiFaW4/lOKYElgpXkBQYV7+/SBrXcg==
 
 nice-try@^1.0.4:
   version "1.0.5"

@@ -42,7 +42,7 @@
         </ul>
       </div>
       <div *ngIf="selected">
-        <app-props [props]="selected" (ok)="onChangeProps($event)"></app-props>
+        <app-props [props]="selected" [readonly]="readonly" (ok)="onChangeProps($event)"></app-props>
       </div>
     </div>
   </div>

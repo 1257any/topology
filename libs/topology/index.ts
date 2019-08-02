@@ -226,7 +226,9 @@ export class Topology {
     return true;
   }
 
-  // open - true: open a new file; false: redraw
+  // open - Is load a new File
+  // true: load a new file
+  // false: redraw
   render(data?: ICanvasData, open?: boolean) {
     if (data) {
       this.nodes.splice(0, this.nodes.length);
@@ -935,7 +937,7 @@ export class Topology {
     this.render(this.caches.list[++this.caches.index]);
   }
 
-  save() {
+  data() {
     return {
       nodes: this.nodes,
       lines: this.lines

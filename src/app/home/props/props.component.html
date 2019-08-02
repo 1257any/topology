@@ -15,6 +15,7 @@
             [(ngModel)]="props.data.rect.x"
             [uiMin]="0"
             [uiMax]="5000"
+            [readonly]="readonly"
             required
           />
         </div>
@@ -26,6 +27,7 @@
             [(ngModel)]="props.data.rect.y"
             [uiMin]="0"
             [uiMax]="5000"
+            [readonly]="readonly"
             required
           />
         </div>
@@ -43,6 +45,7 @@
             [(ngModel)]="props.data.rect.width"
             [uiMin]="0"
             [uiMax]="5000"
+            [readonly]="readonly"
             required
           />
         </div>
@@ -54,6 +57,7 @@
             [(ngModel)]="props.data.rect.height"
             [uiMin]="0"
             [uiMax]="5000"
+            [readonly]="readonly"
             required
           />
         </div>
@@ -64,10 +68,10 @@
       </div>
       <div class="flex grid">
         <div class="mr5">
-          <input type="number" name="borderRadius" class="input" [(ngModel)]="props.data.borderRadius" [uiMin]="0" [uiMax]="1" />
+          <input type="number" name="borderRadius" class="input" [(ngModel)]="props.data.borderRadius" [uiMin]="0" [uiMax]="1" [readonly]="readonly"/>
         </div>
         <div>
-          <input type="number" name="rotate" class="input" [(ngModel)]="props.data.rotate" [uiMin]="0" [uiMax]="360" />
+          <input type="number" name="rotate" class="input" [(ngModel)]="props.data.rotate" [uiMin]="0" [uiMax]="360" [readonly]="readonly"/>
         </div>
       </div>     
     </div>
@@ -76,38 +80,54 @@
       <div class="flex input-line">
         <label>图片URL</label>
         <div>
-          <input name="image" class="input" [(ngModel)]="props.data.image" />
+          <input name="image" class="input" [(ngModel)]="props.data.image" [readonly]="readonly" />
         </div>        
       </div>
-      <div class="gray" style="word-break: keep-all;line-height: 1.5;">图片、Unicode字体图标同时存在时，图片优先</div>
+      <div class="gray" style="width: 2rem;line-height: 1.5;">
+        图片、字体图标同时存在时，图片优先
+      </div>
+      <div class="mt5">为什么不支持图片上传：</div>       
+      <div class="gray" style="width: 2rem;line-height: 1.5;">
+        目前仅支持文件上传保存到云服务器；个人项目，服务器资源有限（1核cpu，1G内存，20G磁盘），欢迎资助
+      </div>
     </div>
     <div class="group">      
-      <div class="title mb5">Unicode字体图标</div>     
-      <div class="flex input-line">
-        <label>字体内容</label>
-        <div>
-          <input name="icon" class="input" [(ngModel)]="iconStr" />
+      <div class="title mb5">字体图标</div>    
+      <div class="flex input-line middle mb10">
+        <label>字体图标</label>
+        <div class="pointer icon" (click)="showIcons=true">
+          <i *ngIf="icon" class="topology {{icon.class}}"></i>
+          <div *ngIf="!icon" class="blank" title="空白"></div>      
+        </div>        
+      </div>  
+      <div [class.hidden]="!showIcons" class="tools">
+        <div class="title flex middle">
+          <label class="full">选择字体图标：</label>
+          <i class="iconfont icon-close hover" (click)="showIcons=false"></i>
         </div>
-      </div>
-      <div class="flex input-line">
-        <label>字体名称</label>
-        <div>
-          <input name="iconFamily" class="input" [(ngModel)]="props.data.iconFamily" />
+        <div class="body">
+          <div class="icon"  [class.active]="!icon"  (click)="onClickIcon()">
+            <div class="blank" title="空白"></div> 
+          </div>
+          <div class="icon" *ngFor="let item of icons"  [class.active]="item.checked"  (click)="onClickIcon(item)">
+            <i class="topology {{item.class}}"></i>
+          </div>
         </div>
-      </div>
+      </div>     
       <div class="flex input-line">
         <label>字体大小</label>
         <div>
-          <input type="number" name="iconSize" class="input" [(ngModel)]="props.data.iconSize" [uiMin]="0" [uiMax]="500"
+          <input type="number" name="iconSize" class="input" [(ngModel)]="props.data.iconSize" [uiMin]="0" [uiMax]="500" [readonly]="readonly"
             placeholder="<=0表示自适应" />
         </div>
       </div>
       <div class="flex input-line">
         <label>字体颜色</label>
         <div>
-          <div class="input color ">
-            <i [ngStyle]="getBackground(props.data.iconColor)"></i>
-            <input name="iconColor" [(ngModel)]="props.data.iconColor" />
+          <div class="input color" [class.readonly]="readonly">
+            <i [(colorPicker)]="props.data.iconColor" [style.background]="props.data.iconColor" 
+              cpAlphaChannel="always" cpOutputFormat="hex" [cpPresetColors]="cpPresetColors" (colorPickerChange)="onSubmitProps(false)"></i>
+            <input name="iconColor" [(ngModel)]="props.data.iconColor" [readonly]="readonly"/>            
           </div>
         </div>
       </div>
@@ -128,6 +148,7 @@
           placeholder="X（px）"
           [uiMin]="0"
           [uiMax]="5000"
+          [readonly]="readonly"
           required
         />
       </div>
@@ -140,6 +161,7 @@
           placeholder="Y（px）"
           [uiMin]="0"
           [uiMax]="5000"
+          [readonly]="readonly"
           required
         />
       </div>
@@ -157,6 +179,7 @@
           placeholder="X（px）"
           [uiMin]="0"
           [uiMax]="5000"
+          [readonly]="readonly"
           required
         />
       </div>
@@ -169,6 +192,7 @@
           placeholder="Y（px）"
           [uiMin]="0"
           [uiMax]="5000"
+          [readonly]="readonly"
           required
         />
       </div>
@@ -180,7 +204,7 @@
     <div class="flex grid">
       <div class="mr5">
         <div class="rel">
-          <div class="input" (click)="$event.stopPropagation(); drowdown = 2">
+          <div class="input" [class.readonly]="readonly" (click)="$event.stopPropagation(); drowdown = 2">
             <div class="icon-item" [class.hidden]="props.data.fromArrow !== ''">
               <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
                 <g fill="none" stroke="black" stroke-width="1">
@@ -253,7 +277,7 @@
               </svg>
             </div>
           </div>
-          <div class="dropdown" [class.block]="drowdown === 2">
+          <div class="dropdown" *ngIf="!readonly" [class.block]="drowdown === 2">
             <div class="icon-item ph10 pv5" (click)="onClickFromArrow('')">
               <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
                 <g fill="none" stroke="black" stroke-width="1">
@@ -330,7 +354,7 @@
       </div>
       <div>
         <div class="rel">
-          <div class="input" (click)="$event.stopPropagation(); drowdown = 3">
+          <div class="input" [class.readonly]="readonly" (click)="$event.stopPropagation(); drowdown = 3">
             <div class="icon-item" [class.hidden]="props.data.toArrow !== ''">
               <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
                 <g fill="none" stroke="black" stroke-width="1">
@@ -403,7 +427,7 @@
               </svg>
             </div>
           </div>
-          <div class="dropdown" [class.block]="drowdown === 3">
+          <div class="dropdown" *ngIf="!readonly" [class.block]="drowdown === 3">
             <div class="icon-item ph10 pv5" (click)="onClickFromArrow('')">
               <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
                 <g fill="none" stroke="black" stroke-width="1">
@@ -488,7 +512,7 @@
     </div>
     <div class="flex grid mt5">
       <div class="mr5 rel" *ngIf="props.type === 'line'">
-        <div class="input" (click)="$event.stopPropagation(); drowdown = 4">
+        <div class="input" [class.readonly]="readonly" (click)="$event.stopPropagation(); drowdown = 4">
           <div class="icon-item" [class.hidden]="props.data.name !== 'curve'">
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
               <g fill="none" stroke="black" stroke-width="1">
@@ -511,7 +535,7 @@
             </svg>
           </div>             
         </div>
-        <div class="dropdown" [class.block]="drowdown === 4">
+        <div class="dropdown" *ngIf="!readonly" [class.block]="drowdown === 4">
           <div class="icon-item ph10 pv5" (click)="onClickName('curve')">
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
               <g fill="none" stroke="black" stroke-width="1">
@@ -536,7 +560,7 @@
         </div>
       </div>
       <div class="mr5 rel">
-        <div class="input" (click)="$event.stopPropagation(); drowdown = 1">
+        <div class="input" [class.readonly]="readonly" (click)="$event.stopPropagation(); drowdown = 1">
           <div class="icon-item" [class.hidden]="props.data.dash">
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
               <g fill="none" stroke="black" stroke-width="1">
@@ -566,7 +590,7 @@
             </svg>
           </div>
         </div>
-        <div class="dropdown" [class.block]="drowdown === 1">
+        <div class="dropdown" *ngIf="!readonly" [class.block]="drowdown === 1">
           <div class="icon-item ph10 pv5" (click)="onClickDash(0)">
             <svg xmlns="http://www.w3.org/2000/svg" version="1.1">
               <g fill="none" stroke="black" stroke-width="1">
@@ -605,9 +629,10 @@
     </div>
     <div class="flex grid">
       <div class="mr5">
-        <div class="input color">
-          <i [ngStyle]="getBackground(props.data.strokeStyle)"></i>
-          <input name="strokeStyle" [(ngModel)]="props.data.strokeStyle" />
+        <div class="input color" [class.readonly]="readonly">
+          <i [(colorPicker)]="props.data.strokeStyle" [style.background]="props.data.strokeStyle" 
+              cpAlphaChannel="always" cpOutputFormat="hex" [cpPresetColors]="cpPresetColors" (colorPickerChange)="onSubmitProps(false)"></i>
+          <input name="strokeStyle" [(ngModel)]="props.data.strokeStyle" [readonly]="readonly"/>
         </div>
       </div>
       <div>
@@ -618,6 +643,7 @@
           [(ngModel)]="props.data.lineWidth"
           [uiMin]="1"
           [uiMax]="100"
+          [readonly]="readonly"
           required
         />
       </div>
@@ -628,9 +654,10 @@
     </div>
     <div class="flex grid">
       <div class="mr5">
-        <div class="input color ">
-          <i [ngStyle]="getBackground(props.data.fillStyle)"></i>
-          <input name="fillStyle" [(ngModel)]="props.data.fillStyle" />
+        <div class="input color" [class.readonly]="readonly">
+          <i [(colorPicker)]="props.data.fillStyle" [style.background]="props.data.fillStyle" 
+              cpAlphaChannel="always" cpOutputFormat="hex" [cpPresetColors]="cpPresetColors" (colorPickerChange)="onSubmitProps(false)"></i>
+          <input name="fillStyle" [(ngModel)]="props.data.fillStyle" [readonly]="readonly"/>
         </div>
       </div>
       <div>
@@ -641,6 +668,7 @@
           [(ngModel)]="props.data.globalAlpha"
           [uiMin]="0"
           [uiMax]="1"
+          [readonly]="readonly"
         />
       </div>
     </div>    
@@ -648,22 +676,23 @@
   <div class="group" *ngIf="props.type === 'line'">
     <div class="title">
       <label class="checkbox">
-        <input name="remember" type="checkbox" [(ngModel)]="props.data.animatePlay" (change)="onSubmitProps()" />
+        <input name="remember" type="checkbox" [(ngModel)]="props.data.animatePlay" (change)="onSubmitProps()" [readonly]="readonly"/>
         <span>动画</span>
       </label>
     </div>
     <div class="flex grid">
       <div>颜色</div>
-      <div>快慢</div>
+      <div *ngIf="!readonly">快慢</div>
     </div>
     <div class="flex grid mt5">
       <div class="mr5">
-        <div class="input color ">
-          <i [ngStyle]="getBackground(props.data.animateColor)"></i>
-          <input name="animateColor" [(ngModel)]="props.data.animateColor" />
+        <div class="input color" [class.readonly]="readonly">
+          <i [(colorPicker)]="props.data.animateColor" [style.background]="props.data.animateColor" 
+              cpAlphaChannel="always" cpOutputFormat="hex" [cpPresetColors]="cpPresetColors" (colorPickerChange)="onSubmitProps(false)"></i>
+          <input name="animateColor" [(ngModel)]="props.data.animateColor" [readonly]="readonly"/>
         </div>
       </div>
-      <div>
+      <div *ngIf="!readonly">
         <ui-slider class="block" [(min)]="props.data.animateSpeed" [options]="{min: 1, max: 5}" (change)="onSubmitProps()"></ui-slider>
       </div>
     </div>
@@ -674,7 +703,7 @@
       字体
     </div>
     <div >
-      <input name="fontFamily" class="input full" [(ngModel)]="props.data.font.fontFamily" />
+      <input name="fontFamily" class="input full" [(ngModel)]="props.data.font.fontFamily" [readonly]="readonly"/>
     </div>
     <div class="flex grid mt5">
       <div>颜色</div>
@@ -682,13 +711,14 @@
     </div>
     <div class="flex grid">
       <div class="mr5">
-        <div class="input color ">
-          <i [ngStyle]="getBackground(props.data.font.color)"></i>
-          <input name="fontColor" [(ngModel)]="props.data.font.color" />
+        <div class="input color" [class.readonly]="readonly">
+          <i [(colorPicker)]="props.data.font.color" [style.background]="props.data.font.color" 
+          cpAlphaChannel="always" cpOutputFormat="hex" [cpPresetColors]="cpPresetColors" (colorPickerChange)="onSubmitProps(false)"></i>
+          <input name="fontColor" [(ngModel)]="props.data.font.color" [readonly]="readonly"/>
         </div>
       </div>
       <div>
-        <input type="number" name="fontSize" class="input" [(ngModel)]="props.data.font.fontSize" uiMin="0" uiMax="500" />
+        <input type="number" name="fontSize" class="input" [(ngModel)]="props.data.font.fontSize" uiMin="0" uiMax="500" [readonly]="readonly"/>
       </div>
     </div>
     <div class="flex grid mt5">
@@ -698,11 +728,11 @@
     <div class="flex grid">
       <div class="mr5">
         <ui-select name="textAlign" [(ngModel)]="props.data.font.textAlign" [options]="textAlignOptions" [multi]="false"
-          (change)="onSubmitProps(propForm.invalid)"></ui-select>
+          (change)="onSubmitProps(propForm.invalid)" [readonly]="readonly"></ui-select>
       </div>
       <div>
         <ui-select name="textBaseline" [(ngModel)]="props.data.font.textBaseline" [options]="textBaselineOptions" [multi]="false"
-        (change)="onSubmitProps(propForm.invalid)"></ui-select>
+        (change)="onSubmitProps(propForm.invalid)" [readonly]="readonly"></ui-select>
       </div>
     </div>
 
@@ -712,10 +742,10 @@
     </div>
     <div class="flex grid">
       <div class="mr5">
-        <input type="number" name="lineHeight" class="input" [(ngModel)]="props.data.font.lineHeight" uiMin="1" uiMax="5" />
+        <input type="number" name="lineHeight" class="input" [(ngModel)]="props.data.font.lineHeight" uiMin="1" uiMax="5" [readonly]="readonly"/>
       </div>
       <div>      
-          <input type="number" name="textMaxLine" class="input" [(ngModel)]="props.data.textMaxLine" uiMin="0" uiMax="500"
+          <input type="number" name="textMaxLine" class="input" [(ngModel)]="props.data.textMaxLine" uiMin="0" uiMax="500" [readonly]="readonly"
             placeholder="0：自动匹配高度" />
       </div>
     </div>
@@ -723,14 +753,14 @@
       内容
     </div>
     <div >
-      <textarea name="text" class="input full" [(ngModel)]="props.data.text" rows="2" (keydown)="onKeyText($event, propForm.invalid)"
+      <textarea name="text" class="input full" [(ngModel)]="props.data.text" rows="2" (keydown)="onKeyText($event, propForm.invalid)" [readonly]="readonly"
        placeholder="Ctrl + Enter换行"></textarea>
     </div>
   </div>
   <div class="group" >
     <div class="title">自定义数据</div> 
     <div>
-      <textarea name="data" class="input full" [(ngModel)]="props.data.data" rows="3" (keydown)="onKeyText($event, propForm.invalid)"
+      <textarea name="data" class="input full" [(ngModel)]="props.data.data" rows="3" (keydown)="onKeyText($event, propForm.invalid)" [readonly]="readonly"
        placeholder="Ctrl + Enter换行"></textarea>
     </div>
   </div>

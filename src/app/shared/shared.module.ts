@@ -21,6 +21,8 @@ import { SliderModule } from 'le5le-components/slider';
 // import { EditorModule } from 'le5le-components/editor';
 // import { RateModule } from 'le5le-components/rate';
 
+import { ColorPickerModule } from 'ngx-color-picker';
+
 import { HtmlPipe } from './pipes/html.pipe';
 import { ImageAuthDirective } from './directives/img.directive';
 
@@ -40,7 +42,8 @@ import { ImageAuthDirective } from './directives/img.directive';
     PaginationModule,
     MoveModule,
     ProgressModule,
-    SliderModule
+    SliderModule,
+    ColorPickerModule
   ],
   declarations: [HtmlPipe, ImageAuthDirective],
   exports: [
@@ -60,7 +63,8 @@ import { ImageAuthDirective } from './directives/img.directive';
     PaginationModule,
     MoveModule,
     ProgressModule,
-    SliderModule
+    SliderModule,
+    ColorPickerModule
   ],
   providers: []
 })
