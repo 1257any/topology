@@ -66,7 +66,7 @@
             </figure>
             <div class="item line"></div>
             <div class="item">
-              <a>
+              <a routerLink="/hot">
                 更多...
               </a>
             </div>
@@ -143,29 +143,14 @@
       <a>查看</a>
       <div class="dropdown">
         <div class="item">
-          <a>
-            基本形状
-          </a>
-        </div>
-        <div class="item">
-          <a>
-            流程图
-          </a>
-        </div>
-        <div class="item">
-          <a>
-            活动图
-          </a>
-        </div>
-        <div class="item">
-          <a>
-            UML类图
+          <a (click)="blank = true">
+            欢迎推荐图文
           </a>
         </div>
         <div class="item line"></div>
         <div class="item">
-          <a>
-            更多...
+          <a href="http://le5le.com" target="_blank">
+            更多
           </a>
         </div>
       </div>
@@ -232,19 +217,19 @@
       </div>
     </div>
     <div class="full text-center" *ngIf="editMode">
-      <div class="inline" *ngIf="!editFilename" (dblclick)="editFilename = true" title="双击修改">
-        {{ filename || '空白文件' }}
-      </div>
       <form
         class="inline"
-        *ngIf="editFilename"
+        [class.hidden]="!editFilename"
         #myForm="ngForm"
         (ngSubmit)="onSubmit(myForm.invalid)"
         [uiTouchForm]="myForm"
         (click)="$event.stopPropagation()"
       >
-        <input name="filename" class="input" [(ngModel)]="filename" required />
+        <input name="filename" #filenameInput class="input" [(ngModel)]="filename" required />
       </form>
+      <div class="inline" *ngIf="!editFilename" (dblclick)="onEditFile(filenameInput)" title="双击修改">
+        {{ filename || '空白文件' }}
+      </div>
     </div>
     <div class="full text-center" *ngIf="!editMode"></div>
     <div class="flex" [class.disabled]="!editMode">
@@ -382,11 +367,15 @@
     </div>
     <div class="modal-footer flex">
       <div class="full">
-        <a style="font-size: .14rem;">
-          <i class="iconfont icon-angle-right"></i>
-          我的文件
-        </a>
+        <label class="checkbox">
+          <input name="disableStart" type="checkbox" [(ngModel)]="disableStartDlg" (change)="onChangeDisableStart()" />
+          <span>不再显示</span>
+        </label>
       </div>
+      <a style="font-size: .14rem;" class="mr15">
+        <i class="iconfont icon-angle-right"></i>
+        我的文件
+      </a>
       <button type="button" class="button mr15" (click)="onMenu('open')">打开本地文件...</button>
       <button type="button" class="button" (click)="blank = null">关闭</button>
     </div>

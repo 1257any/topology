@@ -179,7 +179,12 @@ export class ActiveLayer {
 
     this.initialSizeCPs = [];
     for (const item of this.sizeCPs) {
-      this.initialSizeCPs.push(item.clone());
+      const pt = item.clone();
+      // Cancel rotate while it is a single node. For yScale will < 0 and error.
+      if (this.nodes.length === 1 && this.nodes[0].rotate) {
+        pt.rotate(-this.nodes[0].rotate, this.nodes[0].rect.center);
+      }
+      this.initialSizeCPs.push(pt);
     }
   }
 
@@ -244,26 +249,26 @@ export class ActiveLayer {
   }
 
   // 当initialOccupy缩放为occupy后，计算node在occupy中的新位置
-  // initNode - node的原始位置
+  // initRect - node的原始位置
   // xScale - x坐标缩放比例
   // yScale - y坐标缩放比例
-  calcRelPos(node: Rect, initNode: Rect, pos: Point, xScale: number, yScale: number) {
-    node.x = pos.x + (initNode.x - this.initialSizeCPs[0].x) * xScale;
-    node.y = pos.y + (initNode.y - this.initialSizeCPs[0].y) * yScale;
-    node.width = initNode.width * xScale;
-    node.height = initNode.height * yScale;
-    node.ex = node.x + node.width;
-    node.ey = node.y + node.height;
+  calcRelPos(rect: Rect, initRect: Rect, pos: Point, xScale: number, yScale: number) {
+    rect.x = pos.x + (initRect.x - this.initialSizeCPs[0].x) * xScale;
+    rect.y = pos.y + (initRect.y - this.initialSizeCPs[0].y) * yScale;
+    rect.width = initRect.width * xScale;
+    rect.height = initRect.height * yScale;
+    rect.ex = rect.x + rect.width;
+    rect.ey = rect.y + rect.height;
   }
 
-  moveNodes(pos: Rect) {
+  moveNodes(x: number, y: number) {
     if (this.nodeRects.length !== this.nodes.length) {
       return;
     }
     let i = 0;
     for (const item of this.nodes) {
-      item.rect.x = this.nodeRects[i].x + pos.width;
-      item.rect.y = this.nodeRects[i].y + pos.height;
+      item.rect.x = this.nodeRects[i].x + x;
+      item.rect.y = this.nodeRects[i].y + y;
       item.rect.ex = item.rect.x + item.rect.width;
       item.rect.ey = item.rect.y + item.rect.height;
       item.rect.calceCenter();
@@ -306,8 +311,8 @@ export class ActiveLayer {
     for (const item of this.nodes) {
       const center = this.nodeRects[i].center.clone();
       center.rotate(angle, this.center);
-      item.rect.x = (center.x - item.rect.width / 2 + 0.5) << 0;
-      item.rect.y = (center.y - item.rect.height / 2 + 0.5) << 0;
+      item.rect.x = (center.x - item.rect.width / 2) << 0;
+      item.rect.y = (center.y - item.rect.height / 2) << 0;
       item.rect.ex = item.rect.x + item.rect.width;
       item.rect.ey = item.rect.y + item.rect.height;
       item.rect.calceCenter();
@@ -353,6 +358,7 @@ export class ActiveLayer {
     ctx.save();
     for (const item of this.nodes) {
       const tmp = new Node(item);
+      tmp.fillStyle = null;
       tmp.icon = '';
       tmp.image = '';
       tmp.text = '';
@@ -383,5 +389,23 @@ export class ActiveLayer {
   resize(width: number, height: number) {
     this.canvas.width = width;
     this.canvas.height = height;
+  }
+
+  // Only public prop is requied, for mulit object selected.
+  updateProps(props: { dash: number; lineWidth: number; strokeStyle: string; fillStyle: string; globalAlpha: number }) {
+    for (const item of this.nodes) {
+      item.init();
+      item.dash = props.dash;
+      item.lineWidth = props.lineWidth;
+      item.strokeStyle = props.strokeStyle;
+      item.fillStyle = props.fillStyle;
+    }
+
+    for (const item of this.lines) {
+      item.dash = props.dash;
+      item.lineWidth = props.lineWidth;
+      item.strokeStyle = props.strokeStyle;
+      item.fillStyle = props.fillStyle;
+    }
   }
 }

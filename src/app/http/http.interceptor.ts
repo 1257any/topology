@@ -1,5 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpEvent, HttpInterceptor, HttpHandler, HttpRequest, HttpResponse } from '@angular/common/http';
+import {
+  HttpEvent,
+  HttpInterceptor,
+  HttpHandler,
+  HttpRequest,
+  HttpResponse,
+  HttpErrorResponse
+} from '@angular/common/http';
 
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
@@ -37,18 +44,19 @@ export class AppHttpInterceptor implements HttpInterceptor {
               });
               // tslint:disable-next-line:triple-equals
             }
-
-            if (event.status === 401) {
-              this.store.set('auth', -1);
-            } else if (event.status === 403) {
-              this.store.set('redirect', '/');
-            }
           }
         },
         // Operation failed; error is an HttpErrorResponse
-        error => {
+        (error: HttpErrorResponse) => {
           if (error.status === 401) {
             this.store.set('auth', -1);
+            if (error.url.indexOf('/api/user/profile') < 0) {
+              const noticeService: NoticeService = new NoticeService();
+              noticeService.notice({
+                body: '请先登录，让我们知道保存在谁的云存储下面。',
+                theme: 'error'
+              });
+            }
           } else if (error.status === 403) {
             this.store.set('redirect', '/');
           } else if (error.status === 504) {

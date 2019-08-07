@@ -285,11 +285,11 @@ function getNextPointByRight(from: Point, to: Point) {
 }
 
 function getHorizontalPoints(left: Point, right: Point) {
-  const x = (left.x + (right.x - left.x) / 2 + 0.5) << 0;
+  const x = (left.x + (right.x - left.x) / 2) << 0;
   return [new Point(x, left.y), new Point(x, right.y)];
 }
 
 function getVerticalPoints(up: Point, bottom: Point) {
-  const y = (up.y + (bottom.y - up.y) / 2 + 0.5) << 0;
+  const y = (up.y + (bottom.y - up.y) / 2) << 0;
   return [new Point(up.x, y), new Point(bottom.x, y)];
 }

@@ -17,7 +17,7 @@ export function pentagonIconRect(node: Node) {
 }
 
 export function pentagonTextRect(node: Node) {
-  node.iconTextRect = new Rect(
+  node.textRect = new Rect(
     node.rect.x + node.rect.width / 5,
     node.rect.y + (node.rect.height * 5) / 7,
     (node.rect.width * 3) / 5,

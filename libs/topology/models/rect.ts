@@ -6,10 +6,10 @@ export class Rect {
   ey: number;
   center: Point = new Point(0, 0);
   constructor(public x: number, public y: number, public width: number, public height: number) {
-    this.x = (this.x + 0.5) << 0;
-    this.y = (this.y + 0.5) << 0;
-    this.width = (this.width + 0.5) << 0;
-    this.height = (this.height + 0.5) << 0;
+    this.x = this.x << 0;
+    this.y = this.y << 0;
+    this.width = this.width << 0;
+    this.height = this.height << 0;
     this.ex = this.x + this.width;
     this.ey = this.y + this.height;
     this.calceCenter();
@@ -47,8 +47,8 @@ export class Rect {
   }
 
   calceCenter() {
-    this.center.x = (this.x + this.width / 2 + 0.5) << 0;
-    this.center.y = (this.y + this.height / 2 + 0.5) << 0;
+    this.center.x = (this.x + this.width / 2) << 0;
+    this.center.y = (this.y + this.height / 2) << 0;
   }
 
   toPoints() {

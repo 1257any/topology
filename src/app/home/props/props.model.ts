@@ -16,6 +16,8 @@ export interface Props {
       color: string;
       fontFamily: string;
       fontSize: number;
+      fontStyle: string;
+      fontWeight: string;
       lineHeight: number;
       textAlign: CanvasTextAlign;
       textBaseline: CanvasTextBaseline;
@@ -27,12 +29,20 @@ export interface Props {
 
     // Node
     rect?: Rect;
+    is3D?: boolean;
+    z?: number;
+    zRotate?: number;
     borderRadius?: number;
     icon?: string;
     iconFamily?: string;
     iconSize?: number;
     iconColor?: string;
     image?: string;
+    imgNaturalWidth?: number;
+    imgNaturalHeight?: number;
+    imageWidth?: number;
+    imageHeight?: number;
+    imageRatio?: boolean;
     text?: string;
     textMaxLine?: number;
     // End

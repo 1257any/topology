@@ -7,7 +7,7 @@ export function triangleSolid(ctx: CanvasRenderingContext2D, from: Point, to: Po
   ctx.rotate(Math.atan2(to.y - from.y, to.x - from.x));
   ctx.translate(-to.x, -to.y);
   ctx.moveTo(rect.x, rect.y);
-  ctx.lineTo(rect.x + rect.width, (rect.y + (rect.height / 2 + 0.5)) << 0);
+  ctx.lineTo(rect.x + rect.width, (rect.y + rect.height / 2) << 0);
   ctx.lineTo(rect.x, rect.y + rect.height);
   ctx.closePath();
   ctx.lineWidth = 2;

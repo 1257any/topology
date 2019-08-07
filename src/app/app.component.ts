@@ -38,13 +38,16 @@ export class AppComponent implements OnInit, OnDestroy {
   editMode = false;
   locked = false;
 
+  disableStartDlg = false;
+
   showLicense = false;
   showHelp = false;
   showAbout = false;
   constructor(private service: AppService, private storeService: StoreService, private router: Router) {}
 
   ngOnInit() {
-    this.blank = location.pathname === '/' && !location.search;
+    this.disableStartDlg = !!localStorage.getItem('disable.startDlg');
+    this.blank = location.pathname === '/' && !location.search && !this.disableStartDlg;
     this.user = this.storeService.get('user');
     this.storeService.get$('user').subscribe((user: any) => {
       this.user = user;
@@ -181,6 +184,13 @@ export class AppComponent implements OnInit, OnDestroy {
     }, 800);
   }
 
+  onEditFile(input: HTMLElement) {
+    this.editFilename = true;
+    setTimeout(() => {
+      input.focus();
+    });
+  }
+
   async onSubmit(invalid: boolean) {
     if (invalid) {
       return;
@@ -193,8 +203,10 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onClick() {
+    if (this.editFilename) {
+      this.onSubmit(!this.filename);
+    }
     this.editFilename = false;
-    this.filename = this.file.name;
   }
 
   onHome() {
@@ -211,6 +223,10 @@ export class AppComponent implements OnInit, OnDestroy {
 
   onSignout() {
     this.storeService.set('user', -1);
+  }
+
+  onChangeDisableStart() {
+    localStorage.setItem('disable.startDlg', this.disableStartDlg + '');
   }
 
   ngOnDestroy() {}

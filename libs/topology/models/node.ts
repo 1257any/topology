@@ -8,6 +8,10 @@ import { text, iconfont } from '../middles/nodes/text';
 import { Store } from '../store/store';
 
 export class Node extends Pen {
+  is3D = false;
+  z: number;
+  zRotate = 0;
+
   // 0 -1 之间的小数
   borderRadius: number;
 
@@ -16,14 +20,21 @@ export class Node extends Pen {
   iconFamily: string;
   iconSize: number;
   iconColor: string;
-  iconRect: Rect;
 
   image: string;
+  imgNaturalWidth: number;
+  imgNaturalHeight: number;
+  imageWidth: number;
+  imageHeight: number;
+  imageRatio = true;
   private img: HTMLImageElement;
+
+  iconRect: Rect;
+  fullIconRect: Rect;
 
   text: string;
   textMaxLine: number;
-  iconTextRect: Rect;
+  textRect: Rect;
   fullTextRect: Rect;
 
   anchors: Point[] = [];
@@ -32,6 +43,10 @@ export class Node extends Pen {
 
   constructor(json: any) {
     super(json);
+
+    this.is3D = json.is3D;
+    this.z = json.z;
+    this.zRotate = json.zRotate || 0;
 
     this.borderRadius = +json.borderRadius || 0;
     if (this.borderRadius > 1) {
@@ -44,6 +59,20 @@ export class Node extends Pen {
     this.iconColor = json.iconColor;
 
     this.image = json.image;
+    if (json.imgNaturalWidth) {
+      this.imgNaturalWidth = json.imgNaturalWidth;
+    }
+    if (json.imgNaturalHeight) {
+      this.imgNaturalHeight = json.imgNaturalHeight;
+    }
+    if (json.imageWidth) {
+      this.imageWidth = json.imageWidth;
+    }
+    if (json.imageHeight) {
+      this.imageHeight = json.imageHeight;
+    }
+    this.imageRatio = json.imageRatio;
+
     this.text = json.text;
     if (json.textMaxLine) {
       this.textMaxLine = +json.textMaxLine || 0;
@@ -59,13 +88,6 @@ export class Node extends Pen {
   }
 
   init() {
-    // Calc rect of icon.
-    if (iconRectFns[this.name]) {
-      iconRectFns[this.name](this);
-    } else {
-      defaultIconRect(this);
-    }
-
     // Calc rect of text.
     if (textRectFns[this.name]) {
       textRectFns[this.name](this);
@@ -73,15 +95,14 @@ export class Node extends Pen {
       defaultTextRect(this);
     }
 
-    // Calc anchors.
-    this.anchors = [];
-    if (anchorsFns[this.name]) {
-      anchorsFns[this.name](this);
+    // Calc rect of icon.
+    if (iconRectFns[this.name]) {
+      iconRectFns[this.name](this);
     } else {
-      defaultAnchors(this);
+      defaultIconRect(this);
     }
 
-    this.calcRotateAnchors();
+    this.calcAnchors();
   }
 
   draw(ctx: CanvasRenderingContext2D) {
@@ -105,11 +126,7 @@ export class Node extends Pen {
     if (this.image) {
       // There is the cache of image.
       if (this.img) {
-        ctx.save();
-        ctx.shadowColor = '';
-        ctx.shadowBlur = 0;
-        ctx.drawImage(this.img, this.iconRect.x, this.iconRect.y, this.iconRect.width, this.iconRect.height);
-        ctx.restore();
+        this.drawImg(ctx);
         return;
       } else {
         // Load image and draw it.
@@ -117,11 +134,9 @@ export class Node extends Pen {
         this.img.crossOrigin = 'anonymous';
         this.img.src = this.image;
         this.img.onload = () => {
-          ctx.save();
-          ctx.shadowColor = '';
-          ctx.shadowBlur = 0;
-          ctx.drawImage(this.img, this.iconRect.x, this.iconRect.y, this.iconRect.width, this.iconRect.height);
-          ctx.restore();
+          this.imgNaturalWidth = this.img.naturalWidth;
+          this.imgNaturalHeight = this.img.naturalHeight;
+          this.drawImg(ctx);
           this.emitRender();
         };
       }
@@ -139,9 +154,47 @@ export class Node extends Pen {
     }
   }
 
+  drawImg(ctx: CanvasRenderingContext2D) {
+    ctx.save();
+    ctx.shadowColor = '';
+    ctx.shadowBlur = 0;
+    const rect = this.getIconRect().clone();
+    const h = rect.height;
+    if (this.imageWidth) {
+      rect.width = this.imageWidth;
+    }
+    if (this.imageHeight) {
+      rect.height = this.imageHeight;
+    }
+    if (this.imageRatio) {
+      if (this.imageWidth) {
+        rect.height = (this.imgNaturalHeight / this.imgNaturalWidth) * rect.width;
+      } else {
+        rect.width = (this.imgNaturalWidth / this.imgNaturalHeight) * rect.height;
+      }
+    }
+    if (this.name !== 'image') {
+      rect.x += ((this.rect.width - rect.width) / 2) << 0;
+      rect.y += ((h - rect.height) / 2) << 0;
+    }
+    ctx.drawImage(this.img, rect.x, rect.y, rect.width, rect.height);
+    ctx.restore();
+  }
+
   emitRender() {
     let r = Store.get('render') || 0;
     Store.set('render', ++r);
+  }
+
+  calcAnchors() {
+    this.anchors = [];
+    if (anchorsFns[this.name]) {
+      anchorsFns[this.name](this);
+    } else {
+      defaultAnchors(this);
+    }
+
+    this.calcRotateAnchors();
   }
 
   calcRotateAnchors(angle?: number) {
@@ -155,11 +208,20 @@ export class Node extends Pen {
   }
 
   getTextRect() {
-    let textRect = this.iconTextRect;
+    let textRect = this.textRect;
     if (!this.icon && !this.image) {
       textRect = this.fullTextRect;
     }
 
     return textRect;
+  }
+
+  getIconRect() {
+    let rect = this.iconRect;
+    if (!this.text) {
+      rect = this.fullIconRect || this.fullTextRect;
+    }
+
+    return rect;
   }
 }

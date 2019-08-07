@@ -7,11 +7,11 @@ export function flowInternalStorageIconRect(node: Node) {
 
 export function flowInternalStorageTextRect(node: Node) {
   const offset = node.rect.width / 7;
-  node.iconTextRect = new Rect(
+  node.textRect = new Rect(
     node.rect.x + offset,
     node.rect.y + offset,
     node.rect.width - offset,
     node.rect.height - offset
   );
-  node.fullTextRect = node.iconTextRect;
+  node.fullTextRect = node.textRect;
 }

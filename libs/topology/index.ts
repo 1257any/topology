@@ -140,6 +140,7 @@ export class Topology {
     }
 
     this.offscreen = new Canvas(this.options, 'offscreen');
+    Store.set('offscreen', this.offscreen.canvas);
     this.parentElem.appendChild(this.canvas);
     this.activeLayer = new ActiveLayer(this.parentElem, this.options);
     this.animateLayer = new AnimateLayer(this.parentElem, this.options);
@@ -153,7 +154,7 @@ export class Topology {
     };
 
     this.subcribe = Store.subcribe('render', () => {
-      this.render();
+      this.renderOffscreen();
     });
 
     this.hoverLayer.canvas.onmousemove = this.onMouseMove;
@@ -171,6 +172,18 @@ export class Topology {
     this.input.style.outline = 'none';
     this.input.style.border = '1px solid #cdcdcd';
     this.input.style.resize = 'none';
+    this.input.onkeydown = (key: KeyboardEvent) => {
+      switch (key.keyCode) {
+        case 13:
+          if (key.ctrlKey) {
+            this.input.value = this.input.value + '\n';
+          } else {
+            key.preventDefault();
+            this.setNodeText();
+          }
+          break;
+      }
+    };
     this.parentElem.appendChild(this.input);
 
     this.cache();
@@ -198,8 +211,8 @@ export class Topology {
     event.preventDefault();
     const node = JSON.parse(event.dataTransfer.getData('Text'));
     node.rect = node.rect || {};
-    node.rect.x = event.offsetX - ((node.width / 2 + 0.5) << 0);
-    node.rect.y = event.offsetY - ((node.height / 2 + 0.5) << 0);
+    node.rect.x = event.offsetX - ((node.width / 2) << 0);
+    node.rect.y = event.offsetY - ((node.height / 2) << 0);
     this.addNode(new Node(node));
   }
 
@@ -215,7 +228,7 @@ export class Topology {
     this.hoverLayer.canvas.focus();
 
     this.nodes.push(node);
-    this.offscreen.render(true);
+    this.offscreen.render();
 
     this.cache();
 
@@ -229,33 +242,33 @@ export class Topology {
   // open - Is load a new File
   // true: load a new file
   // false: redraw
-  render(data?: ICanvasData, open?: boolean) {
-    if (data) {
-      this.nodes.splice(0, this.nodes.length);
-      this.lines.splice(0, this.lines.length);
-      if (open) {
-        for (const item of data.nodes) {
-          this.nodes.push(new Node(item));
-        }
-        for (const item of data.lines) {
-          this.lines.push(new Line(item));
-        }
-        this.caches.list = [];
-        this.cache();
-      } else {
-        this.nodes.push.apply(this.nodes, data.nodes);
-        this.lines.push.apply(this.lines, data.lines);
+  render(data: ICanvasData, open?: boolean) {
+    this.nodes.splice(0, this.nodes.length);
+    this.lines.splice(0, this.lines.length);
+    if (open) {
+      for (const item of data.nodes) {
+        this.nodes.push(new Node(item));
       }
-
-      this.activeLayer.nodes = [];
-      this.activeLayer.lines = [];
-      this.hoverLayer.node = null;
-      this.hoverLayer.render();
-      this.activeLayer.render();
-      this.animateLayer.render();
+      for (const item of data.lines) {
+        this.lines.push(new Line(item));
+      }
+      this.caches.list = [];
+      this.cache();
+    } else {
+      this.nodes.push.apply(this.nodes, data.nodes);
+      this.lines.push.apply(this.lines, data.lines);
     }
 
+    this.activeLayer.nodes = [];
+    this.activeLayer.lines = [];
+    this.hoverLayer.node = null;
+    this.hoverLayer.render();
+    this.activeLayer.render();
+    this.animateLayer.render();
     this.offscreen.render();
+  }
+
+  renderOffscreen() {
     this.canvas.height = this.canvas.height;
     const ctx = this.canvas.getContext('2d');
     ctx.drawImage(this.offscreen.canvas, 0, 0);
@@ -279,18 +292,18 @@ export class Topology {
           this.hoverLayer.render();
 
           // Send a move event.
-          if (!this.lastHoverNode && this.options.on) {
-            // this.options.on('moveInNode', new Node(this.moveIn.hoverNode));
-          }
+          // if (!this.lastHoverNode && this.options.on) {
+          //    this.options.on('moveInNode', new Node(this.moveIn.hoverNode));
+          // }
         } else if (this.lastHoverNode) {
           // Clear hover anchors.
           this.hoverLayer.node = null;
           this.hoverLayer.canvas.height = this.hoverLayer.canvas.height;
 
           // Send a move event.
-          if (this.options.on) {
-            this.options.on('moveOutNode', null);
-          }
+          // if (this.options.on) {
+          //   this.options.on('moveOutNode', null);
+          // }
         }
 
         if (this.moveIn.type === MoveInType.LineControlPoint) {
@@ -344,9 +357,7 @@ export class Topology {
           break;
         case MoveInType.Nodes:
           this.nodesMoved = true;
-          this.activeLayer.moveNodes(
-            new Rect(e.offsetX, e.offsetY, e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY)
-          );
+          this.activeLayer.moveNodes(e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY);
           break;
         case MoveInType.ResizeCP:
           this.activeLayer.resizeNodes(this.moveIn.activeAnchorIndex, e);
@@ -382,23 +393,26 @@ export class Topology {
       this.hoverLayer.render();
       this.activeLayer.render();
       this.animateLayer.render();
-      this.offscreen.render(true);
+      this.offscreen.render();
     });
   };
 
+  setNodeText() {
+    this.inputNode.text = this.input.value;
+    this.input.style.zIndex = '-1';
+    this.input.style.left = '-1000px';
+    this.input.style.width = '0';
+    this.inputNode = null;
+    this.cache();
+    this.offscreen.render();
+  }
+
   private onmousedown = (e: MouseEvent) => {
     this.mouseDown = e;
-
     Store.set('activeLine', null);
 
     if (this.inputNode) {
-      this.inputNode.text = this.input.value;
-      this.input.style.zIndex = '-1';
-      this.input.style.left = '-1000px';
-      this.input.style.width = '0';
-      this.inputNode = null;
-      this.cache();
-      this.offscreen.render(true);
+      this.setNodeText();
     }
 
     switch (this.moveIn.type) {
@@ -491,7 +505,6 @@ export class Topology {
           }
         } else {
           this.activeLayer.setNodes([this.moveIn.hoverNode]);
-
           if (this.options.on) {
             this.options.on('node', this.moveIn.hoverNode);
           }
@@ -521,20 +534,18 @@ export class Topology {
       switch (this.moveIn.type) {
         // Add the line.
         case MoveInType.HoverAnchors:
-          // Deactive.
-          this.activeLayer.nodes = [];
-          this.activeLayer.lines = [];
-
           // New active.
           if (this.hoverLayer.line && this.hoverLayer.line.to) {
+            // Deactive nodes.
+            this.activeLayer.nodes = [];
+
             this.activeLayer.lines = [this.hoverLayer.line];
             Store.set('activeLine', this.hoverLayer.line);
             this.activeLayer.render();
-
             this.options.on('line', this.hoverLayer.line);
           }
 
-          this.offscreen.render(true);
+          this.offscreen.render();
 
           this.hoverLayer.line = null;
           break;
@@ -564,10 +575,7 @@ export class Topology {
       case MoveInType.Nodes:
         if (this.moveIn.hoverNode) {
           const textRect = this.moveIn.hoverNode.getTextRect();
-          if (
-            textRect.hitRotate(e, this.moveIn.hoverNode.rotate, this.moveIn.hoverNode.rect.center) ||
-            this.moveIn.hoverNode.name === 'image'
-          ) {
+          if (textRect.hitRotate(e, this.moveIn.hoverNode.rotate, this.moveIn.hoverNode.rect.center)) {
             this.showInput(textRect);
           }
           if (this.options.on) {
@@ -579,6 +587,10 @@ export class Topology {
   };
 
   private onkeydown = (key: KeyboardEvent) => {
+    let done = false;
+
+    let moveX = 0;
+    let moveY = 0;
     switch (key.keyCode) {
       // Delete
       case 46:
@@ -611,16 +623,69 @@ export class Topology {
         this.activeLayer.nodes = [];
         this.activeLayer.lines = [];
         this.hoverLayer.node = null;
-        this.activeLayer.render();
-        this.animateLayer.render();
-        this.hoverLayer.render();
-        this.offscreen.render(true);
-        this.cache();
+        this.hoverLayer.line = null;
+        Store.set('activeLine', null);
+        done = true;
+        break;
+      // Left
+      case 37:
+        moveX = -5;
+        if (key.ctrlKey) {
+          moveX = -1;
+        }
+        done = true;
+        break;
+      // Top
+      case 38:
+        moveY = -5;
+        if (key.ctrlKey) {
+          moveY = -1;
+        }
+        done = true;
+        break;
+      // Right
+      case 39:
+        moveX = 5;
+        if (key.ctrlKey) {
+          moveX = 1;
+        }
+        done = true;
+        break;
+      // Down
+      case 40:
+        moveY = 5;
+        if (key.ctrlKey) {
+          moveY = 1;
+        }
+        done = true;
         break;
     }
+
+    if (!done) {
+      return;
+    }
+
+    if (moveX || moveY) {
+      this.activeLayer.saveNodeRects();
+      this.activeLayer.moveNodes(moveX, moveY);
+    }
+
+    this.activeLayer.render();
+    this.animateLayer.render();
+    this.hoverLayer.render();
+    this.offscreen.render();
+    this.cache();
   };
 
   private getHoverNode(e: MouseEvent) {
+    for (let i = this.activeLayer.nodes.length - 1; i > -1; --i) {
+      if (this.activeLayer.nodes[i].hit(e, 2)) {
+        this.moveIn.hoverNode = this.activeLayer.nodes[i];
+        this.moveIn.type = MoveInType.Nodes;
+        return;
+      }
+    }
+
     for (let i = this.nodes.length - 1; i > -1; --i) {
       if (this.nodes[i].hit(e, 2)) {
         this.moveIn.hoverNode = this.nodes[i];
@@ -637,6 +702,26 @@ export class Topology {
     this.moveIn.lineControlPoint = null;
     this.moveIn.hoverLine = null;
 
+    // In line
+    for (const item of this.activeLayer.lines) {
+      if (this.isInLine(e, item)) {
+        return;
+      }
+    }
+
+    let index = 0;
+    for (const item of this.lines) {
+      ++index;
+      if (!item.to) {
+        this.lines.splice(index - 1, 1);
+        continue;
+      }
+
+      if (this.isInLine(e, item)) {
+        return;
+      }
+    }
+
     // In nodes
     this.getHoverNode(e);
     if (this.moveIn.hoverNode) {
@@ -644,7 +729,6 @@ export class Topology {
     } else {
       this.hoverLayer.canvas.style.cursor = 'default';
     }
-
     // In activeLayer
     if (this.activeLayer.nodes.length) {
       if (this.activeLayer.rotateCPs[0].hit(e, 15)) {
@@ -684,61 +768,51 @@ export class Topology {
         }
       }
     }
+  }
 
-    if (this.moveIn.type !== MoveInType.None) {
-      return;
-    }
-
-    // In line
-    let index = 0;
-    for (const item of this.lines) {
-      ++index;
-      if (!item.to) {
-        this.lines.splice(index - 1, 1);
-        continue;
-      }
-
-      // In LineControlPoint
-      if (this.activeLayer.lines.length) {
-        let i = 0;
-        for (const pt of item.controlPoints) {
-          if (pt.hit(e)) {
-            pt.id = i;
-            this.moveIn.type = MoveInType.LineControlPoint;
-            this.moveIn.lineControlPoint = pt;
-            this.moveIn.hoverLine = item;
-            this.hoverLayer.canvas.style.cursor = 'pointer';
-            return;
-          }
-          ++i;
-        }
-      }
-
-      if (item.from.hit(e, 10)) {
-        this.moveIn.type = MoveInType.LineFrom;
-        this.moveIn.hoverLine = item;
-        this.hoverLayer.canvas.style.cursor = 'move';
-        return;
-      }
-
-      if (item.to.hit(e, 10)) {
-        this.moveIn.type = MoveInType.LineTo;
-        this.moveIn.hoverLine = item;
-        this.hoverLayer.canvas.style.cursor = 'move';
-        return;
-      }
-
-      if (item.pointIn(e)) {
-        this.moveIn.type = MoveInType.LineMove;
-        this.moveIn.hoverLine = item;
-        this.hoverLayer.canvas.style.cursor = 'move';
-        if (item.from.id || item.to.id) {
-          this.moveIn.type = MoveInType.Line;
+  isInLine(e: MouseEvent, line: Line) {
+    // In LineControlPoint
+    if (this.activeLayer.lines.length) {
+      let i = 0;
+      for (const pt of line.controlPoints) {
+        if (pt.hit(e)) {
+          pt.id = i;
+          this.moveIn.type = MoveInType.LineControlPoint;
+          this.moveIn.lineControlPoint = pt;
+          this.moveIn.hoverLine = line;
           this.hoverLayer.canvas.style.cursor = 'pointer';
+          return true;
         }
-        return;
+        ++i;
       }
     }
+
+    if (line.from.hit(e, 10)) {
+      this.moveIn.type = MoveInType.LineFrom;
+      this.moveIn.hoverLine = line;
+      this.hoverLayer.canvas.style.cursor = 'move';
+      return true;
+    }
+
+    if (line.to.hit(e, 10)) {
+      this.moveIn.type = MoveInType.LineTo;
+      this.moveIn.hoverLine = line;
+      this.hoverLayer.canvas.style.cursor = 'move';
+      return true;
+    }
+
+    if (line.pointIn(e)) {
+      this.moveIn.type = MoveInType.LineMove;
+      this.moveIn.hoverLine = line;
+      this.hoverLayer.canvas.style.cursor = 'move';
+      if (line.from.id || line.to.id) {
+        this.moveIn.type = MoveInType.Line;
+        this.hoverLayer.canvas.style.cursor = 'pointer';
+      }
+      return true;
+    }
+
+    return false;
   }
 
   private getLineDock(e: MouseEvent) {
@@ -852,6 +926,7 @@ export class Topology {
     this.input.style.width = pos.width + 'px';
     this.input.style.height = pos.height + 'px';
     this.input.style.zIndex = '1000';
+    this.input.focus();
   }
 
   onInput = (e: MouseEvent) => {};
@@ -1025,7 +1100,7 @@ export class Topology {
     this.hoverLayer.node = null;
     this.hoverLayer.render();
 
-    this.offscreen.render(true);
+    this.offscreen.render();
 
     this.moveIn.hoverLine = null;
     this.moveIn.hoverNode = null;
@@ -1088,20 +1163,23 @@ export class Topology {
       Store.set('activeLine', line);
     }
 
-    this.offscreen.render(true);
+    this.offscreen.render();
     this.activeLayer.render();
     this.animateLayer.render();
 
     this.cache();
   }
 
-  update() {
+  update(props: { dash: number; lineWidth: number; strokeStyle: string; fillStyle: string; globalAlpha: number }) {
+    this.activeLayer.updateProps(props);
+
     this.cache();
+    this.activeLayer.saveNodeRects();
     this.activeLayer.changeLineType();
     this.activeLayer.render();
     this.animateLayer.render();
     this.hoverLayer.render();
-    this.offscreen.render(true);
+    this.offscreen.render();
   }
 
   lock(lock: boolean) {

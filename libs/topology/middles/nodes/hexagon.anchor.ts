@@ -7,4 +7,15 @@ export function hexagonAnchors(node: Node) {
   node.anchors.push(new Point(node.rect.x + node.rect.width, node.rect.y + node.rect.height / 2, Direction.Right));
   node.anchors.push(new Point(node.rect.x + node.rect.width / 2, node.rect.y + node.rect.height, Direction.Bottom));
   node.anchors.push(new Point(node.rect.x, node.rect.y + node.rect.height / 2, Direction.Left));
+  node.anchors.push(new Point(node.rect.x + node.rect.width / 10, node.rect.y + node.rect.height / 4, Direction.Left));
+  node.anchors.push(
+    new Point(node.rect.x + node.rect.width / 10, node.rect.y + (node.rect.height * 3) / 4, Direction.Left)
+  );
+
+  node.anchors.push(
+    new Point(node.rect.x + (node.rect.width * 9) / 10, node.rect.y + node.rect.height / 4, Direction.Right)
+  );
+  node.anchors.push(
+    new Point(node.rect.x + (node.rect.width * 9) / 10, node.rect.y + (node.rect.height * 3) / 4, Direction.Right)
+  );
 }

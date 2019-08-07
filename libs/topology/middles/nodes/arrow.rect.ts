@@ -6,13 +6,13 @@ export function leftArrowIconRect(node: Node) {
 }
 
 export function leftArrowTextRect(node: Node) {
-  node.iconTextRect = new Rect(
+  node.textRect = new Rect(
     node.rect.x + node.rect.height / 2,
     node.rect.y + node.rect.height / 3,
     node.rect.width - node.rect.height / 2,
     node.rect.height / 3
   );
-  node.fullTextRect = node.iconTextRect;
+  node.fullTextRect = node.textRect;
 }
 
 export function rightArrowIconRect(node: Node) {
@@ -20,13 +20,13 @@ export function rightArrowIconRect(node: Node) {
 }
 
 export function rightArrowTextRect(node: Node) {
-  node.iconTextRect = new Rect(
+  node.textRect = new Rect(
     node.rect.x,
     node.rect.y + node.rect.height / 3,
     node.rect.width - node.rect.height / 2,
     node.rect.height / 3
   );
-  node.fullTextRect = node.iconTextRect;
+  node.fullTextRect = node.textRect;
 }
 
 export function twowayArrowIconRect(node: Node) {
@@ -34,11 +34,11 @@ export function twowayArrowIconRect(node: Node) {
 }
 
 export function twowayArrowTextRect(node: Node) {
-  node.iconTextRect = new Rect(
+  node.textRect = new Rect(
     node.rect.x + node.rect.height / 2,
     node.rect.y + node.rect.height / 3,
     node.rect.width - node.rect.height,
     node.rect.height / 3
   );
-  node.fullTextRect = node.iconTextRect;
+  node.fullTextRect = node.textRect;
 }

@@ -40,7 +40,7 @@ export class Canvas {
     return false;
   }
 
-  render(update = false) {
+  render() {
     if (this.rendering) {
       return;
     }
@@ -55,9 +55,8 @@ export class Canvas {
 
     this.renderNodes();
     this.renderLines();
-    if (update) {
-      this.emitRender();
-    }
+    let r = Store.get('render') || 0;
+    Store.set('render', ++r);
     this.rendering = false;
   }
 
@@ -87,10 +86,5 @@ export class Canvas {
       item.render(ctx);
       ++i;
     }
-  }
-
-  emitRender() {
-    let r = Store.get('render') || 0;
-    Store.set('render', ++r);
   }
 }

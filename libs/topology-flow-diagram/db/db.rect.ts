@@ -6,11 +6,11 @@ export function flowDbIconRect(node: Node) {
 }
 
 export function flowDbTextRect(node: Node) {
-  node.iconTextRect = new Rect(
+  node.textRect = new Rect(
     node.rect.x,
     node.rect.y + node.rect.height / 8,
     node.rect.width,
     (node.rect.height * 5) / 8
   );
-  node.fullTextRect = node.iconTextRect;
+  node.fullTextRect = node.textRect;
 }

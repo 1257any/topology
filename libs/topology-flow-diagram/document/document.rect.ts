@@ -6,6 +6,6 @@ export function flowDocumentIconRect(node: Node) {
 }
 
 export function flowDocumentTextRect(node: Node) {
-  node.iconTextRect = new Rect(node.rect.x, node.rect.y, node.rect.width, (node.rect.height * 5) / 7);
-  node.fullTextRect = node.iconTextRect;
+  node.textRect = new Rect(node.rect.x, node.rect.y, node.rect.width, (node.rect.height * 5) / 7);
+  node.fullTextRect = node.textRect;
 }

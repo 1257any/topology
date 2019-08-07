@@ -1,7 +1,7 @@
 import { Node } from '../../models/node';
 
 // getWords: Get the word array from text. A single Chinese character is a word.
-function getWords(txt: string) {
+export function getWords(txt: string) {
   const words = [];
   let word = '';
   for (let i = 0; i < txt.length; ++i) {
@@ -28,7 +28,7 @@ function getWords(txt: string) {
 // getLines：Get lines of drawing text.
 // words - the word array of text, to avoid spliting a word.
 // maxWidth - the max width of the rect.
-function getLines(ctx: CanvasRenderingContext2D, words: string[], maxWidth: number) {
+export function getLines(ctx: CanvasRenderingContext2D, words: string[], maxWidth: number) {
   const lines = [];
   let currentLine = words[0];
   for (let i = 1; i < words.length; ++i) {
@@ -80,11 +80,14 @@ export function text(ctx: CanvasRenderingContext2D, node: Node) {
 
   ctx.save();
   ctx.beginPath();
-  ctx.font = `${node.font.fontSize}px/${node.font.lineHeight} ${node.font.fontFamily}`;
+  ctx.font = `${node.font.fontStyle || 'normal'} normal ${node.font.fontWeight || 'normal'} ${node.font.fontSize}px/${
+    node.font.lineHeight
+  } ${node.font.fontFamily}`;
+
   if (node.font.color) {
     ctx.fillStyle = node.font.color;
   } else {
-    ctx.fillStyle = ctx.strokeStyle;
+    ctx.fillStyle = '#333';
   }
   if (node.font.textAlign) {
     ctx.textAlign = node.font.textAlign;
@@ -130,22 +133,19 @@ export function iconfont(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.save();
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
+  const iconRect = node.getIconRect();
   if (node.iconSize > 0) {
     ctx.font = `${node.iconSize}px ${node.iconFamily}`;
-  } else if (node.iconRect.width > node.iconRect.height) {
-    ctx.font = `${node.iconRect.height}px ${node.iconFamily}`;
+  } else if (iconRect.width > iconRect.height) {
+    ctx.font = `${iconRect.height}px ${node.iconFamily}`;
   } else {
-    ctx.font = `${node.iconRect.width}px ${node.iconFamily}`;
+    ctx.font = `${iconRect.width}px ${node.iconFamily}`;
   }
   if (!node.iconColor) {
     node.iconColor = '#2f54eb';
   }
   ctx.fillStyle = node.iconColor;
   ctx.beginPath();
-  ctx.fillText(
-    node.icon,
-    (node.iconRect.x + node.iconRect.width / 2) << 0,
-    (node.iconRect.y + node.iconRect.height / 2) << 0
-  );
+  ctx.fillText(node.icon, (iconRect.x + iconRect.width / 2) << 0, (iconRect.y + iconRect.height / 2) << 0);
   ctx.restore();
 }

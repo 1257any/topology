@@ -18,6 +18,8 @@ export abstract class Pen {
     fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
     fontSize: 12,
     lineHeight: 1.5,
+    fontStyle: 'normal',
+    fontWeight: 'normal',
     textAlign: 'center' as CanvasTextAlign,
     textBaseline: 'middle' as CanvasTextBaseline
   };

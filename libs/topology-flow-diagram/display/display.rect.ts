@@ -6,11 +6,11 @@ export function flowDisplayIconRect(node: Node) {
 }
 
 export function flowDisplayTextRect(node: Node) {
-  node.iconTextRect = new Rect(
+  node.textRect = new Rect(
     node.rect.x + node.rect.width / 8,
     node.rect.y,
     (node.rect.width * 3) / 4,
     node.rect.height
   );
-  node.fullTextRect = node.iconTextRect;
+  node.fullTextRect = node.textRect;
 }

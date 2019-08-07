@@ -7,8 +7,8 @@ export class Point {
   // The index of docker anchor on node.
   anchorIndex: number;
   constructor(public x: number, public y: number, direction?: Direction, anchorIndex?: number, id?: number | string) {
-    this.x = (this.x + 0.5) << 0;
-    this.y = (this.y + 0.5) << 0;
+    this.x = this.x << 0;
+    this.y = this.y << 0;
     this.direction = direction;
     this.anchorIndex = anchorIndex;
     this.id = id;

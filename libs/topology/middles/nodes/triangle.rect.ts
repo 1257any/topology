@@ -17,7 +17,7 @@ export function triangleIconRect(node: Node) {
 }
 
 export function triangleTextRect(node: Node) {
-  node.iconTextRect = new Rect(
+  node.textRect = new Rect(
     node.rect.x + node.rect.width / 4,
     node.rect.y + (node.rect.height * 2) / 3,
     node.rect.width / 2,

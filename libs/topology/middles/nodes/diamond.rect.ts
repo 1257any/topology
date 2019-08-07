@@ -21,7 +21,7 @@ export function diamondTextRect(node: Node) {
   if (bottom < 5) {
     bottom = 0;
   }
-  node.iconTextRect = new Rect(
+  node.textRect = new Rect(
     node.rect.x + node.rect.width / 3,
     node.rect.y + (node.rect.height * 2) / 3 - bottom,
     node.rect.width / 3,

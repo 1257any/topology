@@ -258,11 +258,10 @@ export class HomeComponent implements OnInit, OnDestroy {
           name: 'text',
           icon: 'icon-text',
           data: {
-            text:
-              '便捷、开放、可扩展、云存储、社区等特点。快速创建微服务拓扑图、微服务流量动画演示、软件项目设计图、流程图、活动图、时序图、类图等UML各种图。',
+            text: 'le5le-topology / 乐吾乐',
             rect: {
-              width: 100,
-              height: 100
+              width: 160,
+              height: 30
             },
             name: 'text'
           }
@@ -273,19 +272,30 @@ export class HomeComponent implements OnInit, OnDestroy {
           data: {
             text: '图片',
             rect: {
-              width: 100,
+              width: 80,
               height: 100
-            },
-            font: {
-              color: '#333',
-              fontFamily: '"Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial',
-              fontSize: 12,
-              lineHeight: 1.5,
-              textAlign: 'center',
-              textBaseline: 'top'
             },
             name: 'image',
             image: '/assets/img/logo.png'
+          }
+        },
+        {
+          name: 'cube',
+          icon: 'icon-cube',
+          data: {
+            rect: {
+              width: 50,
+              height: 70
+            },
+            is3D: true,
+            z: 10,
+            zRotate: 15,
+            fillStyle: '#ddd',
+            name: 'cube',
+            icon: '\ue63c',
+            iconFamily: 'topology',
+            iconColor: '#777',
+            iconSize: 30
           }
         }
       ]
@@ -520,7 +530,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.user = this.storeService.get('user');
     this.subUser = this.storeService.get$('user').subscribe((user: any) => {
       this.user = user;
-      if (this.data && this.data.userId !== this.user.id) {
+      if (this.data && user && this.data.userId !== this.user.id) {
         this.data.shared = false;
         this.data.id = '';
       }
@@ -752,6 +762,9 @@ export class HomeComponent implements OnInit, OnDestroy {
         await this.service.DelImage(this.data.image);
       }
       const file = await this.service.Upload(blob, this.data.shared);
+      if (!file) {
+        return;
+      }
       this.data.image = file.url;
       const ret = await this.service.Save(this.data);
       if (ret) {
@@ -799,7 +812,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   onSaveLocal() {
     const data = this.canvas.data();
-    FileSaver.saveAs(new Blob([JSON.stringify(data)], { type: 'text/plain;charset=utf-8' }), 'le5le.topology.json');
+    FileSaver.saveAs(
+      new Blob([JSON.stringify(data)], { type: 'text/plain;charset=utf-8' }),
+      `${this.data.name || 'le5le.topology'}.json`
+    );
   }
 
   onSavePng(options?: { type?: string; quality?: any; ext?: string }) {
@@ -866,7 +882,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.canvas.activeLayer.changeLineType();
     }
 
-    this.canvas.update();
+    this.canvas.update(props.data);
   }
 
   onSignup() {

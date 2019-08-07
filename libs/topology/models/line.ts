@@ -31,15 +31,15 @@ export class Line extends Pen {
   }
 
   setFrom(from: Point, fromArrow: string = '') {
-    from.x = (from.x + 0.5) << 0;
-    from.y = (from.y + 0.5) << 0;
+    from.x = from.x << 0;
+    from.y = from.y << 0;
     this.from = from;
     this.fromArrow = fromArrow;
   }
 
   setTo(to: Point, toArrow: string = 'triangleSolid') {
-    to.x = (to.x + 0.5) << 0;
-    to.y = (to.y + 0.5) << 0;
+    to.x = to.x << 0;
+    to.y = to.y << 0;
     this.to = to;
     this.toArrow = toArrow;
   }

@@ -7,5 +7,5 @@ export function lineIconRect(node: Node) {
 
 export function lineTextRect(node: Node) {
   node.fullTextRect = new Rect(node.rect.x + 10, node.rect.y + node.rect.height / 2 - 20, node.rect.width - 20, 20);
-  node.iconTextRect = node.fullTextRect;
+  node.textRect = node.fullTextRect;
 }

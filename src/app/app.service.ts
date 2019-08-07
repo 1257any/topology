@@ -8,7 +8,7 @@ export class AppService {
 
   async Topologies(params: any) {
     const ret = await this.http.QueryString(params).Get('/api/topologies');
-    if (ret.error) {
+    if (!ret.list || ret.error) {
       return {
         list: [],
         count: 0
@@ -20,7 +20,7 @@ export class AppService {
 
   async UserTopologies(params: any) {
     const ret = await this.http.QueryString(params).Get('/api/user/topologies');
-    if (ret.error) {
+    if (!ret.list || ret.error) {
       return {
         list: [],
         count: 0
