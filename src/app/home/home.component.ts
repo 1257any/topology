@@ -517,6 +517,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   user: any;
   subUser: any;
 
+  mouseMoving = false;
+
   subRoute: any;
   constructor(
     private service: HomeService,
@@ -714,9 +716,26 @@ export class HomeComponent implements OnInit, OnDestroy {
       ret.id = '';
     }
     this.data = ret;
+    // for demo
+    if (this.data.name === 'cube-demo') {
+      const colors = ['#ff6600', '#1890ff', '#52c41a', '#1890ff', '#ff6600'];
+      for (let i = 0; i < 5; ++i) {
+        this.data.data.lines[i].animateColor = colors[i];
+        this.data.data.lines[i].animateSpeed = 2;
+        this.data.data.lines[i].animatePlay = true;
+      }
+    }
     this.canvas.render(ret.data, true);
 
     this.storeService.set('file', this.data);
+
+    // for demo
+    if (this.data.name === 'cube-demo') {
+      for (let i = 0; i < 5; ++i) {
+        this.canvas.playAnimate(this.data.data.lines[i]);
+      }
+    }
+    // end
   }
 
   onOpenLocal() {
@@ -868,6 +887,21 @@ export class HomeComponent implements OnInit, OnDestroy {
       case 'space':
         this.selected = null;
         break;
+      case 'moveOut':
+        this.workspace.nativeElement.scrollLeft += 10;
+        this.workspace.nativeElement.scrollTop += 10;
+        break;
+      case 'resize':
+        if (!this.mouseMoving) {
+          this.mouseMoving = true;
+          this.workspace.nativeElement.scrollLeft = this.workspace.nativeElement.scrollWidth;
+          this.workspace.nativeElement.scrollTop = this.workspace.nativeElement.scrollHeight;
+          setTimeout(() => {
+            this.mouseMoving = false;
+          }, 2000);
+        }
+
+        break;
     }
     // console.log('onMessage:', event, data, this.selected);
   };
@@ -882,7 +916,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.canvas.activeLayer.changeLineType();
     }
 
-    this.canvas.update(props.data);
+    this.canvas.updateActive(props.data);
   }
 
   onSignup() {

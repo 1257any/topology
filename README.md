@@ -142,6 +142,16 @@ $ npm run build
 
 ```
 
+## Topology-flow-diagram lib
+
+```
+[libs/topology#] yarn or npm install
+
+# build
+[libs/topology-flow-diagram#] npm run build
+
+```
+
 ## Demo
 
 ```

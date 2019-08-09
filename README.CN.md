@@ -121,6 +121,8 @@ force?: boolean
 
 ## Angular project
 
+[在线画图官网](https://topology.le5le.com) 前端源码
+
 ```
 $ yarn or npm install
 
@@ -135,6 +137,8 @@ $ npm run build
 
 ## Topology-core lib
 
+核心库源码
+
 ```
 [libs/topology#] yarn or npm install
 
@@ -143,7 +147,21 @@ $ npm run build
 
 ```
 
+## Topology-flow-diagram lib
+
+流程图源码
+
+```
+[libs/topology#] yarn or npm install
+
+# build
+[libs/topology-flow-diagram#] npm run build
+
+```
+
 ## Demo
+
+demo 源码
 
 ```
 [demo#] yarn or npm install

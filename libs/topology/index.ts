@@ -53,7 +53,7 @@ export class Topology {
   lastHoverNode: Node;
   input = document.createElement('textarea');
   inputNode: Node;
-  mouseDown: MouseEvent;
+  mouseDown: { x: number; y: number };
   moveIn: {
     type: MoveInType;
     activeAnchorIndex: number;
@@ -189,16 +189,21 @@ export class Topology {
     this.cache();
   }
 
-  resize() {
-    if (this.options.width && this.options.width !== 'auto') {
-      this.canvas.width = +this.options.width;
+  resize(size?: { width: number; height: number }) {
+    if (size) {
+      this.canvas.width = size.width;
+      this.canvas.height = size.height;
     } else {
-      this.canvas.width = this.parentElem.clientWidth;
-    }
-    if (this.options.height && this.options.height !== 'auto') {
-      this.canvas.height = +this.options.height;
-    } else {
-      this.canvas.height = this.parentElem.clientHeight - 8;
+      if (this.options.width && this.options.width !== 'auto') {
+        this.canvas.width = +this.options.width;
+      } else {
+        this.canvas.width = this.parentElem.clientWidth;
+      }
+      if (this.options.height && this.options.height !== 'auto') {
+        this.canvas.height = +this.options.height;
+      } else {
+        this.canvas.height = this.parentElem.clientHeight - 8;
+      }
     }
 
     this.offscreen.resize(this.canvas.width, this.canvas.height);
@@ -254,6 +259,9 @@ export class Topology {
       }
       this.caches.list = [];
       this.cache();
+
+      const rect = this.getRect();
+      this.resize({ width: rect.ex + 200, height: rect.ey + 200 });
     } else {
       this.nodes.push.apply(this.nodes, data.nodes);
       this.lines.push.apply(this.lines, data.lines);
@@ -278,13 +286,13 @@ export class Topology {
     if (this.scheduledAnimationFrame) {
       return;
     }
-
     this.scheduledAnimationFrame = true;
+    const pos = new Point(e.offsetX, e.offsetY);
     requestAnimationFrame(() => {
       this.scheduledAnimationFrame = false;
 
       if (!this.mouseDown) {
-        this.getMoveIn(e);
+        this.getMoveIn(pos);
 
         // Render hover anchors.
         if (this.moveIn.hoverNode) {
@@ -292,18 +300,18 @@ export class Topology {
           this.hoverLayer.render();
 
           // Send a move event.
-          // if (!this.lastHoverNode && this.options.on) {
-          //    this.options.on('moveInNode', new Node(this.moveIn.hoverNode));
-          // }
+          if (!this.lastHoverNode && this.options.on) {
+            this.options.on('moveInNode', this.moveIn.hoverNode);
+          }
         } else if (this.lastHoverNode) {
           // Clear hover anchors.
           this.hoverLayer.node = null;
           this.hoverLayer.canvas.height = this.hoverLayer.canvas.height;
 
           // Send a move event.
-          // if (this.options.on) {
-          //   this.options.on('moveOutNode', null);
-          // }
+          if (this.options.on) {
+            this.options.on('moveOutNode', null);
+          }
         }
 
         if (this.moveIn.type === MoveInType.LineControlPoint) {
@@ -317,12 +325,23 @@ export class Topology {
         return;
       }
 
-      const out = e.offsetX + 50 > this.hoverLayer.canvas.width || e.offsetY + 50 > this.hoverLayer.canvas.height;
+      // Move out parent element.
+      const moveOut =
+        pos.x + 50 > this.parentElem.clientWidth + this.parentElem.scrollLeft ||
+        pos.y + 50 > this.parentElem.clientHeight + this.parentElem.scrollTop;
+      if (moveOut) {
+        if (this.options.on) {
+          this.options.on('moveOut', null);
+        }
+      }
+
+      // Send a resize event.
+      const out = pos.x + 50 > this.hoverLayer.canvas.width || pos.y + 50 > this.hoverLayer.canvas.height;
       if (out) {
-        if (e.offsetX + 50 > this.hoverLayer.canvas.width) {
+        if (pos.x + 50 > this.hoverLayer.canvas.width) {
           this.canvas.width += 200;
         }
-        if (e.offsetY + 50 > this.hoverLayer.canvas.height) {
+        if (pos.y + 50 > this.hoverLayer.canvas.height) {
           this.canvas.height += 200;
         }
 
@@ -345,10 +364,10 @@ export class Topology {
       switch (this.moveIn.type) {
         case MoveInType.None:
           this.hoverLayer.dragRect = new Rect(
-            this.mouseDown.offsetX,
-            this.mouseDown.offsetY,
-            e.offsetX - this.mouseDown.offsetX,
-            e.offsetY - this.mouseDown.offsetY
+            this.mouseDown.x,
+            this.mouseDown.y,
+            pos.x - this.mouseDown.x,
+            pos.y - this.mouseDown.y
           );
           if (!out) {
             this.hoverLayer.render();
@@ -357,24 +376,25 @@ export class Topology {
           break;
         case MoveInType.Nodes:
           this.nodesMoved = true;
-          this.activeLayer.moveNodes(e.offsetX - this.mouseDown.offsetX, e.offsetY - this.mouseDown.offsetY);
+          this.getDockPos(pos);
+          this.activeLayer.moveNodes(pos.x - this.mouseDown.x, pos.y - this.mouseDown.y);
           break;
         case MoveInType.ResizeCP:
-          this.activeLayer.resizeNodes(this.moveIn.activeAnchorIndex, e);
+          this.activeLayer.resizeNodes(this.moveIn.activeAnchorIndex, pos);
           break;
         case MoveInType.LineTo:
         case MoveInType.HoverAnchors:
-          this.hoverLayer.lineTo(this.getLineDock(e), this.toArrowType);
+          this.hoverLayer.lineTo(this.getLineDock(pos), this.toArrowType);
           break;
         case MoveInType.LineFrom:
-          this.hoverLayer.lineFrom(this.getLineDock(e));
+          this.hoverLayer.lineFrom(this.getLineDock(pos));
           break;
         case MoveInType.LineMove:
-          this.hoverLayer.lineMove(e, this.mouseDown);
+          this.hoverLayer.lineMove(pos, this.mouseDown);
           break;
         case MoveInType.LineControlPoint:
-          this.moveIn.hoverLine.controlPoints[this.moveIn.lineControlPoint.id].x = e.offsetX;
-          this.moveIn.hoverLine.controlPoints[this.moveIn.lineControlPoint.id].y = e.offsetY;
+          this.moveIn.hoverLine.controlPoints[this.moveIn.lineControlPoint.id].x = pos.x;
+          this.moveIn.hoverLine.controlPoints[this.moveIn.lineControlPoint.id].y = pos.y;
           if (drawLineFns[this.moveIn.hoverLine.name] && drawLineFns[this.moveIn.hoverLine.name].dockControlPointFn) {
             drawLineFns[this.moveIn.hoverLine.name].dockControlPointFn(
               this.moveIn.hoverLine.controlPoints[this.moveIn.lineControlPoint.id],
@@ -384,7 +404,7 @@ export class Topology {
           break;
         case MoveInType.Rotate:
           if (this.activeLayer.nodes.length) {
-            this.activeLayer.offsetRotate(this.getAngle(e));
+            this.activeLayer.offsetRotate(this.getAngle(pos));
             this.activeLayer.updateLines();
           }
           break;
@@ -408,7 +428,7 @@ export class Topology {
   }
 
   private onmousedown = (e: MouseEvent) => {
-    this.mouseDown = e;
+    this.mouseDown = { x: e.offsetX, y: e.offsetY };
     Store.set('activeLine', null);
 
     if (this.inputNode) {
@@ -521,6 +541,8 @@ export class Topology {
   private onmouseup = (e: MouseEvent) => {
     this.mouseDown = null;
     this.hoverLayer.dockAnchor = null;
+    this.hoverLayer.dockLineX = 0;
+    this.hoverLayer.dockLineY = 0;
 
     if (this.hoverLayer.dragRect) {
       this.getRectNodes(this.nodes, this.hoverLayer.dragRect);
@@ -575,7 +597,13 @@ export class Topology {
       case MoveInType.Nodes:
         if (this.moveIn.hoverNode) {
           const textRect = this.moveIn.hoverNode.getTextRect();
-          if (textRect.hitRotate(e, this.moveIn.hoverNode.rotate, this.moveIn.hoverNode.rect.center)) {
+          if (
+            textRect.hitRotate(
+              new Point(e.offsetX, e.offsetY),
+              this.moveIn.hoverNode.rotate,
+              this.moveIn.hoverNode.rect.center
+            )
+          ) {
             this.showInput(textRect);
           }
           if (this.options.on) {
@@ -677,9 +705,9 @@ export class Topology {
     this.cache();
   };
 
-  private getHoverNode(e: MouseEvent) {
+  private getHoverNode(pt: Point) {
     for (let i = this.activeLayer.nodes.length - 1; i > -1; --i) {
-      if (this.activeLayer.nodes[i].hit(e, 2)) {
+      if (this.activeLayer.nodes[i].hit(pt, 2)) {
         this.moveIn.hoverNode = this.activeLayer.nodes[i];
         this.moveIn.type = MoveInType.Nodes;
         return;
@@ -687,7 +715,7 @@ export class Topology {
     }
 
     for (let i = this.nodes.length - 1; i > -1; --i) {
-      if (this.nodes[i].hit(e, 2)) {
+      if (this.nodes[i].hit(pt, 2)) {
         this.moveIn.hoverNode = this.nodes[i];
         this.moveIn.type = MoveInType.Nodes;
         break;
@@ -695,35 +723,22 @@ export class Topology {
     }
   }
 
-  private getMoveIn(e: MouseEvent) {
+  private getMoveIn(pt: Point) {
     this.lastHoverNode = this.moveIn.hoverNode;
     this.moveIn.type = MoveInType.None;
     this.moveIn.hoverNode = null;
     this.moveIn.lineControlPoint = null;
     this.moveIn.hoverLine = null;
 
-    // In line
+    // In active line.
     for (const item of this.activeLayer.lines) {
-      if (this.isInLine(e, item)) {
-        return;
-      }
-    }
-
-    let index = 0;
-    for (const item of this.lines) {
-      ++index;
-      if (!item.to) {
-        this.lines.splice(index - 1, 1);
-        continue;
-      }
-
-      if (this.isInLine(e, item)) {
+      if (this.isInLine(pt, item)) {
         return;
       }
     }
 
     // In nodes
-    this.getHoverNode(e);
+    this.getHoverNode(pt);
     if (this.moveIn.hoverNode) {
       this.hoverLayer.canvas.style.cursor = 'move';
     } else {
@@ -731,18 +746,18 @@ export class Topology {
     }
     // In activeLayer
     if (this.activeLayer.nodes.length) {
-      if (this.activeLayer.rotateCPs[0].hit(e, 15)) {
+      if (this.activeLayer.rotateCPs[0].hit(pt, 15)) {
         this.moveIn.type = MoveInType.Rotate;
         this.hoverLayer.canvas.style.cursor = `url("${this.options.rotateCursor}"), auto`;
       } else {
-        if (pointInRect({ x: e.offsetX, y: e.offsetY }, this.activeLayer.sizeCPs)) {
+        if (pointInRect(pt, this.activeLayer.sizeCPs)) {
           this.moveIn.type = MoveInType.Nodes;
           this.hoverLayer.canvas.style.cursor = 'move';
         }
 
         if (!this.locked) {
           for (let i = 0; i < this.activeLayer.sizeCPs.length; ++i) {
-            if (this.activeLayer.sizeCPs[i].hit(e, 10)) {
+            if (this.activeLayer.sizeCPs[i].hit(pt, 10)) {
               this.moveIn.type = MoveInType.ResizeCP;
               this.moveIn.activeAnchorIndex = i;
               this.hoverLayer.canvas.style.cursor = resizeCursors[i];
@@ -760,22 +775,36 @@ export class Topology {
     // In anchors of hoverNode
     if (this.moveIn.hoverNode && !this.locked) {
       for (let i = 0; i < this.moveIn.hoverNode.rotatedAnchors.length; ++i) {
-        if (this.moveIn.hoverNode.rotatedAnchors[i].hit(e, 10)) {
+        if (this.moveIn.hoverNode.rotatedAnchors[i].hit(pt, 10)) {
           this.moveIn.type = MoveInType.HoverAnchors;
           this.moveIn.hoverAnchorIndex = i;
           this.hoverLayer.canvas.style.cursor = 'crosshair';
-          break;
+          return;
         }
+      }
+    }
+
+    // In line
+    let index = 0;
+    for (const item of this.lines) {
+      ++index;
+      if (!item.to) {
+        this.lines.splice(index - 1, 1);
+        continue;
+      }
+
+      if (this.isInLine(pt, item)) {
+        return;
       }
     }
   }
 
-  isInLine(e: MouseEvent, line: Line) {
+  isInLine(point: Point, line: Line) {
     // In LineControlPoint
     if (this.activeLayer.lines.length) {
       let i = 0;
       for (const pt of line.controlPoints) {
-        if (pt.hit(e)) {
+        if (pt.hit(point)) {
           pt.id = i;
           this.moveIn.type = MoveInType.LineControlPoint;
           this.moveIn.lineControlPoint = pt;
@@ -787,21 +816,21 @@ export class Topology {
       }
     }
 
-    if (line.from.hit(e, 10)) {
+    if (line.from.hit(point, 10)) {
       this.moveIn.type = MoveInType.LineFrom;
       this.moveIn.hoverLine = line;
       this.hoverLayer.canvas.style.cursor = 'move';
       return true;
     }
 
-    if (line.to.hit(e, 10)) {
+    if (line.to.hit(point, 10)) {
       this.moveIn.type = MoveInType.LineTo;
       this.moveIn.hoverLine = line;
       this.hoverLayer.canvas.style.cursor = 'move';
       return true;
     }
 
-    if (line.pointIn(e)) {
+    if (line.pointIn(point)) {
       this.moveIn.type = MoveInType.LineMove;
       this.moveIn.hoverLine = line;
       this.hoverLayer.canvas.style.cursor = 'move';
@@ -815,19 +844,18 @@ export class Topology {
     return false;
   }
 
-  private getLineDock(e: MouseEvent) {
-    const point: Point = new Point(e.offsetX, e.offsetY);
+  private getLineDock(point: Point) {
     this.hoverLayer.dockAnchor = null;
     for (const item of this.nodes) {
       if (this.moveIn.hoverNode && item.id === this.moveIn.hoverNode.id) {
         continue;
       }
 
-      if (item.rect.hit(e, 10)) {
+      if (item.rect.hit(point, 10)) {
         this.hoverLayer.node = item;
       }
       for (let i = 0; i < item.rotatedAnchors.length; ++i) {
-        if (item.rotatedAnchors[i].hit(e, 10)) {
+        if (item.rotatedAnchors[i].hit(point, 10)) {
           point.id = item.id;
           point.anchorIndex = i;
           point.direction = item.rotatedAnchors[point.anchorIndex].direction;
@@ -881,26 +909,23 @@ export class Topology {
     }
     this.activeLayer.lines = [];
     for (const item of lines) {
-      if (
-        rect.hit({ offsetX: item.from.x, offsetY: item.from.y }) &&
-        rect.hit({ offsetX: item.to.x, offsetY: item.to.y })
-      ) {
+      if (rect.hit(item.from) && rect.hit(item.to)) {
         this.activeLayer.lines.push(item);
       }
     }
   }
 
-  private getAngle(e: MouseEvent) {
-    if (e.offsetX === this.activeLayer.center.x) {
-      return e.offsetY <= this.activeLayer.center.y ? 0 : 180;
+  private getAngle(pt: Point) {
+    if (pt.x === this.activeLayer.center.x) {
+      return pt.y <= this.activeLayer.center.y ? 0 : 180;
     }
 
-    if (e.offsetY === this.activeLayer.center.y) {
-      return e.offsetX < this.activeLayer.center.x ? 270 : 90;
+    if (pt.y === this.activeLayer.center.y) {
+      return pt.x < this.activeLayer.center.x ? 270 : 90;
     }
 
-    const x = e.offsetX - this.activeLayer.center.x;
-    const y = e.offsetY - this.activeLayer.center.y;
+    const x = pt.x - this.activeLayer.center.x;
+    const y = pt.y - this.activeLayer.center.y;
     let angle = (Math.atan(Math.abs(x / y)) / (2 * Math.PI)) * 360;
     if (x > 0 && y > 0) {
       angle = 180 - angle;
@@ -928,8 +953,6 @@ export class Topology {
     this.input.style.zIndex = '1000';
     this.input.focus();
   }
-
-  onInput = (e: MouseEvent) => {};
 
   getRect() {
     let x1 = 99999;
@@ -974,6 +997,58 @@ export class Topology {
     }
 
     return new Rect(x1, y1, x2 - x1, y2 - y1);
+  }
+
+  // Get a dock rect for moving nodes.
+  getDockPos(point: Point) {
+    const pos = {
+      x: 0,
+      absX: 0,
+      y: 0,
+      absY: 0,
+      dockLineX: 0,
+      dockLineY: 0
+    };
+
+    let x = 0;
+    let y = 0;
+    for (const pt of this.activeLayer.dockWatchers) {
+      for (const item of this.nodes) {
+        if (this.activeLayer.hasNode(item) || item.name === 'text') {
+          continue;
+        }
+
+        if (!item.dockWatchers) {
+          item.getDockWatchers();
+        }
+        for (const p of item.dockWatchers) {
+          x = Math.abs(p.x - pt.x);
+          if (x < 2) {
+            pos.absX = x;
+            pos.x = p.x - pt.x;
+            pos.dockLineX = p.x;
+          }
+
+          y = Math.abs(p.y - pt.y);
+          if (y < 2) {
+            pos.absY = y;
+            pos.y = p.y - pt.y;
+            pos.dockLineY = p.y;
+          }
+        }
+      }
+    }
+
+    if (pos.dockLineX > 0) {
+      point.x += pos.x;
+    }
+
+    if (pos.dockLineY > 0) {
+      point.y += pos.y;
+    }
+
+    this.hoverLayer.dockLineX = pos.dockLineX;
+    this.hoverLayer.dockLineY = pos.dockLineY;
   }
 
   private cache() {
@@ -1168,9 +1243,37 @@ export class Topology {
     this.animateLayer.render();
 
     this.cache();
+
+    if (
+      this.clipboard.nodes.length > 1 ||
+      this.clipboard.lines.length > 1 ||
+      (this.clipboard.nodes.length && this.clipboard.lines.length)
+    ) {
+      this.options.on('multi', null);
+    } else if (this.clipboard.nodes.length) {
+      this.options.on('node', this.activeLayer.nodes[0]);
+    } else if (this.clipboard.lines.length) {
+      this.options.on('line', this.activeLayer.lines[0]);
+    }
   }
 
-  update(props: { dash: number; lineWidth: number; strokeStyle: string; fillStyle: string; globalAlpha: number }) {
+  playAnimate(line: Line) {
+    for (const item of this.lines) {
+      if (item.id === line.id) {
+        item.animatePlay = line.animatePlay;
+        break;
+      }
+    }
+    this.animateLayer.render();
+  }
+
+  updateActive(props: {
+    dash: number;
+    lineWidth: number;
+    strokeStyle: string;
+    fillStyle: string;
+    globalAlpha: number;
+  }) {
     this.activeLayer.updateProps(props);
 
     this.cache();

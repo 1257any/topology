@@ -1,6 +1,6 @@
 import { Point } from '../models/point';
 
-export function pointInRect(point: { x: number; y: number }, vertices: Point[]): boolean {
+export function pointInRect(point: Point, vertices: Point[]): boolean {
   if (vertices.length < 3) {
     return false;
   }

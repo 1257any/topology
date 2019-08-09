@@ -8,7 +8,7 @@ export class AnimateLayer {
   private animateId: any;
   constructor(parent: HTMLElement, public options: any) {
     if (!this.options.animateColor) {
-      this.options.animateColor = '#52c41a';
+      this.options.animateColor = '#ff6600';
     }
 
     this.canvas.style.position = 'absolute';

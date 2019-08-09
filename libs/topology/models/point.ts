@@ -18,13 +18,8 @@ export class Point {
     return new Point(this.x, this.y, this.direction, this.anchorIndex, this.id);
   }
 
-  hit(e: MouseEvent, radius = 5) {
-    return (
-      e.offsetX > this.x - radius &&
-      e.offsetX < this.x + radius &&
-      e.offsetY > this.y - radius &&
-      e.offsetY < this.y + radius
-    );
+  hit(pt: Point, radius = 5) {
+    return pt.x > this.x - radius && pt.x < this.x + radius && pt.y > this.y - radius && pt.y < this.y + radius;
   }
 
   rotate(angle: number, center: { x: number; y: number }): Point {

@@ -41,6 +41,8 @@ export class Node extends Pen {
   rotatedAnchors: Point[] = [];
   children: Node[];
 
+  // nodes移动时，停靠点的参考位置
+  dockWatchers: Point[];
   constructor(json: any) {
     super(json);
 
@@ -219,9 +221,14 @@ export class Node extends Pen {
   getIconRect() {
     let rect = this.iconRect;
     if (!this.text) {
-      rect = this.fullIconRect || this.fullTextRect;
+      rect = this.fullIconRect || this.fullTextRect || this.rect;
     }
 
     return rect;
+  }
+
+  getDockWatchers() {
+    this.dockWatchers = this.rect.toPoints();
+    this.dockWatchers.push(this.rect.center);
   }
 }

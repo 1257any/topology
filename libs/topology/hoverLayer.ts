@@ -18,6 +18,9 @@ export class HoverLayer {
   // The dock of to point of line.
   dockAnchor: Point;
 
+  dockLineX = 0;
+  dockLineY = 0;
+
   dragRect: Rect;
   constructor(parent: HTMLElement, public options: any) {
     if (!this.options.hoverColor) {
@@ -52,9 +55,9 @@ export class HoverLayer {
     this.line.calcControlPoints();
   }
 
-  lineMove(e: MouseEvent, initPos: MouseEvent) {
-    const x = e.offsetX - initPos.offsetX;
-    const y = e.offsetY - initPos.offsetY;
+  lineMove(pt: Point, initPos: { x: number; y: number }) {
+    const x = pt.x - initPos.x;
+    const y = pt.y - initPos.y;
     this.line.setTo(new Point(this.initLine.to.x + x, this.initLine.to.y + y), this.line.toArrow);
     this.line.setFrom(new Point(this.initLine.from.x + x, this.initLine.from.y + y), this.line.fromArrow);
     this.line.calcControlPoints();
@@ -100,12 +103,28 @@ export class HoverLayer {
       ctx.fill();
     }
 
+    ctx.strokeStyle = this.options.dragColor + '50';
+    ctx.fillStyle = this.options.dragColor + '30';
+    ctx.lineWidth = 1;
+    ctx.translate(0.5, 0.5);
+
+    if (this.dockLineX > 0) {
+      ctx.beginPath();
+      ctx.moveTo(this.dockLineX, 0);
+      ctx.lineTo(this.dockLineX, this.canvas.height);
+      ctx.stroke();
+    }
+
+    if (this.dockLineY > 0) {
+      ctx.beginPath();
+      ctx.moveTo(0, this.dockLineY);
+      ctx.lineTo(this.canvas.width, this.dockLineY);
+      ctx.stroke();
+    }
+
     // Select nodes by drag.
     if (this.dragRect) {
       ctx.strokeStyle = this.options.dragColor;
-      ctx.fillStyle = this.options.dragColor + '30';
-      ctx.lineWidth = 1;
-      ctx.translate(0.5, 0.5);
       ctx.beginPath();
       ctx.strokeRect(this.dragRect.x, this.dragRect.y, this.dragRect.width, this.dragRect.height);
       ctx.fillRect(this.dragRect.x, this.dragRect.y, this.dragRect.width, this.dragRect.height);

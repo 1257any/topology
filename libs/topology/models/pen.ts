@@ -1,4 +1,5 @@
 import { s8 } from '../uuid/uuid';
+import { Point } from './point';
 import { Rect } from './rect';
 import { pointInRect } from '../middles/utils';
 
@@ -99,16 +100,16 @@ export abstract class Pen {
     ctx.restore();
   }
 
-  hit(e: { offsetX: number; offsetY: number }, padding = 0) {
+  hit(point: Point, padding = 0) {
     if (!this.rotate) {
-      return this.rect.hit(e, padding);
+      return this.rect.hit(point, padding);
     }
 
     const pts = this.rect.toPoints();
     for (const pt of pts) {
       pt.rotate(this.rotate, this.rect.center);
     }
-    return pointInRect({ x: e.offsetX, y: e.offsetY }, pts);
+    return pointInRect(point, pts);
   }
 
   abstract draw(ctx: CanvasRenderingContext2D): void;

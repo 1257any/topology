@@ -37,12 +37,13 @@ export class Surface {
 export class Cube {
   surfaces: Surface[] = [];
   constructor(rect: Rect, z: number, zRotate: number, fillStyle = '#ddd', strokeStyle = '#ccc') {
-    const p1 = new Point(rect.x, rect.y);
-    const p2 = new Point(rect.ex, rect.y);
-    const p3 = new Point(rect.ex, rect.ey);
+    const offset = (z * Math.sin((45 * Math.PI) / 180)) << 0;
+
+    const p1 = new Point(rect.x, rect.y + offset);
+    const p2 = new Point(rect.ex - offset, rect.y + offset);
+    const p3 = new Point(rect.ex - offset, rect.ey);
     const p4 = new Point(rect.x, rect.ey);
 
-    const offset = (z * Math.sin((45 * Math.PI) / 180)) << 0;
     // front
     this.surfaces.push(new Surface(p1, p2, p3, p4, fillStyle, strokeStyle));
 
@@ -50,8 +51,8 @@ export class Cube {
     this.surfaces.push(
       new Surface(
         p1,
-        new Point(rect.x + offset, rect.y - offset),
-        new Point(rect.ex + offset, rect.y - offset),
+        new Point(rect.x + offset, rect.y),
+        new Point(rect.ex, rect.y),
         p2,
         pSBC(0.5, fillStyle),
         strokeStyle
@@ -62,8 +63,8 @@ export class Cube {
     this.surfaces.push(
       new Surface(
         p2,
-        new Point(rect.ex + offset, rect.y - offset),
-        new Point(rect.ex + offset, rect.ey - offset),
+        new Point(rect.ex, rect.y),
+        new Point(rect.ex, rect.ey - offset),
         p3,
         pSBC(0.6, fillStyle),
         strokeStyle

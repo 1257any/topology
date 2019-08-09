@@ -56,6 +56,7 @@ import { file } from './nodes/file';
 import { imageIconRect, imageTextRect } from './nodes/image.rect';
 import { cube } from './nodes/cube';
 import { cubeAnchors } from './nodes/cube.anchor';
+import { cubeIconRect, cubeTextRect } from './nodes/cube.rect';
 
 // Functions of drawing a node.
 export const drawNodeFns: any = {};
@@ -164,9 +165,9 @@ function init() {
 
   // Cube
   drawNodeFns.cube = cube;
-  // anchorsFns.cube = cubeAnchors;
-  // iconRectFns.cube = imageIconRect;
-  // textRectFns.cube = imageTextRect;
+  anchorsFns.cube = cubeAnchors;
+  iconRectFns.cube = cubeIconRect;
+  textRectFns.cube = cubeTextRect;
   // ********end********
 
   // ********Default lines.*******

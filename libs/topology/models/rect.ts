@@ -19,13 +19,8 @@ export class Rect {
     return new Rect(this.x, this.y, this.width, this.height);
   }
 
-  hit(e: { offsetX: number; offsetY: number }, padding = 0) {
-    return (
-      e.offsetX > this.x - padding &&
-      e.offsetX < this.ex + padding &&
-      e.offsetY > this.y - padding &&
-      e.offsetY < this.ey + padding
-    );
+  hit(pt: Point, padding = 0) {
+    return pt.x > this.x - padding && pt.x < this.ex + padding && pt.y > this.y - padding && pt.y < this.ey + padding;
   }
 
   hitRect(rect: Rect) {
@@ -37,13 +32,13 @@ export class Rect {
     );
   }
 
-  hitRotate(e: { offsetX: number; offsetY: number }, rotate: number, center: Point) {
+  hitRotate(point: Point, rotate: number, center: Point) {
     const pts = this.toPoints();
     for (const pt of pts) {
       pt.rotate(rotate, center);
     }
 
-    return pointInRect({ x: e.offsetX, y: e.offsetY }, pts);
+    return pointInRect(point, pts);
   }
 
   calceCenter() {

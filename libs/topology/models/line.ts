@@ -96,7 +96,7 @@ export class Line extends Pen {
     }
   }
 
-  pointIn(e: MouseEvent) {
-    return drawLineFns[this.name].pointIn(new Point(e.offsetX, e.offsetY), this);
+  pointIn(pt: Point) {
+    return drawLineFns[this.name].pointIn(pt, this);
   }
 }

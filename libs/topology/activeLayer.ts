@@ -11,15 +11,16 @@ export class ActiveLayer {
   sizeCPs: Point[] = [];
   center: Point = new Point(0, 0);
 
-  initialSizeCPs: Point[] = [];
-
   nodes: Node[] = [];
   lines: Line[] = [];
 
-  // 备份初始位置，方便移动事件处理
-  nodeRects: Rect[] = [];
-
   rotate = 0;
+
+  // 备份初始位置，方便移动事件处理
+  initialSizeCPs: Point[] = [];
+  nodeRects: Rect[] = [];
+  // nodes移动时，停靠点的参考位置
+  dockWatchers: Point[] = [];
   constructor(parent: HTMLElement, public options: any) {
     if (!this.options.activeColor) {
       this.options.activeColor = '#d4380d';
@@ -60,6 +61,9 @@ export class ActiveLayer {
         }
       }
 
+      this.nodes[0].getDockWatchers();
+      this.dockWatchers = this.nodes[0].dockWatchers;
+
       return;
     }
 
@@ -86,6 +90,11 @@ export class ActiveLayer {
     this.center.y = (y1 + (y2 - y1) / 2) << 0;
     this.sizeCPs = [new Point(x1, y1), new Point(x2, y1), new Point(x2, y2), new Point(x1, y2)];
     this.rotateCPs = [new Point(x1 + (x2 - x1) / 2, y1 - 35), new Point(x1 + (x2 - x1) / 2, y1)];
+
+    // 获取停靠关注点
+    const rect = new Rect(x1, y1, x2 - x1, y2 - y1);
+    this.dockWatchers = rect.toPoints();
+    this.dockWatchers.push(rect.center);
   }
 
   getPoints() {
@@ -188,7 +197,7 @@ export class ActiveLayer {
     }
   }
 
-  resizeNodes(type: number, e: MouseEvent) {
+  resizeNodes(type: number, pt: Point) {
     let i = 0;
     const pos: Point = new Point(0, 0);
     let x;
@@ -199,33 +208,33 @@ export class ActiveLayer {
       switch (type) {
         // nw-resize
         case 0:
-          x = e.offsetX;
-          y = e.offsetY;
-          w = this.initialSizeCPs[2].x - e.offsetX;
-          h = this.initialSizeCPs[2].y - e.offsetY;
+          x = pt.x;
+          y = pt.y;
+          w = this.initialSizeCPs[2].x - pt.x;
+          h = this.initialSizeCPs[2].y - pt.y;
           pos.x = w > 30 ? x : this.initialSizeCPs[2].x - 30;
           pos.y = h > 30 ? y : this.initialSizeCPs[2].y - 30;
           break;
         // ne-resize
         case 1:
-          y = e.offsetY;
-          w = e.offsetX - this.initialSizeCPs[0].x;
-          h = this.initialSizeCPs[2].y - e.offsetY;
+          y = pt.y;
+          w = pt.x - this.initialSizeCPs[0].x;
+          h = this.initialSizeCPs[2].y - pt.y;
           pos.x = this.initialSizeCPs[0].x;
           pos.y = h > 30 ? y : this.initialSizeCPs[2].y - 30;
           break;
         // se-resize
         case 2:
-          w = e.offsetX - this.initialSizeCPs[0].x;
-          h = e.offsetY - this.initialSizeCPs[0].y;
+          w = pt.x - this.initialSizeCPs[0].x;
+          h = pt.y - this.initialSizeCPs[0].y;
           pos.x = this.initialSizeCPs[0].x;
           pos.y = this.initialSizeCPs[0].y;
           break;
         // sw-resize
         case 3:
-          x = e.offsetX;
-          w = this.initialSizeCPs[2].x - e.offsetX;
-          h = e.offsetY - this.initialSizeCPs[0].y;
+          x = pt.x;
+          w = this.initialSizeCPs[2].x - pt.x;
+          h = pt.y - this.initialSizeCPs[0].y;
           pos.x = w > 30 ? x : this.initialSizeCPs[2].x - 30;
           pos.y = this.initialSizeCPs[0].y;
           break;
