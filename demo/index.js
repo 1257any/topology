@@ -1,5 +1,5 @@
-import { Topology } from '../dist/togology-core/index';
-import { registerNode } from '../dist/togology-core/middles';
+import { Topology } from 'topology-core';
+import { registerNode } from 'topology-core/middles';
 import {
   flowData,
   flowDataAnchors,
@@ -37,7 +37,7 @@ import {
   flowParallelAnchors,
   flowComment,
   flowCommentAnchors
-} from '../dist/togology-flow-diagram/topology-flow-diagram/index';
+} from 'topology-flow-diagram';
 import { Data } from './data';
 
 // Register flow diagrams.

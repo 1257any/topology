@@ -4,7 +4,8 @@
   "description": "A diagram/topology tool by js.",
   "main": "index.js",
   "scripts": {
-    "build": "tsc"
+    "copy": "copyfiles  package.json ../../dist/topology-core/",
+    "build": "tsc && npm run copy"
   },
   "keywords": [
     "topology",
@@ -22,6 +23,7 @@
   },
   "homepage": "https://github.com/Alsmile/topology#readme",
   "devDependencies": {
-    "typescript": "~3.4.3"
+    "typescript": "~3.4.3",
+    "copyfiles": "latest"
   }
 }

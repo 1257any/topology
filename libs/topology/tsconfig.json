@@ -2,7 +2,7 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
-    "outDir": "../../dist/togology-core",
+    "outDir": "../../dist/topology-core",
     "sourceMap": true,
     "lib": ["es2018", "dom"]
   },

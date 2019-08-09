@@ -1,4 +1,4 @@
-import { Node } from '../../topology/models/node';
+import { Node } from 'topology-core/models/node';
 
 export function flowDb(ctx: CanvasRenderingContext2D, node: Node) {
   ctx.beginPath();

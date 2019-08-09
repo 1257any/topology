@@ -1,10 +1,11 @@
 {
-  "name": "togology-flow-diagram",
+  "name": "topology-flow-diagram",
   "version": "0.0.1",
   "description": "A flow diagram tool using le5le-topology.",
   "main": "index.js",
   "scripts": {
-    "build": "tsc"
+    "copy": "copyfiles  package.json ../../dist/topology-flow-diagram/",
+    "build": "tsc && npm run copy"
   },
   "keywords": [
     "topology",
@@ -22,7 +23,11 @@
     "url": "https://github.com/Alsmile/topology/issues"
   },
   "homepage": "https://github.com/Alsmile/topology#readme",
+  "dependencies": {
+    "topology-core": "^0.0.2"
+  },
   "devDependencies": {
+    "copyfiles": "^2.1.1",
     "typescript": "~3.4.3"
   }
 }

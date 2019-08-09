@@ -1,5 +1,5 @@
-import { Node } from '../../topology/models/node';
-import { Rect } from '../../topology/models/rect';
+import { Node } from 'topology-core/models/node';
+import { Rect } from 'topology-core/models/rect';
 
 export function flowDocumentIconRect(node: Node) {
   node.iconRect = new Rect(0, 0, 0, 0);

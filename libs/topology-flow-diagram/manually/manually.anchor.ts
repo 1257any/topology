@@ -1,6 +1,6 @@
-import { Point } from '../../topology/models/point';
-import { Node } from '../../topology/models/node';
-import { Direction } from '../../topology/models/direction';
+import { Point } from 'topology-core/models/point';
+import { Node } from 'topology-core/models/node';
+import { Direction } from 'topology-core/models/direction';
 
 export function flowManuallyAnchors(node: Node) {
   node.anchors.push(new Point(node.rect.x, node.rect.y + (node.rect.height * 5) / 8, Direction.Left));

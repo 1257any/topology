@@ -2,9 +2,13 @@
   "compilerOptions": {
     "target": "es5",
     "module": "commonjs",
-    "outDir": "../../dist/togology-flow-diagram",
+    "outDir": "../../dist/topology-flow-diagram",
     "sourceMap": true,
     "lib": ["es2018", "dom"]
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules"],
+  "paths": {
+    "topology-core": ["../../dist/topology-core"],
+    "topology-core/*": ["../../dist/topology-core/*"]
+  }
 }

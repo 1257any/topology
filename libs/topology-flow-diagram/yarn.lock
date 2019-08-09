@@ -58,7 +58,7 @@ concat-map@0.0.1:
   resolved "https://registry.yarnpkg.com/concat-map/-/concat-map-0.0.1.tgz#d8a96bd77fd68df7793a73036a3ba0d5405d477b"
   integrity sha1-2Klr13/Wjfd5OnMDajug1UBdR3s=
 
-copyfiles@latest:
+copyfiles@^2.1.1:
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/copyfiles/-/copyfiles-2.1.1.tgz#d430e122d7880f92c45d372208b0af03b0c39db6"
   integrity sha512-y6DZHve80whydXzBal7r70TBgKMPKesVRR1Sn/raUu7Jh/i7iSLSyGvYaq0eMJ/3Y/CKghwzjY32q1WzEnpp3Q==
@@ -296,6 +296,11 @@ through2@^2.0.1:
   dependencies:
     readable-stream "~2.3.6"
     xtend "~4.0.1"
+
+topology-core@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/topology-core/-/topology-core-0.0.2.tgz#ed84aad61178cae69a0d2d43e02b96acbcec306b"
+  integrity sha512-02fVEbcDqANxLaLNR4WlqYiRGGs2OZ7ZjgUOGzu2kNqOAYHqCkSLdrvvRtJe6/Bbg6t0FYlrkWv0UeSwMD06dA==
 
 typescript@~3.4.3:
   version "3.4.5"
