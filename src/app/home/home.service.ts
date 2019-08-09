@@ -30,7 +30,7 @@ export class HomeService {
   }
 
   async DelImage(image: string) {
-    const ret = await this.http.Delete('/api' + image);
+    const ret = await this.http.Delete('/api/' + image);
     if (ret.error) {
       return false;
     }
@@ -60,15 +60,17 @@ export class HomeService {
   }
 
   async Patch(data: any) {
-    let ret = await this.http.Patch('/api' + data.image, {
-      public: data.shared
-    });
-    if (ret.error) {
-      return false;
+    if (data.image) {
+      const retImage = await this.http.Patch('/api/' + data.image, {
+        public: data.shared
+      });
+      if (retImage.error) {
+        return false;
+      }
     }
 
     delete data.image;
-    ret = await this.http.Patch('/api/user/topology', data);
+    const ret = await this.http.Patch('/api/user/topology', data);
     if (ret.error) {
       return false;
     }

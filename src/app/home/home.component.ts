@@ -744,7 +744,8 @@ export class HomeComponent implements OnInit, OnDestroy {
     input.onchange = event => {
       const elem: any = event.srcElement || event.target;
       if (elem.files && elem.files[0]) {
-        this.data.name = elem.files[0].name.replace('.json', '');
+        const name = elem.files[0].name.replace('.json', '');
+        this.data.name = name;
         this.storeService.set('file', this.data);
         const reader = new FileReader();
         reader.onload = (e: any) => {
@@ -756,7 +757,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                 id: '',
                 fileId: '',
                 data,
-                name: '',
+                name: name,
                 desc: '',
                 image: '',
                 userId: '',
@@ -802,11 +803,16 @@ export class HomeComponent implements OnInit, OnDestroy {
           name: this.data.name,
           desc: this.data.desc
         });
+
+        this.router.navigate(['/'], { queryParams: { id: this.data.id } });
       }
     });
   }
 
   async onSaveFilename(filename: string) {
+    this.data.name = filename;
+    this.storeService.set('file', this.data);
+
     if (this.data.id) {
       if (
         !(await this.service.Patch({
@@ -824,9 +830,6 @@ export class HomeComponent implements OnInit, OnDestroy {
         name: filename
       });
     }
-
-    this.data.name = filename;
-    this.storeService.set('file', this.data);
   }
 
   onSaveLocal() {

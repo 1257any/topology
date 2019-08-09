@@ -46,7 +46,7 @@ export class AppComponent implements OnInit, OnDestroy {
   constructor(private service: AppService, private storeService: StoreService, private router: Router) {}
 
   ngOnInit() {
-    this.disableStartDlg = !!localStorage.getItem('disable.startDlg');
+    this.disableStartDlg = localStorage.getItem('disable.startDlg') === 'true';
     this.blank = location.pathname === '/' && !location.search && !this.disableStartDlg;
     this.user = this.storeService.get('user');
     this.storeService.get$('user').subscribe((user: any) => {
