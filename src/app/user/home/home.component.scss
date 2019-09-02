@@ -26,6 +26,7 @@ $color-border: #ddd;
 }
 
 .topo {
+  position: relative;
   width: calc(25% - 0.2rem);
   height: 3rem;
   margin: 0.1rem;
@@ -70,5 +71,11 @@ $color-border: #ddd;
       padding: 0.02rem 0.05rem;
       resize: none;
     }
+  }
+
+  .icon-delete {
+    position: absolute;
+    top: 0.05rem;
+    right: 0.1rem;
   }
 }

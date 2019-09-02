@@ -215,7 +215,6 @@ export class Topology {
   private ondrop(event: DragEvent) {
     event.preventDefault();
     const node = JSON.parse(event.dataTransfer.getData('Text'));
-    node.rect = node.rect || {};
     node.rect.x = event.offsetX - ((node.width / 2) << 0);
     node.rect.y = event.offsetY - ((node.height / 2) << 0);
     this.addNode(new Node(node));
@@ -276,7 +275,7 @@ export class Topology {
     this.offscreen.render();
   }
 
-  renderOffscreen() {
+  private renderOffscreen() {
     this.canvas.height = this.canvas.height;
     const ctx = this.canvas.getContext('2d');
     ctx.drawImage(this.offscreen.canvas, 0, 0);
@@ -417,7 +416,7 @@ export class Topology {
     });
   };
 
-  setNodeText() {
+  private setNodeText() {
     this.inputNode.text = this.input.value;
     this.input.style.zIndex = '-1';
     this.input.style.left = '-1000px';

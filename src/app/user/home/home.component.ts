@@ -1,6 +1,8 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
 
+import { NoticeService } from 'le5le-components/notice';
+
 import { UserHomeService } from './home.service';
 @Component({
   selector: 'app-user-home',
@@ -97,6 +99,24 @@ export class UserHomeComponent implements OnInit, OnDestroy {
     }
 
     this.onSubmitDesc(!this.desc);
+  }
+
+  onDel(item: any) {
+    const _noticeService: NoticeService = new NoticeService();
+    _noticeService.dialog({
+      title: '提示',
+      theme: '',
+      body: '确定删除此文件？',
+      callback: async (ret: boolean) => {
+        if (ret && (await this.service.Del(item.id))) {
+          this.list();
+          _noticeService.notice({
+            body: '已经删除配置文件！',
+            theme: 'success'
+          });
+        }
+      }
+    });
   }
 
   ngOnDestroy() {

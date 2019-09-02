@@ -218,11 +218,11 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   onLogin() {
-    location.href = environment.urls.account;
+    location.href = `${environment.urls.account}?cb=${encodeURIComponent(location.href)}`;
   }
 
   onSignout() {
-    this.storeService.set('user', -1);
+    this.storeService.set('auth', -1);
   }
 
   onChangeDisableStart() {

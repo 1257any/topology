@@ -165,12 +165,12 @@
         </div>
         <div class="item line"></div>
         <div class="item">
-          <a>
+          <a (click)="showAbout = true" target="_blank">
             咨询与建议
           </a>
         </div>
         <div class="item">
-          <a>
+          <a href="https://github.com/le5le-com/topology" target="_blank">
             开源（GitHub）
           </a>
         </div>
@@ -187,12 +187,12 @@
       <a>帮助</a>
       <div class="dropdown">
         <div class="item">
-          <a>
+          <a href="http://le5le.com/app/topology" target="_blank">
             欢迎使用
           </a>
         </div>
         <div class="item">
-          <a>
+          <a href="https://www.yuque.com/alsmile/topology/about" target="_blank">
             API开发教程
           </a>
         </div>
@@ -319,7 +319,7 @@
       <figure>
         <div class="mb20">
           <div class="title">推荐图文</div>
-          <div class="flex wrap">
+          <div class="flex wrap" *ngIf="list.recommend.length">
             <a
               class="topo"
               *ngFor="let item of list.recommend"
@@ -331,6 +331,11 @@
               <img [appImgAuthSrc]="item.image" />
             </a>
           </div>
+          <ui-loading
+            *ngIf="!list.recommend.length"
+            class="mv50"
+            tip="正在加载，请稍等（个人云服务器资源小，人多可能慢，欢迎资助）..."
+          ></ui-loading>
         </div>
         <div *ngIf="list.recently.length" class="mb20">
           <div class="title">最近使用</div>
@@ -406,7 +411,7 @@
       <i class="fr iconfont icon-close" (click)="showHelp = null"></i>
     </div>
     <div class="modal-body">
-      <li>个人开发不易，放弃了周末个人生活，卸载了手游，利用有限的周末时间开发！</li>
+      <li>个人开发不易，时间、各种资源都有限！</li>
       <li>
         热烈欢迎和期待大家一起参与，联系：
         <div class="ml30">邮箱：alsmile123@qq.com</div>
@@ -431,7 +436,7 @@
       <i class="fr iconfont icon-close" (click)="showAbout = null"></i>
     </div>
     <div class="modal-body">
-      <p>本产品属于个人作品，利用业余周末时间开发，精力有限，但会一直继续完善，做的更好！</p>
+      <p>本产品目前虽然属于个人作品，但会一直继续完善，做的更好，欢迎加入或资助！</p>
       <p>欢迎有任何问题或建议请联系：</p>
       <p>邮箱：alsmile123@qq.com</p>
       <p>微信：alsmile123</p>

@@ -38,11 +38,15 @@ canvas.render(data, true);
 
 [Todo]
 
+[→ Chinese docs](https://www.yuque.com/alsmile/topology/about)
+
 # Development
 
 ## Make your diagrams
 
 - Step 1:
+
+[→ Reference](https://github.com/le5le-com/topology/tree/master/libs/topology-flow-diagram/display)
 
 ```
 export function diagram(ctx: CanvasRenderingContext2D, node: Node) {
@@ -98,6 +102,7 @@ export function diagramAnchors(node: Node) {
 ```
 
 - Step 2:
+  [→ Reference](https://github.com/le5le-com/topology/blob/master/demo/index.js)
 
 ```
 // registerNode: Register a custom node.

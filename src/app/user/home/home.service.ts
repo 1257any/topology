@@ -93,4 +93,13 @@ export class UserHomeService {
 
     return true;
   }
+
+  async Del(id: string) {
+    const ret = await this.http.Delete('/api/user/topology/' + id);
+    if (ret.error) {
+      return false;
+    }
+
+    return true;
+  }
 }

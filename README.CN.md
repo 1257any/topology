@@ -38,6 +38,8 @@ canvas.render(data, true);
 
 [Todo]
 
+[→ 中文文档](https://www.yuque.com/alsmile/topology/about)
+
 # 开发
 
 ## 扩展定制自己的图
