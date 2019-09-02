@@ -102,7 +102,8 @@ export function diagramAnchors(node: Node) {
 ```
 
 - Step 2:
-  [→ Reference](https://github.com/le5le-com/topology/blob/master/demo/index.js)
+
+[→ Reference](https://github.com/le5le-com/topology/blob/master/demo/index.js)
 
 ```
 // registerNode: Register a custom node.
